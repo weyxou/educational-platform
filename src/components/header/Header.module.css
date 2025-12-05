@@ -1,0 +1,114 @@
+/* Header.module.css */
+.header {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #EEEEEE;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #1A1A1A;
+}
+
+.logo svg {
+  width: 2rem;
+  height: 2rem;
+  fill: #FF9500;
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav a {
+  color: #555;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav a:hover {
+  color: #1A1A1A;
+}
+
+.auth {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.authButtons {
+    display: flex;
+    gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.signup {
+  border: 1.5px solid #EEEEEE;
+  color: #555;
+    padding: 1rem 1.5rem;       /* увеличивает размер кнопки */
+
+}
+
+.signup:hover {
+  background: #4E56C0;
+  color: white;
+}
+
+.login {
+  background: #4E56C0;
+  color: white;
+  padding: 1rem 2rem;       /* увеличивает размер кнопки */
+
+}
+
+.login:hover {
+  background: white;
+  color: #1A1A1A;
+}
+
+/* Активная ссылка в навигации */
+.nav a.active {
+  color: #2563eb;
+  font-weight: 600;
+  position: relative;
+}
+
+.nav a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #2563eb;
+  border-radius: 2px;
+}
+
+/* Или если хочешь просто подчёркивание без анимации */
+.nav a {
+  color: #4b5563;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+  position: relative;
+}
+
+.nav a:hover {
+  color: #2563eb;
+}

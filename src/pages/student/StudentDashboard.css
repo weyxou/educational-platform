@@ -1,0 +1,141 @@
+/* src/pages/student/StudentDashboard.css */
+
+.dashboard-container {
+  min-height: 100vh;
+  background: #f9fafb;
+  padding: 4rem 2rem;
+}
+
+.dashboard-header {
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.dashboard-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.user-name {
+  color: #2563eb;
+}
+
+.logout-btn {
+  padding: 0.85rem 2rem;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-2px);
+}
+
+/* Сетка карточек */
+.stats-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1.2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.courses-icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.deadline-icon {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.notif-icon {
+  background: #d1fae5;
+  color: #10b981;
+}
+
+.stat-content h3 {
+  font-size: 1.3rem;
+  color: #475569;
+  margin: 0 0 0.5rem 0;
+}
+
+.stat-number {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+  color: #1f2937;
+}
+
+.stat-number.green {
+  color: #10b981;
+}
+
+.deadline-text {
+  font-size: 1.2rem;
+  color: #dc2626;
+  font-weight: 500;
+  margin: 0.8rem 0;
+}
+
+.stat-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+
+.stat-link:hover {
+  text-decoration: underline;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .dashboard-title {
+    font-size: 2.2rem;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
