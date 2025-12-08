@@ -1,91 +1,99 @@
-// src/pages/LoginPage.jsx
-import { Link } from 'react-router-dom'
-import './auth.css'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import './auth.css';
+
+const API_BASE = 'http://localhost:8090';
 
 export default function LoginPage() {
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  // ТЕСТОВЫЙ ВХОД — просто нажми кнопку
-  const handleTestLogin = (role) => {
-    const testUser = {
-      email: role === 'student' ? 'student@example.com' : 'teacher@example.com',
-      role: role
-    };
-    localStorage.setItem('user', JSON.stringify(testUser));
-    window.location.href = '/dashboard';
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          password: formData.password
+        })
+      });
+
+      // Получаем ответ (JSON или текст)
+      let data;
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        data = await res.text();
+      }
+
+      if (!res.ok) {
+        setError(typeof data === "string" ? data : data.message || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      // Формируем объект user на фронте
+      const user = {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        userId: data.userId,
+        role: data.userType // бэкенд возвращает userType
+      };
+
+      login(user, data.token);
+
+      navigate(user.role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard');
+
+    } catch (err) {
+      console.error(err);
+      setError('Server not responding (port 8090?)');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1 className="auth-title">Educational Platform</h1>
-        <p className="auth-subtitle">Sign in to your account</p>
-
-        <form>
-          <div className="form-group">
-            <label>Email Address</label>
-            <input type="email" placeholder="you@example.com" required />
-          </div>
-
-          <div className="form-group">
-            <label>Password</label>
-            <input type="password" placeholder="••••••••" required />
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center' }}>
-              <input type="checkbox" style={{ marginRight: '0.5rem' }} />
-              Remember me
-            </label>
-            <a href="#" className="text-link">Forgot password?</a>
-          </div>
-
-          <button type="submit" className="btn-primary">
-            Sign In
+        <h1>Login</h1>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-
-        {/* ТЕСТОВЫЕ КНОПКИ */}
-        <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-          <button
-            onClick={() => handleTestLogin('student')}
-            style={{
-              padding: '14px',
-              background: '#10b981',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.75rem',
-              fontSize: '1.1rem',
-              fontWeight: '600',
-              cursor: 'pointer'
-            }}
-          >
-            Войти как студент (тест)
-          </button>
-
-          <button
-            onClick={() => handleTestLogin('instructor')}
-            style={{
-              padding: '14px',
-              background: '#8b5cf6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.75rem',
-              fontSize: '1.1rem',
-              fontWeight: '600',
-              cursor: 'pointer'
-            }}
-          >
-            Войти как преподаватель (тест)
-          </button>
-        </div>
-
-        <div className="divider"><span>Or</span></div>
-
-        <p style={{ textAlign: 'center', color: '#6b7280' }}>
-          Don't have an account?{' '}
-          <Link to="/register" className="text-link">Sign up</Link>
-        </p>
+        <p>No account? <Link to="/register">Register</Link></p>
       </div>
     </div>
-  )
+  );
 }

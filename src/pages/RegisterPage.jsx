@@ -1,56 +1,158 @@
-// src/pages/RegisterPage.jsx
-import { Link } from 'react-router-dom'
-import './auth.css';    // ← вот так правильно
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import './auth.css';
+
+const API_BASE = 'http://localhost:8090';
 
 export default function RegisterPage() {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    role: 'student'
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login, authFetch } = useAuth();
+  const navigate = useNavigate();
+
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleRoleChange = (role) =>
+    setFormData((prev) => ({ ...prev, role }));
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setLoading(true);
+
+  if (formData.password.length < 6) {
+    setError('Password must be at least 6 characters');
+    setLoading(false);
+    return;
+  }
+
+  const payload = {
+    email: formData.email.trim(),
+    password: formData.password,
+    role: formData.role === 'student' ? 'STUDENT' : 'INSTRUCTOR'
+  };
+
+  try {
+    const response = await fetch(`${API_BASE}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    // Проверка типа ответа
+    let data;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+
+    if (!response.ok) {
+      setError(typeof data === "string" ? data : data.message || 'Registration failed');
+      setLoading(false);
+      return;
+    }
+
+    data.user.role = data.user.role?.role || data.user.role;
+    login(data.user, data.token);
+
+    if (formData.firstName || formData.lastName) {
+      try {
+        await authFetch(`${API_BASE}/users/${data.user.userId}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            firstName: formData.firstName.trim(),
+            lastName: formData.lastName.trim()
+          })
+        });
+      } catch (err) {
+        console.warn('Failed to update profile:', err);
+      }
+    }
+
+    navigate(data.user.role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard');
+
+  } catch (err) {
+    console.error(err);
+    setError('Server not responding (port 8090?)');
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1 className="auth-title">Educational Platform</h1>
-        <p className="auth-subtitle">Create your account</p>
-
-        <form>
-          <div className="form-group">
-            <label>Email Address</label>
-            <input type="email" placeholder="you@example.com" required />
+        <h1>Create Account</h1>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <input
+            name="firstName"
+            placeholder="First Name"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+          />
+          <input
+            name="lastName"
+            placeholder="Last Name"
+            value={formData.lastName}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <div>
+            <label>
+              <input
+                type="radio"
+                checked={formData.role === 'student'}
+                onChange={() => handleRoleChange('student')}
+              />
+              Student
+            </label>
+            <label>
+              <input
+                type="radio"
+                checked={formData.role === 'instructor'}
+                onChange={() => handleRoleChange('instructor')}
+              />
+              Instructor
+            </label>
           </div>
-
-          <div className="form-group">
-            <label>Password</label>
-            <input type="password" placeholder="Minimum 6 characters" required />
-          </div>
-
-          <div className="form-group">
-            <label>Confirm Password</label>
-            <input type="password" required />
-          </div>
-
-          <div className="form-group">
-            <label>I am registering as</label>
-            <div className="role-options">
-              <label className="role-card selected">
-                <input type="radio" name="role" value="student" defaultChecked />
-                <div className="text-3xl mb-2">Student</div>
-                <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>Student</div>
-              </label>
-              <label className="role-card">
-                <input type="radio" name="role" value="instructor" />
-                <div className="text-3xl mb-2">Teacher</div>
-                <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>Instructor</div>
-              </label>
-            </div>
-          </div>
-
-          <button type="submit" className="btn-primary">
-            Create Account
+          <button type="submit" disabled={loading}>
+            {loading ? 'Creating...' : 'Create Account'}
           </button>
         </form>
-
-        <p style={{ textAlign: 'center', marginTop: '2rem', color: '#6b7280' }}>
-          Already have an account?{' '}
-          <Link to="/login" className="text-link">Sign in</Link>
+        <p>
+          Already have an account? <Link to="/login">Sign in</Link>
         </p>
       </div>
     </div>
-  )
+  );
 }

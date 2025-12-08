@@ -1,4 +1,4 @@
-// src/App.jsx — финальная версия с реальным InstructorDashboard
+// src/App.jsx
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -6,7 +6,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 // Компоненты
 import Header from './components/header/Header';
 import Footer from './components/footer/Footer';
-import Benefits from './components/benefits/Benefirs';
+import Benefits from './components/benefits/Benefits';
 import Courses from './components/courses/Courses';
 import AboutUs from './components/aboutus/AboutUs';
 import Contact from './components/contact/Contact';
@@ -15,9 +15,9 @@ import Contact from './components/contact/Contact';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import StudentDashboard from './pages/student/StudentDashboard';
-import InstructorDashboard from './pages/instructor/InstructorDashboard'; // ← НОВОЕ
+import InstructorDashboard from './pages/instructor/InstructorDashboard';
 
-// Заглушки
+// Заглушка для всех курсов
 const AllCoursesPage = () => (
   <div style={{ padding: '150px', textAlign: 'center', fontSize: '2.5rem' }}>
     Все курсы — скоро здесь
@@ -25,52 +25,62 @@ const AllCoursesPage = () => (
 );
 
 // Защищённый роут
-function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+function ProtectedRoute({ children, requiredRole }) {
+  const { user, loading, role } = useAuth();
+
   if (loading) return <div style={{ padding: '150px', textAlign: 'center' }}>Загрузка...</div>;
-  return user ? children : <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace />;
+  if (requiredRole && role !== requiredRole) return <Navigate to="/" replace />;
+
+  return children;
 }
 
 // Только для незалогиненных
 function PublicRoute({ children }) {
-  const { user } = useAuth();
-  return user ? <Navigate to="/dashboard" replace /> : children;
+  const { user, role } = useAuth();
+  if (user) {
+    return <Navigate to={role === "STUDENT" ? "/student/dashboard" : "/instructor/dashboard"} replace />;
+  }
+  return children;
 }
 
 // Главный контент
 function AppContent() {
-  const { user } = useAuth();
+  const isDashboard = window.location.pathname.includes('/dashboard');
 
   return (
     <>
-      {/* Хедер показываем везде, кроме дашбордов — там будет свой */}
-      {!user || !window.location.pathname.startsWith('/dashboard') ? <Header /> : null}
+      {/* Хедер/футер скрываем на дашбордах */}
+      {!isDashboard && <Header />}
 
       <main>
         <Routes>
-          {/* Публичные */}
-          <Route path="/courses" element={<Courses/>} />
-          <Route path="/about" element={<AboutUs />} />   
-          <Route path='/contact' element={<Contact />}  />
-          <Route path="/" element={<><Benefits/></>} />
+          {/* Публичные страницы */}
+          <Route path="/benefits" element={<Benefits />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+          <Route path="/all-courses" element={<AllCoursesPage />} />
 
-
-          {/* Защищённые — один роут /dashboard автоматически выбирает нужный дашборд */}
+          {/* Защищённые дашборды */}
           <Route
-            path="/dashboard"
+            path="/student/dashboard"
             element={
-              <ProtectedRoute>
-                {user?.role === 'instructor'
-                  ? <InstructorDashboard />
-                  : <StudentDashboard />
-                }
+              <ProtectedRoute requiredRole="STUDENT">
+                <StudentDashboard />
               </ProtectedRoute>
             }
           />
-
-          <Route path="/courses" element={<AllCoursesPage />} />
+          <Route
+            path="/instructor/dashboard"
+            element={
+              <ProtectedRoute requiredRole="INSTRUCTOR">
+                <InstructorDashboard />
+              </ProtectedRoute>
+            }
+          />
 
           {/* 404 */}
           <Route path="*" element={
@@ -81,8 +91,7 @@ function AppContent() {
         </Routes>
       </main>
 
-      {/* Футер тоже прячем на дашбордах */}
-      {!user || !window.location.pathname.startsWith('/dashboard') ? <Footer /> : null}
+      {!isDashboard && <Footer />}
     </>
   );
 }

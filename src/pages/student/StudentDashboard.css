@@ -1,24 +1,23 @@
-/* src/pages/student/StudentDashboard.css */
-
+/* General container */
 .dashboard-container {
-  min-height: 100vh;
-  background: #f9fafb;
-  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #f4f5f7;
+  font-family: 'Inter', sans-serif;
 }
 
+/* Header */
 .dashboard-header {
-  max-width: 1200px;
-  margin: 0 auto 3rem auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 2rem;
   flex-wrap: wrap;
-  gap: 1rem;
 }
 
-.dashboard-title {
-  font-size: 2.8rem;
-  font-weight: 700;
+.dashboard-header h1 {
+  font-size: 2rem;
   color: #111827;
 }
 
@@ -27,12 +26,11 @@
 }
 
 .logout-btn {
-  padding: 0.85rem 2rem;
-  background: #dc2626;
+  background: #ef4444;
   color: white;
   border: none;
-  border-radius: 0.75rem;
-  font-size: 1rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -40,102 +38,144 @@
 
 .logout-btn:hover {
   background: #b91c1c;
-  transform: translateY(-2px);
 }
 
-/* Сетка карточек */
-.stats-grid {
-  max-width: 1200px;
-  margin: 0 auto;
+/* Courses */
+.courses-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
-}
-
-.stat-card {
-  background: white;
-  padding: 2rem;
-  border-radius: 1.2rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
-  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.stat-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+.course-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.stat-icon {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  flex-shrink: 0;
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
-.courses-icon {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-.deadline-icon {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.notif-icon {
-  background: #d1fae5;
-  color: #10b981;
-}
-
-.stat-content h3 {
-  font-size: 1.3rem;
-  color: #475569;
-  margin: 0 0 0.5rem 0;
-}
-
-.stat-number {
-  font-size: 3.5rem;
-  font-weight: 700;
+.progress-bar {
+  background: #e5e7eb;
+  border-radius: 0.5rem;
+  height: 10px;
   margin: 0.5rem 0;
-  color: #1f2937;
+  width: 100%;
 }
 
-.stat-number.green {
-  color: #10b981;
+.progress {
+  background: #2563eb;
+  height: 100%;
+  border-radius: 0.5rem;
 }
 
-.deadline-text {
-  font-size: 1.2rem;
-  color: #dc2626;
+.continue-btn {
+  margin-top: 0.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
   font-weight: 500;
-  margin: 0.8rem 0;
 }
 
-.stat-link {
-  color: #2563eb;
-  font-weight: 600;
-  text-decoration: none;
-  font-size: 1.05rem;
+.continue-btn:hover {
+  background: #1e40af;
 }
 
-.stat-link:hover {
-  text-decoration: underline;
+/* Profile */
+.profile-section {
+  margin-top: 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
-/* Адаптивность */
+.profile-section h2 {
+  margin-bottom: 1rem;
+}
+
+.profile-actions {
+  margin-top: 1rem;
+}
+
+.action-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background: #1e40af;
+}
+
+/* Achievements */
+.achievements-section {
+  margin-top: 2rem;
+}
+
+.achievements-section h2 {
+  margin-bottom: 1rem;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.achievement-card {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.achievement-card:hover {
+  transform: translateY(-5px);
+}
+
+.badge {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .dashboard-title {
-    font-size: 2.2rem;
+  .dashboard-header h1 {
+    font-size: 1.6rem;
   }
-  .stats-grid {
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .achievements-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .achievements-grid {
     grid-template-columns: 1fr;
   }
 }
