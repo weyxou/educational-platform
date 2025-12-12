@@ -23,7 +23,7 @@ export default function Header() {
 
         {/* Навигация */}
         <nav className={styles.nav}>
-          <Link to="/" className={isActive('/')}>
+          <Link to="/home" className={isActive('/home')}>
             Home
           </Link>
           <Link to="/courses" className={isActive('/courses')}>

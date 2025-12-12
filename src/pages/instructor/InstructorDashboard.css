@@ -2,6 +2,13 @@
   min-height: 100vh;
   background: #f8fafc;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 2rem 1rem;
+}
+
+/* ==================== КОНТЕЙНЕРЫ ==================== */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Header */
@@ -9,11 +16,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 0;
+  padding: 0 0 2rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 2.5rem;
 }
 
 .dashboard-header h1 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
   color: #111827;
 }
@@ -22,150 +31,380 @@
   background: #ef4444;
   color: white;
   border: none;
-  padding: 0.7rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 0.75rem 1.8rem;
+  border-radius: 9999px; /* полностью скруглённые углы как у Add New Course */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .logout-btn:hover {
-  background: #b91c1c;
+  background: #dc2626;
 }
 
-/* Courses */
+/* ==================== СЕКЦИЯ КУРСОВ ==================== */
 .courses-section {
   margin-top: 2rem;
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .section-header h3 {
-  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
   color: #1e293b;
+  margin: 0;
 }
 
 .quick-btn.primary {
   background: #6366f1;
   color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 10px;
+  padding: 0.75rem 1.8rem;
+  border-radius: 9999px;
   border: none;
   cursor: pointer;
   font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s;
 }
 
 .quick-btn.primary:hover {
   background: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
 }
 
-.courses-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+/* Сетка курсов */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
 }
 
+/* Карточка курса */
 .course-item {
-  padding: 1rem;
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  transition: all 0.2s;
 }
 
 .course-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
   border-color: #6366f1;
-  box-shadow: 0 4px 15px rgba(99,102,241,0.1);
 }
 
 .course-main {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
 
 .course-main h4 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
+  font-weight: 700;
   color: #1e293b;
 }
 
-.status-badge {
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
-.status-badge.active { background: #dcfce7; color: #166534; }
-.status-badge.archived { background: #fee2e2; color: #991b1b; }
-
 .course-meta {
   color: #64748b;
-  font-size: 0.9rem;
-  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.course-actions button {
-  margin-right: 0.5rem;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.85rem;
+/* КНОПКИ ДЕЙСТВИЙ — в стиле Add New Course */
+.course-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.course-actions .action-btn {
+  flex: 1;
+  padding: 10px 15px;
   border: none;
-  border-radius: 8px;
-  background: #f1f5f9;
+  border-radius: 10px;
+  font-weight: 300;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.2s;
+  text-align: center;
 }
 
-.course-actions button:hover {
+.btn-edit {
   background: #6366f1;
   color: white;
 }
 
-/* Other sections */
-.management-section, .stats-section, .profile-section {
-  margin-top: 2rem;
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+.btn-edit:hover {
+  background: #4f46e5;
 }
 
-.management-section h2, .stats-section h2, .profile-section h2 {
-  margin-bottom: 1rem;
+.btn-manage {
+  background: #10b981;
+  color: white;
+}
+
+.btn-manage:hover {
+  background: #059669;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+}
+
+/* Пустое состояние */
+.courses-grid + p {
+  text-align: center;
+  color: #64748b;
+  font-size: 1.1rem;
+  margin-top: 2rem;
+}
+
+/* ==================== ПРОФИЛЬ ==================== */
+.profile-section {
+  margin-top: 3rem;
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+}
+
+.profile-section h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
   color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.profile-section p {
+  color: #475569;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
 }
 
 .action-btn {
   background: #6366f1;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  padding: 0.75rem 1.8rem;
+  border-radius: 9999px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .action-btn:hover {
   background: #4f46e5;
 }
 
-/* Responsive */
+/* ==================== АДАПТИВНОСТЬ ==================== */
 @media (max-width: 768px) {
-  .dashboard-header {
+  .section-header {
     flex-direction: column;
     gap: 1rem;
+    align-items: stretch;
   }
 
-  .courses-list {
-    gap: 0.8rem;
+  .quick-btn.primary {
+    width: 100%;
   }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .course-actions {
+    flex-direction: column;
+  }
+
+  .course-actions .action-btn {
+    width: 100%;
+  }
+
+}
+
+/* ==================== МОДАЛЬНОЕ ОКНО ==================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Переиспользуем стили формы из CreateCourse */
+.course-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-input,
+.form-textarea {
+  padding: 0.85rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.btn {
+  padding: 0.75rem 1.8rem;
+  border: none;
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #6366f1;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #4f46e5;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.btn-secondary:hover {
+  background: #cbd5e1;
+}
+.lessons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.lesson-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: 0.2s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.lesson-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.lesson-thumb {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.lesson-info {
+  padding: 1rem;
+}
+
+.lesson-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.delete-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
 }

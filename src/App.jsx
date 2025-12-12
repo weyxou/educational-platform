@@ -1,6 +1,6 @@
 // src/App.jsx
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Компоненты
@@ -17,7 +17,10 @@ import RegisterPage from './pages/RegisterPage';
 import StudentDashboard from './pages/student/StudentDashboard';
 import InstructorDashboard from './pages/instructor/InstructorDashboard';
 
-// Заглушка для всех курсов
+// Новые страницы инструктора
+import ManageLessons from './pages/instructor/ManageLessons';
+
+// Заглушка для всех курсов (можно заменить на реальную страницу позже)
 const AllCoursesPage = () => (
   <div style={{ padding: '150px', textAlign: 'center', fontSize: '2.5rem' }}>
     Все курсы — скоро здесь
@@ -28,71 +31,110 @@ const AllCoursesPage = () => (
 function ProtectedRoute({ children, requiredRole }) {
   const { user, loading, role } = useAuth();
 
-  if (loading) return <div style={{ padding: '150px', textAlign: 'center' }}>Загрузка...</div>;
-  if (!user) return <Navigate to="/login" replace />;
-  if (requiredRole && role !== requiredRole) return <Navigate to="/" replace />;
-
-  return children;
-}
-
-// Только для незалогиненных
-function PublicRoute({ children }) {
-  const { user, role } = useAuth();
-  if (user) {
-    return <Navigate to={role === "STUDENT" ? "/student/dashboard" : "/instructor/dashboard"} replace />;
+  if (loading) {
+    return <div style={{ padding: '150px', textAlign: 'center' }}>Загрузка...</div>;
   }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (requiredRole && role !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }
 
-// Главный контент
-function AppContent() {
-  const isDashboard = window.location.pathname.includes('/dashboard');
+// Только для незалогиненных пользователей
+function PublicOnlyRoute({ children }) {
+  const { user, role } = useAuth();
+
+  if (user) {
+    const redirectTo = role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard';
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  return children;
+}
+
+// Обёртка для контента с условным хедером/футером
+function MainLayout({ children }) {
+  const location = useLocation();
+  const isDashboardRoute = location.pathname.includes('/dashboard') ||
+                           location.pathname.includes('/courses/') && location.pathname.includes('/lessons');
 
   return (
     <>
-      {/* Хедер/футер скрываем на дашбордах */}
-      {!isDashboard && <Header />}
+      {!isDashboardRoute && <Header />}
+      <main>{children}</main>
+      {!isDashboardRoute && <Footer />}
+    </>
+  );
+}
 
-      <main>
-        <Routes>
-          {/* Публичные страницы */}
-          <Route path="/benefits" element={<Benefits />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-          <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-          <Route path="/all-courses" element={<AllCoursesPage />} />
+// Основные роуты
+function AppContent() {
+  return (
+    <MainLayout>
+      <Routes>
+        {/* Главная страница и публичные роуты */}
+        <Route path="/" element={<Benefits />} />
+        <Route path="/home" element={<Benefits />} />
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/all-courses" element={<AllCoursesPage />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<Contact />} />
 
-          {/* Защищённые дашборды */}
-          <Route
-            path="/student/dashboard"
-            element={
-              <ProtectedRoute requiredRole="STUDENT">
-                <StudentDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/instructor/dashboard"
-            element={
-              <ProtectedRoute requiredRole="INSTRUCTOR">
-                <InstructorDashboard />
-              </ProtectedRoute>
-            }
-          />
+        {/* Авторизация */}
+        <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
+        <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
 
-          {/* 404 */}
-          <Route path="*" element={
-            <div style={{ padding: '150px', textAlign: 'center', fontSize: '3rem', minHeight: '100vh' }}>
+        {/* Дашборд студента */}
+        <Route
+          path="/student/dashboard"
+          element={
+            <ProtectedRoute requiredRole="STUDENT">
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Дашборд инструктора + связанные страницы */}
+        <Route
+          path="/instructor/dashboard"
+          element={
+            <ProtectedRoute requiredRole="INSTRUCTOR">
+              <InstructorDashboard />
+            </ProtectedRoute>
+          }
+        />
+  
+        <Route
+          path="/courses/:id/lessons"
+          element={
+            <ProtectedRoute requiredRole="INSTRUCTOR">
+              <ManageLessons />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 404 */}
+        <Route
+          path="*"
+          element={
+            <div style={{
+              padding: '150px',
+              textAlign: 'center',
+              fontSize: '3rem',
+              minHeight: '80vh'
+            }}>
               404 — Страница не найдена
             </div>
-          } />
-        </Routes>
-      </main>
-
-      {!isDashboard && <Footer />}
-    </>
+          }
+        />
+      </Routes>
+    </MainLayout>
   );
 }
 
