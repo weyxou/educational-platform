@@ -1,101 +1,118 @@
-import { Link, useNavigate } from 'react-router-dom';
+// src/pages/RegisterPage.jsx
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/api';  // ← используем твой axios-инстанс
 import './auth.css';
-
-const API_BASE = 'http://localhost:8090';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
     firstName: '',
     lastName: '',
-    role: 'student'
+    email: '',
+    password: '',
+    role: 'STUDENT' // по умолчанию студент
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, authFetch } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const handleRoleChange = (role) =>
-    setFormData((prev) => ({ ...prev, role }));
-
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
-
-  if (formData.password.length < 6) {
-    setError('Password must be at least 6 characters');
-    setLoading(false);
-    return;
-  }
-
-  const payload = {
-    email: formData.email.trim(),
-    password: formData.password,
-    role: formData.role === 'student' ? 'STUDENT' : 'INSTRUCTOR'
   };
 
-  try {
-    const response = await fetch(`${API_BASE}/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+  const handleRoleChange = (role) => {
+    setFormData((prev) => ({ ...prev, role }));
+  };
 
-    // Проверка типа ответа
-    let data;
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-    if (!response.ok) {
-      setError(typeof data === "string" ? data : data.message || 'Registration failed');
+    const trimmedData = {
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      email: formData.email.trim(),
+      password: formData.password,
+      role: formData.role
+    };
+
+    if (!trimmedData.firstName || !trimmedData.lastName || !trimmedData.email || !trimmedData.password) {
+      setError('All fields are required');
       setLoading(false);
       return;
     }
 
-    data.user.role = data.user.role?.role || data.user.role;
-    login(data.user, data.token);
-
-    if (formData.firstName || formData.lastName) {
-      try {
-        await authFetch(`${API_BASE}/users/${data.user.userId}`, {
-          method: 'PUT',
-          body: JSON.stringify({
-            firstName: formData.firstName.trim(),
-            lastName: formData.lastName.trim()
-          })
-        });
-      } catch (err) {
-        console.warn('Failed to update profile:', err);
-      }
+    if (trimmedData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setLoading(false);
+      return;
     }
 
-    navigate(data.user.role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard');
+    try {
+      // Основной запрос на регистрацию
+      const signupPayload = {
+        email: trimmedData.email,
+        password: trimmedData.password,
+        role: trimmedData.role  // "STUDENT" или "INSTRUCTOR"
+      };
 
-  } catch (err) {
-    console.error(err);
-    setError('Server not responding (port 8090?)');
-  } finally {
-    setLoading(false);
-  }
-};
+      const signupRes = await api.post('/auth/signup', signupPayload);
 
+      const data = signupRes.data;
+
+      // Формируем объект пользователя
+      const user = {
+        email: data.email || trimmedData.email,
+        firstName: trimmedData.firstName,
+        lastName: trimmedData.lastName,
+        userAccountId: data.userId || data.userAccountId || data.id,
+        role: data.userType || data.role || trimmedData.role
+      };
+
+      // Сохраняем токен и логинимся
+      if (data.token) {
+        localStorage.setItem('jwtToken', data.token);
+      }
+
+      login(user);
+
+      // Если бэкенд поддерживает firstName/lastName в AuthRequest — всё уже готово
+      // Если нет — обновляем профиль отдельно
+      if (data.userId || data.userAccountId) {
+        try {
+          await api.put(`/instructor/update_profile/${user.userAccountId || data.userId}`, {
+            firstName: trimmedData.firstName,
+            lastName: trimmedData.lastName
+          });
+          // Если студент — возможно другой эндпоинт, но пока предполагаем общий или instructor
+        } catch (profileErr) {
+          console.warn('Could not update profile names:', profileErr);
+          // Не критично — можно продолжить
+        }
+      }
+
+      // Редирект
+      navigate(user.role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard');
+
+    } catch (err) {
+      console.error('Registration error:', err);
+      const msg = err.response?.data?.message || err.response?.data || 'Registration failed';
+      setError(typeof msg === 'string' ? msg : 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
         <h1>Create Account</h1>
         {error && <div className="error-message">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           <input
             name="firstName"
@@ -122,34 +139,47 @@ export default function RegisterPage() {
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Password (min 6 characters)"
             value={formData.password}
             onChange={handleChange}
             required
           />
-          <div>
-            <label>
-              <input
-                type="radio"
-                checked={formData.role === 'student'}
-                onChange={() => handleRoleChange('student')}
-              />
-              Student
-            </label>
-            <label>
-              <input
-                type="radio"
-                checked={formData.role === 'instructor'}
-                onChange={() => handleRoleChange('instructor')}
-              />
-              Instructor
-            </label>
+
+          {/* Выбор роли */}
+          <div style={{ margin: '1.5rem 0', textAlign: 'center' }}>
+            <span style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600' }}>
+              Register as:
+            </span>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="STUDENT"
+                  checked={formData.role === 'STUDENT'}
+                  onChange={() => handleRoleChange('STUDENT')}
+                />
+                <span style={{ marginLeft: '0.5rem' }}>Student</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="INSTRUCTOR"
+                  checked={formData.role === 'INSTRUCTOR'}
+                  onChange={() => handleRoleChange('INSTRUCTOR')}
+                />
+                <span style={{ marginLeft: '0.5rem' }}>Instructor</span>
+              </label>
+            </div>
           </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Creating...' : 'Create Account'}
+
+          <button type="submit" disabled={loading} className="btn btn-primary">
+            {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
-        <p>
+
+        <p style={{ marginTop: '1.5rem' }}>
           Already have an account? <Link to="/login">Sign in</Link>
         </p>
       </div>
