@@ -11,13 +11,15 @@ import Courses from './components/courses/Courses';
 import AboutUs from './components/aboutus/AboutUs';
 import Contact from './components/contact/Contact';
 
+
 // Страницы
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import StudentDashboard from './pages/student/StudentDashboard';
 import InstructorDashboard from './pages/instructor/InstructorDashboard';
 import ManageLessons from './pages/instructor/ManageLessons';
-import CourseLessonsView from './common/CourseLessonsView'; // Новый импорт
+import CourseLessonsView from './common/CourseLessonsView'; 
+import LessonDetail from './common/LessonDetail';
 
 // Заглушка
 const AllCoursesPage = () => (
@@ -134,6 +136,12 @@ function AppContent() {
           </div>
         } />
       </Routes>
+
+{/* <Route path="/courses/:courseId/lesson/:lessonId" element={<LessonDetail />} /> */}
+
+
+
+
     </MainLayout>
   );
 }
