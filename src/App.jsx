@@ -16,11 +16,10 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import StudentDashboard from './pages/student/StudentDashboard';
 import InstructorDashboard from './pages/instructor/InstructorDashboard';
-
-// Новые страницы инструктора
 import ManageLessons from './pages/instructor/ManageLessons';
+import CourseLessonsView from './common/CourseLessonsView'; // Новый импорт
 
-// Заглушка для всех курсов (можно заменить на реальную страницу позже)
+// Заглушка
 const AllCoursesPage = () => (
   <div style={{ padding: '150px', textAlign: 'center', fontSize: '2.5rem' }}>
     Все курсы — скоро здесь
@@ -46,7 +45,7 @@ function ProtectedRoute({ children, requiredRole }) {
   return children;
 }
 
-// Только для незалогиненных пользователей
+// Только для незалогиненных
 function PublicOnlyRoute({ children }) {
   const { user, role } = useAuth();
 
@@ -58,27 +57,26 @@ function PublicOnlyRoute({ children }) {
   return children;
 }
 
-// Обёртка для контента с условным хедером/футером
+// Layout с условным хедером/футером
 function MainLayout({ children }) {
   const location = useLocation();
-  const isDashboardRoute = location.pathname.includes('/dashboard') ||
-                           location.pathname.includes('/courses/') && location.pathname.includes('/lessons');
+  const hideHeaderFooter = location.pathname.includes('/dashboard') ||
+                           location.pathname.includes('/courses/') && 
+                           (location.pathname.includes('/view') || location.pathname.includes('/lessons'));
 
   return (
     <>
-      {!isDashboardRoute && <Header />}
+      {!hideHeaderFooter && <Header />}
       <main>{children}</main>
-      {!isDashboardRoute && <Footer />}
+      {!hideHeaderFooter && <Footer />}
     </>
   );
 }
 
-// Основные роуты
 function AppContent() {
   return (
     <MainLayout>
       <Routes>
-        {/* Главная страница и публичные роуты */}
         <Route path="/" element={<Benefits />} />
         <Route path="/home" element={<Benefits />} />
         <Route path="/courses" element={<Courses />} />
@@ -90,7 +88,7 @@ function AppContent() {
         <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
         <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
 
-        {/* Дашборд студента */}
+        {/* Студент */}
         <Route
           path="/student/dashboard"
           element={
@@ -100,7 +98,7 @@ function AppContent() {
           }
         />
 
-        {/* Дашборд инструктора + связанные страницы */}
+        {/* Инструктор */}
         <Route
           path="/instructor/dashboard"
           element={
@@ -109,9 +107,9 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-  
+
         <Route
-          path="/courses/:id/lessons"
+          path="/courses/:courseId/lessons"
           element={
             <ProtectedRoute requiredRole="INSTRUCTOR">
               <ManageLessons />
@@ -119,20 +117,22 @@ function AppContent() {
           }
         />
 
-        {/* 404 */}
+        {/* Просмотр курса (доступен и студентам, и инструкторам) */}
         <Route
-          path="*"
+          path="/courses/:courseId/view"
           element={
-            <div style={{
-              padding: '150px',
-              textAlign: 'center',
-              fontSize: '3rem',
-              minHeight: '80vh'
-            }}>
-              404 — Страница не найдена
-            </div>
+            <ProtectedRoute>
+              <CourseLessonsView />
+            </ProtectedRoute>
           }
         />
+
+        {/* 404 */}
+        <Route path="*" element={
+          <div style={{ padding: '150px', textAlign: 'center', fontSize: '3rem', minHeight: '80vh' }}>
+            404 — Страница не найдена
+          </div>
+        } />
       </Routes>
     </MainLayout>
   );

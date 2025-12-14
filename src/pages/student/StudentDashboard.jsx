@@ -1,20 +1,31 @@
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import api from '../../api/api';
 import './StudentDashboard.css';
 
 export default function StudentDashboard() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  // Заглушки для данных (замените на реальные из API)
-  const courses = [
-    { id: 1, name: 'React Basics', progress: 60, lastLesson: 'Hooks' },
-    { id: 2, name: 'JavaScript Advanced', progress: 30, lastLesson: 'Promises' },
-    { id: 3, name: 'HTML & CSS', progress: 90, lastLesson: 'Flexbox' },
-  ];
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const achievements = [
-    { id: 1, title: 'React Novice', description: 'Completed first React course', badge: '🎓' },
-    { id: 2, title: 'JS Pro', description: 'Advanced JavaScript completed', badge: '🏆' },
-  ];
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await api.get('/course/all_courses');
+        setCourses(res.data); // 👈 ВСЕ курсы инструкторов
+      } catch (err) {
+        console.error(err);
+        alert('Failed to load courses');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   return (
     <div className="dashboard-container">
@@ -28,20 +39,32 @@ export default function StudentDashboard() {
 
       {/* Courses */}
       <section className="courses-section">
-        <h2>My Courses</h2>
-        <div className="courses-grid">
-          {courses.map(course => (
-            <div key={course.id} className="course-card">
-              <h3>{course.name}</h3>
-              <p>Last lesson: {course.lastLesson}</p>
-              <div className="progress-bar">
-                <div className="progress" style={{ width: `${course.progress}%` }}></div>
+        <h2>Available Courses</h2>
+
+        {loading ? (
+          <p>Loading courses...</p>
+        ) : (
+          <div className="courses-grid">
+            {courses.map(course => (
+              <div
+                key={course.courseId}
+                className="course-card"
+                onClick={() => navigate(`/courses/${course.courseId}/view`)}
+              >
+                <h3>{course.courseName}</h3>
+                {course.description && <p>{course.description}</p>}
+                <p><strong>Duration:</strong> {course.duration || 'N/A'}</p>
+                <button className="continue-btn">View Course</button>
               </div>
-              <p>{course.progress}% completed</p>
-              <button className="continue-btn">Continue</button>
-            </div>
-          ))}
-        </div>
+            ))}
+
+            {courses.length === 0 && (
+              <p style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
+                No courses available yet.
+              </p>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Profile */}
@@ -49,24 +72,6 @@ export default function StudentDashboard() {
         <h2>Profile</h2>
         <p><strong>Name:</strong> {user?.firstName || 'Student'}</p>
         <p><strong>Email:</strong> {user?.email}</p>
-        <div className="profile-actions">
-          <button className="action-btn">Change Password</button>
-          <button className="action-btn">Language Settings</button>
-        </div>
-      </section>
-
-      {/* Achievements */}
-      <section className="achievements-section">
-        <h2>Achievements</h2>
-        <div className="achievements-grid">
-          {achievements.map(a => (
-            <div key={a.id} className="achievement-card">
-              <div className="badge">{a.badge}</div>
-              <h4>{a.title}</h4>
-              <p>{a.description}</p>
-            </div>
-          ))}
-        </div>
       </section>
     </div>
   );

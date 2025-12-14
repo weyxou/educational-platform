@@ -1,18 +1,19 @@
 // src/pages/instructor/InstructorDashboard.jsx
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../api/api';
 import './InstructorDashboard.css';
 
 export default function InstructorDashboard() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Модалка создания курса
+  // Модалки
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newCourse, setNewCourse] = useState({
     courseName: '',
@@ -20,19 +21,16 @@ export default function InstructorDashboard() {
     duration: '',
   });
 
-  // Модалка редактирования курса
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
 
-  // Модалка редактирования профиля
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [profileForm, setProfileForm] = useState({
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileData, setProfileData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
-    email: user?.email || '',
+    school: user?.school || 'My School',
   });
 
-  // Загрузка курсов
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -51,7 +49,6 @@ export default function InstructorDashboard() {
     if (user?.userAccountId) fetchCourses();
   }, [user]);
 
-  // Создание курса
   const createCourse = async (e) => {
     e.preventDefault();
     try {
@@ -68,7 +65,6 @@ export default function InstructorDashboard() {
     }
   };
 
-  // Редактирование курса
   const openEditModal = (course) => {
     setEditingCourse({ ...course });
     setIsEditModalOpen(true);
@@ -86,27 +82,8 @@ export default function InstructorDashboard() {
     }
   };
 
-  // Редактирование профиля
-  const saveProfile = async (e) => {
-    e.preventDefault();
-    try {
-      const updateRequest = {
-        firstName: profileForm.firstName,
-        lastName: profileForm.lastName,
-        email: profileForm.email,
-      };
-      await api.put(`/instructor/update_profile/${user.userAccountId}`, updateRequest);
-      // Здесь можно обновить контекст аутентификации, если нужно
-      alert('Profile updated successfully!');
-      setIsProfileModalOpen(false);
-    } catch (err) {
-      alert('Failed to update profile');
-    }
-  };
-
-  // Удаление курса
   const deleteCourse = async (courseId) => {
-    if (!window.confirm('Delete this course?')) return;
+    if (!window.confirm('Delete this course? All lessons will be deleted.')) return;
     try {
       await api.delete(`/course/delete/course_id/${courseId}`);
       setCourses(courses.filter(c => c.courseId !== courseId));
@@ -139,26 +116,56 @@ export default function InstructorDashboard() {
         ) : (
           <div className="courses-grid">
             {courses.map(course => (
-              <div key={course.courseId} className="course-item">
+              <div
+                key={course.courseId}
+                className="course-item clickable-course-card"
+                onClick={() => navigate(`/courses/${course.courseId}/view`)} // Клик по карточке → просмотр
+              >
                 <div className="course-main">
                   <h4>{course.courseName}</h4>
                   <span className="status-badge active">Active</span>
                 </div>
                 <p className="course-meta">Duration: {course.duration || 'N/A'}</p>
-                <div className="course-actions">
-                  <button onClick={() => openEditModal(course)} className="action-btn btn-edit">
+
+                {/* Кнопки — отключаем переход по карточке */}
+                <div className="course-actions" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(course);
+                    }}
+                    className="action-btn btn-edit"
+                  >
                     Edit
                   </button>
+
                   <Link to={`/courses/${course.courseId}/lessons`}>
-                    <button className="action-btn btn-manage">Manage Lessons</button>
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="action-btn btn-manage"
+                    >
+                      Manage Lessons
+                    </button>
                   </Link>
-                  <button onClick={() => deleteCourse(course.courseId)} className="action-btn btn-delete">
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteCourse(course.courseId);
+                    }}
+                    className="action-btn btn-delete"
+                  >
                     Delete
                   </button>
                 </div>
               </div>
             ))}
-            {courses.length === 0 && <p>No courses yet. Create your first one!</p>}
+
+            {courses.length === 0 && (
+              <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#666' }}>
+                No courses yet. Create your first one!
+              </p>
+            )}
           </div>
         )}
       </section>
@@ -248,68 +255,11 @@ export default function InstructorDashboard() {
         </div>
       )}
 
-      {/* Модалка редактирования профиля */}
-      {isProfileModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsProfileModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Edit Profile</h2>
-            <form onSubmit={saveProfile} className="course-form">
-              <div className="form-group">
-                <label>First Name</label>
-                <input
-                  className="form-input"
-                  value={profileForm.firstName}
-                  onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Last Name</label>
-                <input
-                  className="form-input"
-                  value={profileForm.lastName}
-                  onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  className="form-input"
-                  type="email"
-                  value={profileForm.email}
-                  onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">Save Profile</button>
-                <button type="button" onClick={() => setIsProfileModalOpen(false)} className="btn btn-secondary">
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Profile Section */}
+      {/* Профиль (если нужно — добавишь сам) */}
       <section className="profile-section">
         <h2>Profile</h2>
-        <div className="profile-info">
-          <p><strong>Name:</strong> {user?.firstName} {user?.lastName}</p>
-          <p><strong>Email:</strong> {user?.email}</p>
-        </div>
-        <button onClick={() => {
-          setProfileForm({
-            firstName: user?.firstName || '',
-            lastName: user?.lastName || '',
-            email: user?.email || '',
-          });
-          setIsProfileModalOpen(true);
-        }} className="action-btn">
-          Edit Profile
-        </button>
+        <p><strong>Name:</strong> {user?.firstName} {user?.lastName}</p>
+        <p><strong>Email:</strong> {user?.email}</p>
       </section>
     </div>
   );

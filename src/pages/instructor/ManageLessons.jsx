@@ -5,7 +5,7 @@ import api from '../../api/api';
 import './InstructorDashboard.css';
 
 export default function ManageLessons() {
-  const { id: courseId } = useParams();
+  const { courseId } = useParams();
   const navigate = useNavigate();
   const [lessons, setLessons] = useState([]);
 
@@ -13,8 +13,7 @@ export default function ManageLessons() {
   const [newLesson, setNewLesson] = useState({
     title: '',
     content: '',
-    youtubeUrl: '',
-    status: 'Draft' // по умолчанию Draft
+    youtubeUrl: ''
   });
 
   // Модалка редактирования
@@ -23,7 +22,7 @@ export default function ManageLessons() {
 
   // Загрузка уроков
   useEffect(() => {
-    api.get(`/lesson/get_all_lessons/${courseId}`)
+    api.get(`/lesson/get_all_lessons/${Number(courseId)}`)
       .then(res => setLessons(res.data))
       .catch(err => {
         console.error(err);
@@ -33,7 +32,7 @@ export default function ManageLessons() {
 
   // Валидация YouTube URL
   const isValidYouTubeUrl = (url) => {
-    if (!url) return true; // опционально — разрешено пустое
+    if (!url) return true;
     const regExp = /^(https?:\/\/)?(www\.)?(youtube\.com\/(embed\/|watch\?v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
     return regExp.test(url.trim());
   };
@@ -68,13 +67,12 @@ export default function ManageLessons() {
         lessonName: newLesson.title.trim(),
         content: newLesson.content.trim() || null,
         youtubeUrl: newLesson.youtubeUrl.trim() || null,
-        status: newLesson.status,
         courseId: Number(courseId)
       };
 
       const res = await api.post('/lesson/add_lesson', dto);
       setLessons([...lessons, res.data]);
-      setNewLesson({ title: '', content: '', youtubeUrl: '', status: 'Draft' });
+      setNewLesson({ title: '', content: '', youtubeUrl: '' });
     } catch (err) {
       console.error(err);
       alert('Failed to add lesson');
@@ -100,15 +98,14 @@ export default function ManageLessons() {
         lessonName: editingLesson.lessonName.trim(),
         content: editingLesson.content?.trim() || null,
         youtubeUrl: editingLesson.youtubeUrl?.trim() || null,
-        status: editingLesson.status || 'Draft',
         courseId: Number(courseId)
       };
 
       await api.put(`/lesson/update/lesson_id/${editingLesson.lessonId}`, updatedDto);
 
-      setLessons(lessons.map(l => 
-        l.lessonId === editingLesson.lessonId 
-          ? { ...l, ...updatedDto } 
+      setLessons(lessons.map(l =>
+        l.lessonId === editingLesson.lessonId
+          ? { ...l, ...updatedDto }
           : l
       ));
       setIsEditModalOpen(false);
@@ -124,7 +121,7 @@ export default function ManageLessons() {
     if (!window.confirm('Delete this lesson?')) return;
 
     try {
-      await api.delete(`/lesson/delete/lesson_id/${lessonId}/course_id/${courseId}`);
+      await api.delete(`/lesson/delete/lesson_id/${lessonId}/course_id/${Number(courseId)}`);
       setLessons(lessons.filter(l => l.lessonId !== lessonId));
     } catch (err) {
       console.error(err);
@@ -175,22 +172,8 @@ export default function ManageLessons() {
               />
             </div>
 
-            <div className="form-group">
-              <label>Status</label>
-              <select
-                className="form-input"
-                value={newLesson.status}
-                onChange={(e) => setNewLesson({ ...newLesson, status: e.target.value })}
-              >
-                <option value="Draft">Draft</option>
-                <option value="Published">Published</option>
-              </select>
-            </div>
-
             <div className="form-actions">
-              <button onClick={createLesson} className="btn btn-primary">
-                Add Lesson
-              </button>
+              <button onClick={createLesson} className="btn btn-primary">Add Lesson</button>
             </div>
           </div>
         </section>
@@ -212,7 +195,6 @@ export default function ManageLessons() {
 
                 return (
                   <div key={lesson.lessonId} className="course-item">
-                    {/* Thumbnail или заглушка */}
                     <div
                       className="course-thumb"
                       style={{
@@ -259,9 +241,6 @@ export default function ManageLessons() {
 
                     <div className="course-main" style={{ padding: '1rem' }}>
                       <h4 style={{ margin: 0, fontSize: '1.2rem' }}>{lesson.lessonName}</h4>
-                      <span className={`status-badge ${lesson.status === 'Published' ? 'active' : 'inactive'}`}>
-                        {lesson.status || 'Draft'}
-                      </span>
                     </div>
 
                     <div className="course-actions" style={{ padding: '0 1rem 1rem', display: 'flex', gap: '0.5rem' }}>
@@ -318,18 +297,6 @@ export default function ManageLessons() {
                     value={editingLesson.youtubeUrl || ''}
                     onChange={(e) => setEditingLesson({ ...editingLesson, youtubeUrl: e.target.value })}
                   />
-                </div>
-
-                <div className="form-group">
-                  <label>Status</label>
-                  <select
-                    className="form-input"
-                    value={editingLesson.status || 'Draft'}
-                    onChange={(e) => setEditingLesson({ ...editingLesson, status: e.target.value })}
-                  >
-                    <option value="Draft">Draft</option>
-                    <option value="Published">Published</option>
-                  </select>
                 </div>
 
                 <div className="form-actions">
