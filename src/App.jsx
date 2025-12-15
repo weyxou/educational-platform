@@ -20,6 +20,7 @@ import InstructorDashboard from './pages/instructor/InstructorDashboard';
 import ManageLessons from './pages/instructor/ManageLessons';
 import CourseLessonsView from './common/CourseLessonsView'; 
 import LessonDetail from './common/LessonDetail';
+import CourseDetailPage from './components/courses/CourseDetailPage';
 
 // Заглушка
 const AllCoursesPage = () => (
@@ -135,9 +136,30 @@ function AppContent() {
             404 — Страница не найдена
           </div>
         } />
+
+
+        {/* Детальный просмотр урока */}
+<Route
+  path="/courses/:courseId/lesson/:lessonId"
+  element={
+    <ProtectedRoute>
+      <LessonDetail />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/courses/:courseId/detail"
+  element={
+    <>
+      <CourseDetailPage />
+    </>
+  }
+/>
+
+
       </Routes>
 
-{/* <Route path="/courses/:courseId/lesson/:lessonId" element={<LessonDetail />} /> */}
+
 
 
 

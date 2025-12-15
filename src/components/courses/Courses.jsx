@@ -4,26 +4,26 @@ import { Link } from "react-router-dom";
 import api from '../../api/api';
 import "./Courses.css";
 
-const Courses = () => {
+const AllCoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
+  // Категории должны точно совпадать с тем, что возвращает API
   const categories = [
     { value: "all", label: "All Courses" },
-    { value: "frontend", label: "Frontend" },
-    { value: "backend", label: "Backend" },
-    { value: "data", label: "Data Science" },
-    { value: "design", label: "Design" },
-    { value: "security", label: "Security" },
+    { value: "Frontend", label: "Frontend" },
+    { value: "Backend", label: "Backend" },
+    { value: "Data Science", label: "Data Science" },
+    { value: "Design", label: "Design" },
+    { value: "Security", label: "Security" },
   ];
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await api.get("/course/all_courses"); // эндпоинт бэкенда
-        // фильтруем только курсы с инструктором
+        const res = await api.get("/course/all_courses"); // эндпоинт API
         const instructorCourses = res.data.filter(course => course.instructorName);
         setCourses(instructorCourses);
       } catch (err) {
@@ -38,12 +38,17 @@ const Courses = () => {
   }, []);
 
   const filteredCourses = courses.filter(course => {
-    const matchesSearch =
-      course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (course.instructorName && course.instructorName.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === "all" || course.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const matchesSearch =
+    course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (course.instructorName && course.instructorName.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const matchesCategory =
+    selectedCategory === "all" ||
+    (course.category && course.category.toLowerCase() === selectedCategory.toLowerCase());
+
+  return matchesSearch && matchesCategory;
+});
+
 
   if (loading) return <div className="loading">Loading courses...</div>;
 
@@ -81,10 +86,9 @@ const Courses = () => {
           <div className="courses-grid">
             {filteredCourses.length > 0 ? (
               filteredCourses.map(course => (
-                // Ссылка ведет на страницу детальной информации курса
                 <Link
-                  to={`/courses/${course.courseId}/detail`}
-                  key={course.courseId}
+                  to={`/courses/${course.id}/detail`} // Ссылка на детальную страницу курса
+                  key={course.id}
                   className="course-square"
                 >
                   <div className="course-square-inner">
@@ -118,4 +122,4 @@ const Courses = () => {
   );
 };
 
-export default Courses;
+export default AllCoursesPage;

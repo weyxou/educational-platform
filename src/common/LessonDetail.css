@@ -1,0 +1,204 @@
+.lesson-detail-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+  min-height: 100vh;
+}
+
+/* 🔙 Кнопка "Назад к курсу" — теперь большая и заметная */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  padding: 0.9rem 1.8rem;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white !important;
+  font-weight: 600;
+  font-size: 1.15rem;               /* Увеличил шрифт */
+  text-decoration: none;
+  border-radius: 1.2rem;
+  box-shadow: 
+    0 8px 20px rgba(99, 102, 241, 0.3),
+    0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.back-link:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 12px 28px rgba(99, 102, 241, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+}
+
+.back-link:active {
+  transform: translateY(-1px);
+}
+
+.back-link::before {
+  content: '←';
+  font-size: 1.6rem;                /* Иконка стала крупнее */
+  font-weight: bold;
+}
+
+/* 🎥 Видео контейнер */
+.video-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 2.5rem;
+  border-radius: 1.4rem;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 
+    0 16px 32px -8px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.video-container:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 24px 48px -10px rgba(0, 0, 0, 0.25),
+    0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.video-container iframe {
+  width: 100%;
+  height: 450px;
+  display: block;
+  border: none;
+}
+
+/* 📘 Информация урока */
+.lesson-info {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.lesson-info h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.lesson-description {
+  font-size: 1.15rem;
+  color: #475569;
+  margin-bottom: 2rem;
+  line-height: 1.65;
+}
+
+/* 📝 Контент урока */
+.lesson-content {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 1.4rem;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #334155;
+  box-shadow: 
+    0 8px 24px -6px rgba(0, 0, 0, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  white-space: pre-line;
+  transition: all 0.3s ease;
+}
+
+.lesson-content:hover {
+  box-shadow: 
+    0 16px 32px -8px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-3px);
+}
+
+/* ⏳ Загрузка и ошибка */
+.loading,
+.not-found {
+  text-align: center;
+  padding: 6rem 2rem;
+  font-size: 1.4rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.loading::after {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 36px;
+  margin: 1.5rem auto 0;
+  border: 4px solid #e2e8f0;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 📱 Адаптив */
+@media (max-width: 992px) {
+  .video-container {
+    max-width: 700px;
+  }
+  .video-container iframe {
+    height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .lesson-detail-container {
+    padding: 2rem 1rem 4rem;
+  }
+
+  .back-link {
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 1rem;
+  }
+
+  .back-link::before {
+    font-size: 1.5rem;
+  }
+
+  .video-container {
+    max-width: 100%;
+    border-radius: 1rem;
+  }
+
+  .video-container iframe {
+    height: 320px;
+  }
+
+  .lesson-info h1 {
+    font-size: 2.1rem;
+  }
+
+  .lesson-content {
+    padding: 1.6rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-container iframe {
+    height: 240px;
+  }
+
+  .lesson-info h1 {
+    font-size: 1.9rem;
+  }
+
+  .back-link {
+    font-size: 1.05rem;
+    padding: 0.75rem 1.4rem;
+  }
+}

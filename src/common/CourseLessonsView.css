@@ -1,95 +1,157 @@
 .course-view-container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem 1rem;
-  font-family: 'Inter', sans-serif;
+  padding: 2.5rem 1.5rem 5rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+  min-height: 100vh;
 }
 
+/* 🔙 Большая кнопка "Назад" — как в LessonDetail */
 .back-link {
-  display: inline-block;
-  margin-bottom: 1.5rem;
-  color: #6366f1;
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  padding: 0.9rem 1.8rem;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white !important;
   font-weight: 600;
+  font-size: 1.15rem;
+  text-decoration: none;
+  border-radius: 1.2rem;
+  box-shadow: 
+    0 8px 20px rgba(99, 102, 241, 0.3),
+    0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .back-link:hover {
-  text-decoration: underline;
+  transform: translateY(-4px);
+  box-shadow: 
+    0 12px 28px rgba(99, 102, 241, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
 }
 
+.back-link::before {
+  content: '←';
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+/* 📚 Заголовок курса */
 .course-header {
   text-align: center;
-  margin-bottom: 3rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 3.5rem;
 }
 
 .course-header h1 {
   font-size: 2.8rem;
+  font-weight: 800;
   color: #1e293b;
   margin: 0 0 1rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .course-desc {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   color: #475569;
-  max-width: 700px;
-  margin: 0 auto 1rem;
+  max-width: 760px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.7;
 }
 
 .course-duration {
-  background: #eef2ff;
+  display: inline-block;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
   color: #4f46e5;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.4rem;
   border-radius: 2rem;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.15);
 }
 
+/* 📝 Список уроков */
 .lessons-list h2 {
-  font-size: 2rem;
+  font-size: 2.2rem;
+  font-weight: 700;
   color: #1e293b;
-  margin-bottom: 2rem;
   text-align: center;
+  margin-bottom: 2.5rem;
 }
 
+/* Карточки уроков — сетка */
 .lessons-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 2rem;
 }
 
 .lesson-card {
   background: white;
-  border-radius: 1.5rem;
+  border-radius: 1.6rem;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0.1);
+  box-shadow: 
+    0 10px 25px -8px rgba(0, 0, 0, 0.1),
+    0 4px 10px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .lesson-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  box-shadow: 
+    0 20px 40px -12px rgba(0, 0, 0, 0.15),
+    0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Номер урока */
 .lesson-number {
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: white;
-  padding: 0.8rem 1.5rem;
+  padding: 1rem 1.6rem;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
+/* Заголовок урока */
 .lesson-card h3 {
-  padding: 1.5rem 1.5rem 1rem;
+  padding: 1.6rem 1.6rem 0.8rem;
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   color: #1e293b;
+  font-weight: 600;
 }
 
+/* Бейдж статуса (только для инструктора) */
+.status-badge {
+  display: inline-block;
+  margin: 0 1.6rem 1rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Миниатюра видео */
 .video-thumbnail {
   position: relative;
-  height: 200px;
+  height: 220px;
   overflow: hidden;
 }
 
@@ -97,6 +159,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.lesson-card:hover .video-thumbnail img {
+  transform: scale(1.08);
 }
 
 .play-icon {
@@ -104,39 +171,142 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
-  background: rgba(255,255,255,0.9);
+  width: 84px;
+  height: 84px;
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   color: #6366f1;
-  backdrop-filter: blur(5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
 }
 
+.lesson-card:hover .play-icon {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Без видео */
 .no-video {
-  height: 200px;
-  background: #f1f5f9;
+  height: 220px;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #64748b;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 500;
 }
 
+/* Превью текста */
 .lesson-preview {
-  padding: 1.5rem;
+  flex-grow: 1;
+  padding: 1.6rem;
   color: #475569;
-  line-height: 1.6;
+  font-size: 1.05rem;
+  line-height: 1.7;
   background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
 }
 
+/* Кнопка "Начать урок" */
+.continue-btn {
+  display: block;
+  margin: 1.6rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 1.2rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(99, 102, 241, 0.25);
+}
+
+.continue-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
+  background: linear-gradient(135deg, #4f46e5, #4338ca);
+}
+
+/* Пустой список */
 .empty-lessons {
   text-align: center;
   color: #94a3b8;
-  font-size: 1.3rem;
-  padding: 4rem 0;
+  font-size: 1.4rem;
+  padding: 5rem 0;
+  font-weight: 500;
+}
+
+/* Состояния загрузки */
+.loading,
+.not-found {
+  text-align: center;
+  padding: 8rem 2rem;
+  font-size: 1.6rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* 📱 Адаптив */
+@media (max-width: 992px) {
+  .lessons-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .course-view-container {
+    padding: 2rem 1rem 4rem;
+  }
+
+  .course-header h1 {
+    font-size: 2.4rem;
+  }
+
+  .course-desc {
+    font-size: 1.15rem;
+  }
+
+  .back-link {
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .lessons-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .video-thumbnail,
+  .no-video {
+    height: 200px;
+  }
+
+  .play-icon {
+    width: 70px;
+    height: 70px;
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .course-header h1 {
+    font-size: 2.1rem;
+  }
+
+  .lesson-card h3 {
+    font-size: 1.4rem;
+  }
+
+  .continue-btn {
+    margin: 1.2rem;
+    padding: 0.9rem;
+    font-size: 1.05rem;
+  }
 }

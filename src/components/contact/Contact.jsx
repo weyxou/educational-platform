@@ -38,8 +38,8 @@ const Contact = () => {
             <div className="contact-info-compact">
               <h2>Get in Touch</h2>
               <div className="info-row">support@educationalplatform.com</div>
-              <div className="info-row">+1 (555) 123-4567</div>
-              <div className="info-row">San Francisco, CA</div>
+              <div className="info-row">+996 707000999</div>
+              <div className="info-row">Bishkek, Kyrgyzstan</div>
 
               <div className="social-mini">
                 <a href="#">Facebook</a>

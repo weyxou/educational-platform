@@ -13,7 +13,7 @@ export default function InstructorDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Модалки
+  // Модалки для курсов
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newCourse, setNewCourse] = useState({
     courseName: '',
@@ -24,11 +24,13 @@ export default function InstructorDashboard() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
 
+  // Состояние для редактирования профиля
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileData, setProfileData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
-    school: user?.school || 'My School',
+    email: user?.email || '',
+    school: user?.school || '',
   });
 
   useEffect(() => {
@@ -47,6 +49,16 @@ export default function InstructorDashboard() {
     };
 
     if (user?.userAccountId) fetchCourses();
+  }, [user]);
+
+  // Обновление данных профиля при изменении user (на случай если user обновился извне)
+  useEffect(() => {
+    setProfileData({
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      email: user?.email || '',
+      school: user?.school || '',
+    });
   }, [user]);
 
   const createCourse = async (e) => {
@@ -92,6 +104,24 @@ export default function InstructorDashboard() {
     }
   };
 
+  // Обработчик изменения полей профиля
+  const handleProfileChange = (e) => {
+    setProfileData({ ...profileData, [e.target.name]: e.target.value });
+  };
+
+  // Сохранение профиля
+  const saveProfile = async () => {
+    try {
+      await api.put(`/student/update_profile/${user.userAccountId}`, profileData);
+      alert('Profile updated successfully!');
+      setIsEditingProfile(false);
+      // Здесь можно обновить user в AuthContext, если нужно
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update profile');
+    }
+  };
+
   return (
     <div className="dashboard-container">
       {/* Header */}
@@ -119,7 +149,7 @@ export default function InstructorDashboard() {
               <div
                 key={course.courseId}
                 className="course-item clickable-course-card"
-                onClick={() => navigate(`/courses/${course.courseId}/view`)} // Клик по карточке → просмотр
+                onClick={() => navigate(`/courses/${course.courseId}/view`)}
               >
                 <div className="course-main">
                   <h4>{course.courseName}</h4>
@@ -127,7 +157,6 @@ export default function InstructorDashboard() {
                 </div>
                 <p className="course-meta">Duration: {course.duration || 'N/A'}</p>
 
-                {/* Кнопки — отключаем переход по карточке */}
                 <div className="course-actions" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={(e) => {
@@ -255,11 +284,58 @@ export default function InstructorDashboard() {
         </div>
       )}
 
-      {/* Профиль (если нужно — добавишь сам) */}
+      {/* Секция профиля с встроенным редактированием */}
+           {/* Секция профиля с встроенным редактированием */}
       <section className="profile-section">
         <h2>Profile</h2>
-        <p><strong>Name:</strong> {user?.firstName} {user?.lastName}</p>
-        <p><strong>Email:</strong> {user?.email}</p>
+        <div className="edit-profile-container">
+          {!isEditingProfile ? (
+            <>
+              <p><strong>Name:</strong> {profileData.firstName} {profileData.lastName}</p>
+              <p><strong>Email:</strong> {profileData.email}</p>
+              <button className="edit-profile-btn" onClick={() => setIsEditingProfile(true)}>
+                Edit Profile
+              </button>
+            </>
+          ) : (
+            <div className="edit-profile-form">
+              <label>
+                First Name:
+                <input
+                  type="text"
+                  name="firstName"
+                  value={profileData.firstName}
+                  onChange={handleProfileChange}
+                />
+              </label>
+              <label>
+                Last Name:
+                <input
+                  type="text"
+                  name="lastName"
+                  value={profileData.lastName}
+                  onChange={handleProfileChange}
+                />
+              </label>
+              <label>
+                Email:
+                <input
+                  type="email"
+                  name="email"
+                  value={profileData.email}
+                  onChange={handleProfileChange}
+                />
+              </label>
+             
+              <div className="profile-buttons">
+                <button className="save-btn" onClick={saveProfile}>Save</button>
+                <button className="cancel-btn" onClick={() => setIsEditingProfile(false)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </section>
     </div>
   );

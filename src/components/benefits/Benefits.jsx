@@ -4,33 +4,33 @@ import styles from './Benefits.module.css';
 const benefitsData = [
   {
     number: '01',
-    title: 'Flexible Learning Schedule',
-    desc: 'Fit your coursework around your existing commitments and obligations.',
+    title: 'Learn at Your Own Pace',
+    desc: 'Access courses anytime, anywhere, and study according to your own schedule.',
   },
   {
     number: '02',
-    title: 'Expert Instruction',
-    desc: 'Learn from industry experts who have hands-on experience in design and development.',
+    title: 'Industry Experts',
+    desc: 'Gain knowledge from experienced instructors who work in the field.',
   },
   {
     number: '03',
-    title: 'Diverse Course Offerings',
-    desc: 'Explore a wide range of design and development courses covering various topics.',
+    title: 'Wide Range of Courses',
+    desc: 'Explore various subjects including tech, business, design, and more.',
   },
   {
     number: '04',
-    title: 'Updated Curriculum',
-    desc: 'Access courses with up-to-date content reflecting the latest trends and industry practices.',
+    title: 'Up-to-Date Content',
+    desc: 'Stay ahead with courses that reflect the latest industry trends and skills.',
   },
   {
     number: '05',
-    title: 'Practical Projects and Assignments',
-    desc: 'Develop a portfolio showcasing your skills and abilities to potential employers.',
+    title: 'Hands-On Projects',
+    desc: 'Work on real-world projects to build a strong portfolio for future opportunities.',
   },
   {
     number: '06',
-    title: 'Interactive Learning Environment',
-    desc: 'Collaborate with fellow learners, exchanging ideas and feedback to enhance your understanding.',
+    title: 'Collaborative Learning',
+    desc: 'Engage with peers, share ideas, and enhance your learning through discussion.',
   },
 ];
 
@@ -38,9 +38,9 @@ const Benefits = () => {
   return (
     <section className={styles.benefits}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Benefits</h2>
+        <h2 className={styles.title}>Why Choose Our Platform</h2>
         <p className={styles.subtitle}>
-          Lorem ipsum dolor sit amet consectetur. Tempus tincidunt et sit elit imperdiet et. Cras eu sit dignissim lorem nibh et. Ac cum eget habitasse in velit fringilla feugiat senectus in.
+          Our online educational platform is designed to help you learn effectively, build new skills, and achieve your career goals with flexible and interactive courses.
         </p>
 
         <div className={styles.grid}>

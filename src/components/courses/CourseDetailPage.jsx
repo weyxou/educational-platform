@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../../api/api";
+import './Courses.css'
+
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();

@@ -7,7 +7,7 @@ import './CourseLessonsView.css';
 
 export default function CourseLessonsView() {
   const { courseId } = useParams();
-  const { user } = useAuth(); // Получаем текущего пользователя и его роль
+  const { user } = useAuth();
 
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
@@ -18,15 +18,13 @@ export default function CourseLessonsView() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Загружаем курс
         const courseRes = await api.get(`/course/course_id/${courseId}`);
         setCourse(courseRes.data);
 
-        // Загружаем все уроки
         const lessonsRes = await api.get(`/lesson/get_all_lessons/${courseId}`);
         setLessons(lessonsRes.data);
       } catch (err) {
-        console.error('Ошибка загрузки курса или уроков:', err);
+        console.error('Error loading course or lessons:', err);
       } finally {
         setLoading(false);
       }
@@ -35,10 +33,9 @@ export default function CourseLessonsView() {
     fetchData();
   }, [courseId]);
 
-  if (loading) return <div className="loading">Загрузка курса...</div>;
-  if (!course) return <div className="not-found">Курс не найден</div>;
+  if (loading) return <div className="loading">Loading course...</div>;
+  if (!course) return <div className="not-found">Course not found</div>;
 
-  // Убираем фильтрацию по статусу: все уроки видны
   const visibleLessons = lessons;
 
   const backLink = isInstructor
@@ -49,60 +46,74 @@ export default function CourseLessonsView() {
     <div className="course-view-container">
       <div className="course-header">
         <Link to={backLink} className="back-link">
-          ← Назад
+          ← Back
         </Link>
+
         <h1>{course.courseName}</h1>
-        {course.description && <p className="course-desc">{course.description}</p>}
-        {course.duration && <span className="course-duration">Продолжительность: {course.duration}</span>}
+
+        {course.description && (
+          <p className="course-desc">{course.description}</p>
+        )}
+
+        {course.duration && (
+          <span className="course-duration">
+            Duration: {course.duration}
+          </span>
+        )}
       </div>
 
       <div className="lessons-list">
-        <h2>
-          Уроки ({visibleLessons.length})
-        </h2>
+        <h2>Lessons ({visibleLessons.length})</h2>
 
         {visibleLessons.length === 0 ? (
-          <p className="empty-lessons" style={{ textAlign: 'center', padding: '3rem 0', color: '#666' }}>
+          <p
+            className="empty-lessons"
+            style={{ textAlign: 'center', padding: '3rem 0', color: '#666' }}
+          >
             {isInstructor
-              ? 'В этом курсе пока нет уроков. Добавьте первый урок в разделе управления.'
-              : 'В этом курсе пока нет уроков.'}
+              ? 'This course has no lessons yet. Add the first lesson in the management section.'
+              : 'This course has no lessons yet.'}
           </p>
         ) : (
           <div className="lessons-grid">
             {visibleLessons.map((lesson, index) => (
               <div key={lesson.lessonId} className="lesson-card">
-                <div className="lesson-number">Урок {index + 1}</div>
+                <div className="lesson-number">
+                  Lesson {index + 1}
+                </div>
+
                 <h3>{lesson.lessonName}</h3>
 
-                {/* Статус урока — видно только инструктору */}
-                {isInstructor && (
-                  <span
-                    className={`status-badge ${lesson.status === 'Published' ? 'active' : 'inactive'}`}
-                    style={{ fontSize: '0.8rem', marginBottom: '8px', display: 'inline-block' }}
-                  >
-                    {lesson.status || 'Draft'}
-                  </span>
-                )}
-
+              
                 {lesson.youtubeUrl ? (
                   <div className="video-thumbnail">
                     <img
-                      src={`https://img.youtube.com/vi/${getYouTubeId(lesson.youtubeUrl)}/hqdefault.jpg`}
+                      src={`https://img.youtube.com/vi/${getYouTubeId(
+                        lesson.youtubeUrl
+                      )}/hqdefault.jpg`}
                       alt={lesson.lessonName}
                     />
                     <div className="play-icon">▶</div>
                   </div>
                 ) : (
-                  <div className="no-video">Текстовый урок</div>
+                  <div className="no-video">Text Lesson</div>
                 )}
 
-                {lesson.content && <p className="lesson-preview">{lesson.content}</p>}
+                {lesson.content && (
+                  <p className="lesson-preview">
+                    {lesson.content}
+                  </p>
+                )}
 
-                {/* Кнопка "Начать урок" для студентов */}
+                {/* Start lesson (students only) */}
                 {!isInstructor && (
-                  <button className="continue-btn" style={{ marginTop: 'auto' }}>
-                    Начать урок
-                  </button>
+                  <Link
+                    to={`/courses/${courseId}/lesson/${lesson.lessonId}`}
+                    className="continue-btn"
+                    style={{ marginTop: 'auto', textAlign: 'center' }}
+                  >
+                    Start Lesson →
+                  </Link>
                 )}
               </div>
             ))}
@@ -113,9 +124,8 @@ export default function CourseLessonsView() {
   );
 }
 
-// Вспомогательная функция для извлечения YouTube ID
 function getYouTubeId(url) {
-  if (!url) return 'dQw4w9WgXcQ'; // fallback
+  if (!url) return 'dQw4w9WgXcQ';
   const match = url.match(
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
   );
