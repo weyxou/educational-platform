@@ -1,4 +1,3 @@
-// src/pages/AllCoursesPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from '../../api/api';
@@ -10,7 +9,6 @@ const AllCoursesPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // Категории должны точно совпадать с тем, что возвращает API
   const categories = [
     { value: "all", label: "All Courses" },
     { value: "Frontend", label: "Frontend" },
@@ -23,7 +21,7 @@ const AllCoursesPage = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await api.get("/course/all_courses"); // эндпоинт API
+        const res = await api.get("/course/all_courses"); 
         const instructorCourses = res.data.filter(course => course.instructorName);
         setCourses(instructorCourses);
       } catch (err) {
@@ -87,7 +85,7 @@ const AllCoursesPage = () => {
             {filteredCourses.length > 0 ? (
               filteredCourses.map(course => (
                 <Link
-                  to={`/courses/${course.id}/detail`} // Ссылка на детальную страницу курса
+                  to={`/courses/${course.id}/detail`} 
                   key={course.id}
                   className="course-square"
                 >
