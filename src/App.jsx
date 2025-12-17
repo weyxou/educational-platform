@@ -21,6 +21,8 @@ import ManageLessons from './pages/instructor/ManageLessons';
 import CourseLessonsView from './common/CourseLessonsView'; 
 import LessonDetail from './common/LessonDetail';
 import CourseDetailPage from './components/courses/CourseDetailPage';
+import AssignmentSubmissions from './pages/instructor/AssignmentSubmissions';
+import CourseAssignments from './pages/student/CourseAssignments';
 
 // Заглушка
 const AllCoursesPage = () => (
@@ -156,8 +158,25 @@ function AppContent() {
   }
 />
 
+ <Route 
+          path="/courses/:courseId/assignments/:assignmentId/submissions" 
+          element={<AssignmentSubmissions />} 
+        />
+
+
+
+      <Route
+  path="/courses/:courseId/assignments"
+  element={
+    <ProtectedRoute>
+      <CourseAssignments />
+    </ProtectedRoute>
+  }
+/>
 
       </Routes>
+
+
 
 
 

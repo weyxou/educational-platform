@@ -1,4 +1,3 @@
-// src/pages/instructor/InstructorDashboard.jsx
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
@@ -6,14 +5,14 @@ import api from '../../api/api';
 import './InstructorDashboard.css';
 
 export default function InstructorDashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  // Модалки для курсов
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newCourse, setNewCourse] = useState({
     courseName: '',
@@ -24,7 +23,6 @@ export default function InstructorDashboard() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
 
-  // Состояние для редактирования профиля
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileData, setProfileData] = useState({
     firstName: user?.firstName || '',
@@ -51,7 +49,6 @@ export default function InstructorDashboard() {
     if (user?.userAccountId) fetchCourses();
   }, [user]);
 
-  // Обновление данных профиля при изменении user (на случай если user обновился извне)
   useEffect(() => {
     setProfileData({
       firstName: user?.firstName || '',
@@ -63,6 +60,8 @@ export default function InstructorDashboard() {
 
   const createCourse = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
     try {
       const res = await api.post('/course/add_course', {
         ...newCourse,
@@ -71,9 +70,10 @@ export default function InstructorDashboard() {
       setCourses([...courses, res.data]);
       setIsCreateModalOpen(false);
       setNewCourse({ courseName: '', description: '', duration: '' });
-      alert('Course created successfully!');
+      setSuccess('Course created successfully!');
     } catch (err) {
-      alert('Failed to create course');
+      console.error(err);
+      setError('Failed to create course');
     }
   };
 
@@ -84,55 +84,61 @@ export default function InstructorDashboard() {
 
   const saveCourseChanges = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
     try {
       await api.put(`/course/update/course_id/${editingCourse.courseId}`, editingCourse);
       setCourses(courses.map(c => c.courseId === editingCourse.courseId ? editingCourse : c));
       setIsEditModalOpen(false);
-      alert('Course updated successfully!');
+      setSuccess('Course updated successfully!');
     } catch (err) {
-      alert('Failed to update course');
+      console.error(err);
+      setError('Failed to update course');
     }
   };
 
   const deleteCourse = async (courseId) => {
+    setError('');
+    setSuccess('');
     if (!window.confirm('Delete this course? All lessons will be deleted.')) return;
     try {
       await api.delete(`/course/delete/course_id/${courseId}`);
       setCourses(courses.filter(c => c.courseId !== courseId));
+      setSuccess('Course deleted successfully!');
     } catch (err) {
-      alert('Failed to delete course');
+      console.error(err);
+      setError('Failed to delete course');
     }
   };
 
-  // Обработчик изменения полей профиля
   const handleProfileChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
 
-  // Сохранение профиля
   const saveProfile = async () => {
+    setError('');
+    setSuccess('');
     try {
       await api.put(`/student/update_profile/${user.userAccountId}`, profileData);
-      alert('Profile updated successfully!');
+      updateUser(profileData); // Обновление AuthContext
       setIsEditingProfile(false);
-      // Здесь можно обновить user в AuthContext, если нужно
+      setSuccess('Profile updated successfully!');
     } catch (err) {
       console.error(err);
-      alert('Failed to update profile');
+      setError('Failed to update profile');
     }
   };
 
   return (
     <div className="dashboard-container">
-      {/* Header */}
       <div className="dashboard-header">
         <h1>Welcome, {user?.firstName || user?.email}!</h1>
         <button onClick={logout} className="logout-btn">Logout</button>
       </div>
 
       {error && <p className="error">{error}</p>}
+      {success && <p className="success">{success}</p>}
 
-      {/* My Courses */}
       <section className="courses-section">
         <div className="section-header">
           <h3>My Courses ({courses.length})</h3>
@@ -159,29 +165,18 @@ export default function InstructorDashboard() {
 
                 <div className="course-actions" onClick={(e) => e.stopPropagation()}>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditModal(course);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); openEditModal(course); }}
                     className="action-btn btn-edit"
                   >
                     Edit
                   </button>
-
                   <Link to={`/courses/${course.courseId}/lessons`}>
-                    <button
-                      onClick={(e) => e.stopPropagation()}
-                      className="action-btn btn-manage"
-                    >
+                    <button onClick={(e) => e.stopPropagation()} className="action-btn btn-manage">
                       Manage Lessons
                     </button>
                   </Link>
-
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteCourse(course.courseId);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); deleteCourse(course.courseId); }}
                     className="action-btn btn-delete"
                   >
                     Delete
@@ -199,144 +194,138 @@ export default function InstructorDashboard() {
         )}
       </section>
 
-      {/* Модалка создания курса */}
+      {/* Модалки создания и редактирования курса */}
       {isCreateModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsCreateModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Create New Course</h2>
-            <form onSubmit={createCourse} className="course-form">
-              <div className="form-group">
-                <label>Course Name</label>
-                <input
-                  className="form-input"
-                  value={newCourse.courseName}
-                  onChange={(e) => setNewCourse({ ...newCourse, courseName: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  className="form-textarea"
-                  value={newCourse.description}
-                  onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Duration</label>
-                <input
-                  className="form-input"
-                  value={newCourse.duration}
-                  onChange={(e) => setNewCourse({ ...newCourse, duration: e.target.value })}
-                  placeholder="e.g., 8 weeks"
-                />
-              </div>
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">Create Course</button>
-                <button type="button" onClick={() => setIsCreateModalOpen(false)} className="btn btn-secondary">
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <CourseModal
+          title="Create New Course"
+          course={newCourse}
+          setCourse={setNewCourse}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSave={createCourse}
+          saveBtnText="Create Course"
+        />
       )}
-
-      {/* Модалка редактирования курса */}
       {isEditModalOpen && editingCourse && (
-        <div className="modal-overlay" onClick={() => setIsEditModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Edit Course</h2>
-            <form onSubmit={saveCourseChanges} className="course-form">
-              <div className="form-group">
-                <label>Course Name</label>
-                <input
-                  className="form-input"
-                  value={editingCourse.courseName || ''}
-                  onChange={(e) => setEditingCourse({ ...editingCourse, courseName: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  className="form-textarea"
-                  value={editingCourse.description || ''}
-                  onChange={(e) => setEditingCourse({ ...editingCourse, description: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Duration</label>
-                <input
-                  className="form-input"
-                  value={editingCourse.duration || ''}
-                  onChange={(e) => setEditingCourse({ ...editingCourse, duration: e.target.value })}
-                />
-              </div>
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">Save Changes</button>
-                <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn btn-secondary">
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <CourseModal
+          title="Edit Course"
+          course={editingCourse}
+          setCourse={setEditingCourse}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={saveCourseChanges}
+          saveBtnText="Save Changes"
+        />
       )}
+<section className="profile-section">
+  <h2>Profile</h2>
 
-      {/* Секция профиля с встроенным редактированием */}
-           {/* Секция профиля с встроенным редактированием */}
-      <section className="profile-section">
-        <h2>Profile</h2>
-        <div className="edit-profile-container">
-          {!isEditingProfile ? (
-            <>
-              <p><strong>Name:</strong> {profileData.firstName} {profileData.lastName}</p>
-              <p><strong>Email:</strong> {profileData.email}</p>
-              <button className="edit-profile-btn" onClick={() => setIsEditingProfile(true)}>
-                Edit Profile
-              </button>
-            </>
-          ) : (
-            <div className="edit-profile-form">
-              <label>
-                First Name:
-                <input
-                  type="text"
-                  name="firstName"
-                  value={profileData.firstName}
-                  onChange={handleProfileChange}
-                />
-              </label>
-              <label>
-                Last Name:
-                <input
-                  type="text"
-                  name="lastName"
-                  value={profileData.lastName}
-                  onChange={handleProfileChange}
-                />
-              </label>
-              <label>
-                Email:
-                <input
-                  type="email"
-                  name="email"
-                  value={profileData.email}
-                  onChange={handleProfileChange}
-                />
-              </label>
-             
-              <div className="profile-buttons">
-                <button className="save-btn" onClick={saveProfile}>Save</button>
-                <button className="cancel-btn" onClick={() => setIsEditingProfile(false)}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
+  <div className="profile-card">
+    {!isEditingProfile ? (
+      <div className="profile-view">
+        <div className="profile-info">
+          <p><strong>Name:</strong> {profileData.firstName} {profileData.lastName}</p>
+          <p><strong>Email:</strong> {profileData.email}</p>
         </div>
-      </section>
+        <button
+          onClick={() => setIsEditingProfile(true)}
+          className="quick-btn primary edit-profile-btn"
+        >
+          Edit Profile
+        </button>
+      </div>
+    ) : (
+      <div className="profile-edit-form">
+        <div className="form-group">
+          <label>First Name</label>
+          <input
+            type="text"
+            name="firstName"
+            value={profileData.firstName}
+            onChange={handleProfileChange}
+            className="form-input"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Last Name</label>
+          <input
+            type="text"
+            name="lastName"
+            value={profileData.lastName}
+            onChange={handleProfileChange}
+            className="form-input"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            name="email"
+            value={profileData.email}
+            onChange={handleProfileChange}
+            className="form-input"
+            required
+          />
+        </div>
+
+        <div className="form-actions profile-actions">
+          <button onClick={saveProfile} className="btn btn-primary">
+            Save Changes
+          </button>
+          <button
+            onClick={() => setIsEditingProfile(false)}
+            className="btn btn-secondary"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+</section>
+    </div>
+  );
+}
+
+// Вынесенная компонент модалки курса
+function CourseModal({ title, course, setCourse, onClose, onSave, saveBtnText }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2 className="modal-title">{title}</h2>
+        <form onSubmit={onSave} className="course-form">
+          <div className="form-group">
+            <label>Course Name</label>
+            <input
+              className="form-input"
+              value={course.courseName}
+              onChange={(e) => setCourse({ ...course, courseName: e.target.value })}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Description</label>
+            <textarea
+              className="form-textarea"
+              value={course.description}
+              onChange={(e) => setCourse({ ...course, description: e.target.value })}
+            />
+          </div>
+          <div className="form-group">
+            <label>Duration</label>
+            <input
+              className="form-input"
+              value={course.duration}
+              onChange={(e) => setCourse({ ...course, duration: e.target.value })}
+              placeholder="e.g., 8 weeks"
+            />
+          </div>
+          <div className="form-actions">
+            <button type="submit" className="btn btn-primary">{saveBtnText}</button>
+            <button type="button" onClick={onClose} className="btn btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

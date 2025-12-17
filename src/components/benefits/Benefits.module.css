@@ -1,115 +1,133 @@
+/* Benefits.module.css */
+
 .benefits {
-  padding: 80px 0;
-  background-color: #ffffff;
-  font-family: 'Inter', sans-serif;
+  padding: 4rem 0;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 1.5rem;
 }
 
 .title {
-  font-size: 36px;
-  font-weight: 700;
-  color: #1f2937;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1e293b;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .subtitle {
-  font-size: 16px;
-  color: #6b7280;
+  font-size: 1.05rem;
+  color: #64748b;
   text-align: center;
   max-width: 700px;
-  margin: 0 auto 48px;
+  margin: 0 auto 3rem;
   line-height: 1.6;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
 .card {
-  background-color: #f9fafb;
-  padding: 32px;
-  border-radius: 12px;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .number {
-  font-size: 32px;
-  font-weight: 800;
-  color: #4E56C0;
-  margin-bottom: 16px;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 0.75rem;
 }
 
 .cardTitle {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 12px;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
   line-height: 1.4;
 }
 
 .cardDesc {
-  font-size: 14px;
-  color: #6b7280;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.5;
   flex-grow: 1;
+  margin-bottom: 1rem;
 }
 
 .arrow {
-  margin-top: 20px;
-  font-size: 20px;
-  color: #4E56C0;
-  font-weight: bold;
+  font-size: 1rem;
+  color: #94a3b8;
+  font-weight: 600;
   align-self: flex-start;
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
+@media (max-width: 992px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .benefits {
-    padding: 60px 0;
+    padding: 3rem 0;
   }
-
+  
+  .container {
+    padding: 0 1rem;
+  }
+  
   .title {
-    font-size: 28px;
+    font-size: 1.5rem;
   }
-
+  
   .subtitle {
-    font-size: 15px;
-    margin-bottom: 32px;
+    font-size: 1rem;
+    margin-bottom: 2rem;
   }
+  
+  .card {
+    padding: 1.25rem;
+  }
+  
+  .number {
+    font-size: 2rem;
+  }
+  
+  .cardTitle {
+    font-size: 1rem;
+  }
+}
 
+@media (max-width: 480px) {
+  .benefits {
+    padding: 2rem 0;
+  }
+  
   .grid {
     grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .card {
-    padding: 24px;
-  }
-
-  .number {
-    font-size: 28px;
+    gap: 1rem;
   }
 }

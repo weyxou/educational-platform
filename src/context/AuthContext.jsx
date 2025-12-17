@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
@@ -17,7 +16,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("jwtToken");  // ← ЕДИНЫЙ КЛЮЧ
+    const savedToken = localStorage.getItem("jwtToken");
     const savedUser = safeParse(localStorage.getItem("user"));
 
     if (savedToken && savedUser) {
@@ -39,14 +38,19 @@ export function AuthProvider({ children }) {
       role: userData?.role?.role || userData?.role || null
     };
     localStorage.setItem("user", JSON.stringify(normalizedUser));
-    // Токен сохраняется в LoginPage — здесь не дублируем
     setUser(normalizedUser);
   };
 
   const logout = () => {
-    localStorage.removeItem("jwtToken");  // ← ЕДИНЫЙ КЛЮЧ
+    localStorage.removeItem("jwtToken");
     localStorage.removeItem("user");
     setUser(null);
+  };
+
+  const updateUser = (updatedData) => {
+    const newUser = { ...user, ...updatedData };
+    localStorage.setItem("user", JSON.stringify(newUser));
+    setUser(newUser);
   };
 
   return (
@@ -55,6 +59,7 @@ export function AuthProvider({ children }) {
         user,
         login,
         logout,
+        updateUser,
         loading,
         role: user?.role || null,
         isAuthenticated: !!user,

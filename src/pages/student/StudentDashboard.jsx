@@ -169,6 +169,27 @@ export default function StudentDashboard() {
                   >
                     Continue Learning →
                   </button>
+                  
+                  {/* Кнопка для просмотра заданий */}
+                  <button
+                    className="assignments-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/courses/${course.courseId}/assignments`);
+                    }}
+                    style={{
+                      background: '#f0f9ff',
+                      color: '#0369a1',
+                      border: '1px solid #bae6fd',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    View Assignments
+                  </button>
 
                   <button
                     className="unenroll-btn"
@@ -209,9 +230,33 @@ export default function StudentDashboard() {
                 <div className="course-actions">
                   <button
                     className="enroll-btn"
-                    onClick={() => handleEnroll(course)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEnroll(course);
+                    }}
                   >
                     Enroll Now
+                  </button>
+                  
+                  {/* Кнопка для просмотра деталей курса */}
+                  <button
+                    className="preview-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/courses/${course.courseId}/view`);
+                    }}
+                    style={{
+                      background: '#f8f9fa',
+                      color: '#495057',
+                      border: '1px solid #dee2e6',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    Preview Course
                   </button>
                 </div>
               </div>
