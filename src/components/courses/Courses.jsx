@@ -7,16 +7,6 @@ const AllCoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-
-  const categories = [
-    { value: "all", label: "All Courses" },
-    { value: "Frontend", label: "Frontend" },
-    { value: "Backend", label: "Backend" },
-    { value: "Data Science", label: "Data Science" },
-    { value: "Design", label: "Design" },
-    { value: "Security", label: "Security" },
-  ];
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -36,17 +26,12 @@ const AllCoursesPage = () => {
   }, []);
 
   const filteredCourses = courses.filter(course => {
-  const matchesSearch =
-    course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (course.instructorName && course.instructorName.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch =
+      course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (course.instructorName && course.instructorName.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const matchesCategory =
-    selectedCategory === "all" ||
-    (course.category && course.category.toLowerCase() === selectedCategory.toLowerCase());
-
-  return matchesSearch && matchesCategory;
-});
-
+    return matchesSearch;
+  });
 
   if (loading) return <div className="loading">Loading courses...</div>;
 
@@ -65,15 +50,6 @@ const AllCoursesPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="category-select"
-            >
-              {categories.map(cat => (
-                <option key={cat.value} value={cat.value}>{cat.label}</option>
-              ))}
-            </select>
           </div>
         </div>
       </section>
