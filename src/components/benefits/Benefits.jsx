@@ -6,31 +6,37 @@ const benefitsData = [
     number: '01',
     title: 'Learn at Your Own Pace',
     desc: 'Access courses anytime, anywhere, and study according to your own schedule.',
+    gradient: 'gradient1',
   },
   {
     number: '02',
     title: 'Industry Experts',
     desc: 'Gain knowledge from experienced instructors who work in the field.',
+    gradient: 'gradient2',
   },
   {
     number: '03',
     title: 'Wide Range of Courses',
     desc: 'Explore various subjects including tech, business, design, and more.',
+    gradient: 'gradient3',
   },
   {
     number: '04',
     title: 'Up-to-Date Content',
     desc: 'Stay ahead with courses that reflect the latest industry trends and skills.',
+    gradient: 'gradient1',
   },
   {
     number: '05',
     title: 'Hands-On Projects',
     desc: 'Work on real-world projects to build a strong portfolio for future opportunities.',
+    gradient: 'gradient2',
   },
   {
     number: '06',
     title: 'Collaborative Learning',
     desc: 'Engage with peers, share ideas, and enhance your learning through discussion.',
+    gradient: 'gradient3',
   },
 ];
 
@@ -45,7 +51,7 @@ const Benefits = () => {
 
         <div className={styles.grid}>
           {benefitsData.map((item, index) => (
-            <div key={index} className={styles.card}>
+            <div key={index} className={`${styles.card} ${styles[item.gradient]}`}>
               <div className={styles.number}>{item.number}</div>
               <h3 className={styles.cardTitle}>{item.title}</h3>
               <p className={styles.cardDesc}>{item.desc}</p>

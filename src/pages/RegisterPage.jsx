@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/api';  // ← используем твой axios-инстанс
+import api from '../api/api';
 import './auth.css';
 
 export default function RegisterPage() {
@@ -11,11 +11,12 @@ export default function RegisterPage() {
     lastName: '',
     email: '',
     password: '',
-    role: 'STUDENT' // по умолчанию студент
+    role: 'STUDENT'
   });
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -53,18 +54,15 @@ export default function RegisterPage() {
     }
 
     try {
-      // Основной запрос на регистрацию
       const signupPayload = {
         email: trimmedData.email,
         password: trimmedData.password,
-        role: trimmedData.role  // "STUDENT" или "INSTRUCTOR"
+        role: trimmedData.role
       };
 
       const signupRes = await api.post('/auth/signup', signupPayload);
-
       const data = signupRes.data;
 
-      // Формируем объект пользователя
       const user = {
         email: data.email || trimmedData.email,
         firstName: trimmedData.firstName,
@@ -73,115 +71,172 @@ export default function RegisterPage() {
         role: data.userType || data.role || trimmedData.role
       };
 
-      // Сохраняем токен и логинимся
       if (data.token) {
         localStorage.setItem('jwtToken', data.token);
       }
 
       login(user);
 
-      // Если бэкенд поддерживает firstName/lastName в AuthRequest — всё уже готово
-      // Если нет — обновляем профиль отдельно
       if (data.userId || data.userAccountId) {
         try {
           await api.put(`/instructor/update_profile/${user.userAccountId || data.userId}`, {
             firstName: trimmedData.firstName,
             lastName: trimmedData.lastName
           });
-          // Если студент — возможно другой эндпоинт, но пока предполагаем общий или instructor
         } catch (profileErr) {
           console.warn('Could not update profile names:', profileErr);
-          // Не критично — можно продолжить
         }
       }
 
-      // Редирект
-      navigate(user.role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard');
+      // Добавляем анимацию перед редиректом
+      setIsAnimating(true);
+      
+      // Ждем завершения анимации, затем редирект
+      setTimeout(() => {
+        navigate(user.role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard');
+      }, 600);
 
     } catch (err) {
       console.error('Registration error:', err);
       const msg = err.response?.data?.message || err.response?.data || 'Registration failed';
       setError(typeof msg === 'string' ? msg : 'Something went wrong');
-    } finally {
       setLoading(false);
     }
   };
 
+  const handleLoginRedirect = (e) => {
+    e.preventDefault();
+    setIsAnimating(true);
+    
+    setTimeout(() => {
+      navigate('/login');
+    }, 600);
+  };
+
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h1>Create Account</h1>
-        {error && <div className="error-message">{error}</div>}
+    <div className={`auth-container ${isAnimating ? 'fade-out' : ''}`}>
+      <div className={`auth-wrapper register-wrapper ${isAnimating ? 'slide-out' : ''}`}>
+        {/* Левая колонка с формой */}
+        <div className="auth-left register-left">
+          <div className="auth-card register-card">
+            <h1>Create Account</h1>
+            <div className="auth-subtitle">Join our community of learners and instructors</div>
+            
+            {error && <div className="error-message">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <input
-            name="firstName"
-            placeholder="First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="lastName"
-            placeholder="Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password (min 6 characters)"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+            <form onSubmit={handleSubmit}>
+              <div className="input-group">
+                <label>First Name</label>
+                <input
+                  name="firstName"
+                  placeholder="Enter your first name"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-          {/* Выбор роли */}
-          <div style={{ margin: '1.5rem 0', textAlign: 'center' }}>
-            <span style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600' }}>
-              Register as:
-            </span>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem' }}>
-              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+              <div className="input-group">
+                <label>Last Name</label>
                 <input
-                  type="radio"
-                  name="role"
-                  value="STUDENT"
-                  checked={formData.role === 'STUDENT'}
-                  onChange={() => handleRoleChange('STUDENT')}
+                  name="lastName"
+                  placeholder="Enter your last name"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
                 />
-                <span style={{ marginLeft: '0.5rem' }}>Student</span>
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+              </div>
+
+              <div className="input-group">
+                <label>Email Address</label>
                 <input
-                  type="radio"
-                  name="role"
-                  value="INSTRUCTOR"
-                  checked={formData.role === 'INSTRUCTOR'}
-                  onChange={() => handleRoleChange('INSTRUCTOR')}
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                 />
-                <span style={{ marginLeft: '0.5rem' }}>Instructor</span>
-              </label>
+              </div>
+
+              <div className="input-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Create a password (min 6 characters)"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              {/* Выбор роли */}
+              <div className="role-selection">
+                <div className="role-title">I want to join as:</div>
+                <div className="role-options">
+                  <label className="role-radio">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="STUDENT"
+                      checked={formData.role === 'STUDENT'}
+                      onChange={() => handleRoleChange('STUDENT')}
+                    />
+                    <span>Student</span>
+                  </label>
+                  <label className="role-radio">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="INSTRUCTOR"
+                      checked={formData.role === 'INSTRUCTOR'}
+                      onChange={() => handleRoleChange('INSTRUCTOR')}
+                    />
+                    <span>Instructor</span>
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" disabled={loading}>
+                {loading ? 'Creating Account...' : 'Create Account'}
+              </button>
+            </form>
+
+            <p>
+              Already have an account?{' '}
+              <Link to="/login" onClick={handleLoginRedirect}>
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Правая колонка с контентом */}
+        <div className="auth-right register-right">
+          <div className="auth-content">
+            <h2>Start Your Journey Today</h2>
+            <p>Join thousands of successful students and instructors who are already learning and teaching on our platform</p>
+            <div className="features">
+              <div className="feature-item">
+                <span className="feature-icon">📚</span>
+                <span>1000+ courses available</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">🎓</span>
+                <span>Learn from industry experts</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">🏆</span>
+                <span>Earn certificates & advance career</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">💡</span>
+                <span>Teach what you love</span>
+              </div>
             </div>
           </div>
-
-          <button type="submit" disabled={loading} className="btn btn-primary">
-            {loading ? 'Creating Account...' : 'Create Account'}
-          </button>
-        </form>
-
-        <p style={{ marginTop: '1.5rem' }}>
-          Already have an account? <Link to="/login">Sign in</Link>
-        </p>
+        </div>
       </div>
     </div>
   );

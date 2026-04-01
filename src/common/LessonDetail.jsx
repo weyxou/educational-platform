@@ -1,4 +1,3 @@
-// src/pages/common/LessonDetail.jsx
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api/api';
@@ -25,7 +24,6 @@ export default function LessonDetail() {
         setLoading(false);
       }
     };
-
     fetchLesson();
   }, [lessonId]);
 
@@ -35,48 +33,37 @@ export default function LessonDetail() {
   return (
     <div className="lesson-detail-container">
       <Link to={`/courses/${courseId}/view`} className="back-link">
-        ← Back to Course
+      Back to Course
       </Link>
 
-      {/* Video */}
-      {lesson.youtubeUrl && (
-        <div className="video-container">
-          <iframe
-            src={`https://www.youtube.com/embed/${getYouTubeId(
-              lesson.youtubeUrl
-            )}`}
-            title={lesson.lessonName}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-      )}
-
-      {/* Lesson info */}
       <div className="lesson-info">
-        <h1>{lesson.lessonName}</h1>
+        <h1>
+          {lesson.lessonOrder ? `Lesson ${lesson.lessonOrder}: ` : ''}
+          {lesson.lessonName}
+        </h1>
 
         {lesson.lessonDescription && (
-          <p className="lesson-description">
-            {lesson.lessonDescription}
-          </p>
+          <p className="lesson-description">{lesson.lessonDescription}</p>
         )}
 
         {lesson.content && (
-          <div className="lesson-content">
-            {lesson.content}
+          <div
+            className="lesson-content"
+            dangerouslySetInnerHTML={{ __html: lesson.content }}
+          />
+        )}
+
+        {isInstructor && (
+          <div className="otp-section">
+            <p><strong>Lesson OTP:</strong> {lesson.otp ?? 'Not generated'}</p>
           </div>
         )}
+
+        <div className="lesson-meta">
+          <p><strong>Created:</strong> {new Date(lesson.createdAt).toLocaleString()}</p>
+          <p><strong>Updated:</strong> {new Date(lesson.updatedAt).toLocaleString()}</p>
+        </div>
       </div>
     </div>
   );
-}
-
-function getYouTubeId(url) {
-  if (!url) return '';
-  const match = url.match(
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
-  );
-  return match ? match[1] : '';
 }

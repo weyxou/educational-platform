@@ -1,8 +1,15 @@
 /* Header.module.css */
+/* Подключаем шрифт Montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 .header {
-  padding: 1.5rem 0;
+  padding: 1rem 0;
   border-bottom: 1px solid #e2e8f0;
   background: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .container {
@@ -15,133 +22,401 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 2rem;
+  position: relative;
 }
 
+/* Логотип */
 .logo {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
+  flex-shrink: 0;
 }
 
 .logo a {
+  display: flex;
+  align-items: center;
   text-decoration: none;
   color: inherit;
 }
 
-.nav {
+.logoImage {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  display: block;
+}
+
+/* ==================== ДЕСКТОПНАЯ НАВИГАЦИЯ ==================== */
+.desktopNav {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
   gap: 2rem;
 }
 
-.nav a {
+.navDesktop {
+  display: flex;
+  gap: 2rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.navLink {
   color: #64748b;
   text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
-  transition: color 0.2s ease;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
   padding: 0.5rem 0;
   position: relative;
+  white-space: nowrap;
 }
 
-.nav a:hover {
-  color: #475569;
+.navLink:hover {
+  color: #4a5568;
 }
 
-.nav a.active {
-  color: #1e293b;
-  font-weight: 600;
+.active {
+  color: #667eea !important;
+  font-weight: 700;
 }
 
-.nav a.active::after {
+.active::after {
   content: '';
   position: absolute;
   bottom: -0.5rem;
   left: 0;
   right: 0;
-  height: 2px;
-  background: #1e293b;
-  border-radius: 1px;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 2px;
 }
 
+/* Десктопные кнопки авторизации */
+.authButtonsDesktop {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.authButtonsDesktop a {
+  padding: 0.625rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ==================== БУРГЕР-МЕНЮ (МОБИЛЬНОЕ) ==================== */
+.burger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.burgerLine {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.burgerActive .burgerLine:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.burgerActive .burgerLine:nth-child(2) {
+  opacity: 0;
+}
+
+.burgerActive .burgerLine:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Мобильное меню */
+.mobileMenu {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 80%;
+  max-width: 400px;
+  height: 100vh;
+  background: white;
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+  padding: 100px 2rem 2rem;
+  flex-direction: column;
+  gap: 2rem;
+  transition: right 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.mobileMenuOpen {
+  right: 0;
+  display: flex;
+}
+
+/* Мобильная навигация */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.nav a {
+  font-size: 1.2rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+/* Мобильные кнопки авторизации */
 .authButtons {
   display: flex;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
 }
 
 .authButtons a {
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.9rem;
+  padding: 0.875rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .signup {
-  color: #475569;
-  border: 1px solid #e2e8f0;
+  color: #667eea;
+  border: 2px solid #e2e8f0;
   background: transparent;
 }
 
 .signup:hover {
   background: #f8fafc;
-  border-color: #cbd5e1;
+  border-color: #667eea;
 }
 
 .login {
   color: white;
-  background: #1e293b;
-  border: 1px solid #1e293b;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
 }
 
 .login:hover {
-  background: #334155;
-  border-color: #334155;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-/* ==================== RESPONSIVE ==================== */
-@media (max-width: 768px) {
-  .header {
-    padding: 1rem 0;
+/* Оверлей для затемнения фона */
+.mobileMenu::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobileMenuOpen::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==================== АДАПТИВНОСТЬ ==================== */
+
+/* Планшеты (до 992px) */
+@media (max-width: 992px) {
+  .container {
+    padding: 0 1.5rem;
   }
   
+  .logoImage {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .navDesktop {
+    gap: 1.5rem;
+  }
+  
+  .navLink {
+    font-size: 0.95rem;
+  }
+  
+  .authButtonsDesktop a {
+    padding: 0.5rem 1.25rem;
+  }
+}
+
+/* Мобильные устройства (до 768px) - активируем бургер */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.75rem 0;
+  }
+  
+  .desktopNav {
+    display: none;
+  }
+  
+  .burger {
+    display: flex;
+  }
+  
+  .logoImage {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Маленькие мобильные устройства (до 580px) */
+@media (max-width: 580px) {
   .container {
     padding: 0 1rem;
   }
   
-  .headerContent {
-    flex-direction: column;
-    gap: 1rem;
+  .logoImage {
+    width: 55px;
+    height: 55px;
   }
   
-  .nav {
-    gap: 1rem;
+  .mobileMenu {
+    width: 100%;
+    max-width: 100%;
+    padding: 90px 1.5rem 1.5rem;
   }
   
-  .authButtons {
-    gap: 0.5rem;
+  .nav a {
+    font-size: 1.1rem;
+    padding: 0.7rem 0;
   }
   
   .authButtons a {
-    padding: 0.5rem 1rem;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Очень маленькие экраны (до 480px) */
+@media (max-width: 480px) {
+  .logoImage {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .burger {
+    width: 26px;
+    height: 18px;
+  }
+  
+  .burgerLine {
+    height: 2.5px;
+  }
+  
+  .burgerActive .burgerLine:nth-child(1) {
+    transform: translateY(7.5px) rotate(45deg);
+  }
+  
+  .burgerActive .burgerLine:nth-child(3) {
+    transform: translateY(-7.5px) rotate(-45deg);
+  }
+  
+  .mobileMenu {
+    padding: 80px 1.25rem 1.25rem;
+  }
+  
+  .nav a {
+    font-size: 1rem;
+    padding: 0.6rem 0;
+  }
+  
+  .authButtons a {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Экстремально маленькие экраны (до 360px) */
+@media (max-width: 360px) {
+  .logoImage {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .burger {
+    width: 24px;
+    height: 16px;
+  }
+  
+  .burgerLine {
+    height: 2px;
+  }
+  
+  .burgerActive .burgerLine:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  
+  .burgerActive .burgerLine:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+  
+  .mobileMenu {
+    padding: 70px 1rem 1rem;
+  }
+  
+  .nav a {
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+  }
+  
+  .authButtons a {
+    padding: 0.6rem;
     font-size: 0.85rem;
   }
 }
 
-@media (max-width: 480px) {
+/* Альбомная ориентация на мобильных */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobileMenu {
+    padding: 70px 1.5rem 1rem;
+  }
+  
   .nav {
-    flex-wrap: wrap;
-    justify-content: center;
     gap: 0.75rem;
   }
   
+  .nav a {
+    padding: 0.4rem 0;
+    font-size: 0.9rem;
+  }
+  
   .authButtons {
-    flex-direction: column;
-    width: 100%;
+    gap: 0.75rem;
   }
   
   .authButtons a {
-    width: 100%;
-    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.85rem;
   }
 }

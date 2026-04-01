@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import api from '../../api/api';
+import api from "../../api/api";
 import "./Courses.css";
 
 const AllCoursesPage = () => {
@@ -11,8 +11,10 @@ const AllCoursesPage = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await api.get("/course/all_courses"); 
-        const instructorCourses = res.data.filter(course => course.instructorName);
+        const res = await api.get("/course/all_courses");
+        const instructorCourses = res.data.filter(
+          (course) => course.instructorName
+        );
         setCourses(instructorCourses);
       } catch (err) {
         console.error("Failed to load courses:", err);
@@ -25,60 +27,69 @@ const AllCoursesPage = () => {
     fetchCourses();
   }, []);
 
-  const filteredCourses = courses.filter(course => {
-    const matchesSearch =
-      course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (course.instructorName && course.instructorName.toLowerCase().includes(searchTerm.toLowerCase()));
-
-    return matchesSearch;
+  const filteredCourses = courses.filter((course) => {
+    const search = searchTerm.toLowerCase();
+    return (
+      course.courseName.toLowerCase().includes(search) ||
+      (course.instructorName &&
+        course.instructorName.toLowerCase().includes(search))
+    );
   });
 
   if (loading) return <div className="loading">Loading courses...</div>;
 
   return (
     <div className="courses-page">
-      {/* Hero + Filters */}
+      {/* HERO */}
       <section className="courses-hero">
         <div className="container">
           <h1>All Courses</h1>
-          <p className="subtitle">Choose from courses created by expert instructors</p>
-          <div className="filters-bar">
-            <input
-              type="text"
-              placeholder="Search courses or instructors..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div>
+          <p className="subtitle">
+            Choose from courses created by expert instructors
+          </p>
+
+          <input
+            type="text"
+            placeholder="Search courses or instructors..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
         </div>
       </section>
 
-      {/* Courses Grid */}
+      {/* GRID */}
       <section className="courses-grid-section">
         <div className="container">
           <div className="courses-grid">
             {filteredCourses.length > 0 ? (
-              filteredCourses.map(course => (
+              filteredCourses.map((course) => (
                 <Link
-                  to={`/courses/${course.id}/detail`} 
+                  to={`/courses/${course.id}/detail`}
                   key={course.id}
                   className="course-square"
                 >
                   <div className="course-square-inner">
-                    <div className="course-header" style={{ backgroundColor: course.color || "#6366f1" }}>
+                    <div className="course-header">
                       <h3>{course.courseName}</h3>
-                      <div className="price-tag">{course.price || "Free"}</div>
-                    </div>
-                    <div className="course-body">
-                      <p className="instructor">by <strong>{course.instructorName}</strong></p>
-                      <div className="course-stats">
-                        <span>{course.studentsCount || 0} students</span>
-                        <span className="rating">★ {course.rating || 0}</span>
+                      <div className="price-tag">
+                        {course.price || "Free"}
                       </div>
                     </div>
+
+                    <div className="course-body">
+                      <p className="instructor">
+                        by <strong>{course.instructorName}</strong>
+                      </p>
+
+                      <div className="course-stats">
+                        <span>{course.studentsCount || 0} students</span>
+                        <span>★ {course.rating || 0}</span>
+                      </div>
+                    </div>
+
                     <div className="course-footer">
-                      <span>View Details →</span>
+                      View Details →
                     </div>
                   </div>
                 </Link>
@@ -86,7 +97,7 @@ const AllCoursesPage = () => {
             ) : (
               <div className="no-courses">
                 <h3>No courses found</h3>
-                <p>Try changing filters or search term</p>
+                <p>Try another search</p>
               </div>
             )}
           </div>

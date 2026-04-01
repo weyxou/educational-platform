@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -30,7 +31,6 @@ export default function LoginPage() {
     }
 
     try {
-      // Отправляем ТОЛЬКО email и password — без role!
       const res = await api.post('/auth/login', {
         email: email,
         password: password,
@@ -43,64 +43,118 @@ export default function LoginPage() {
         firstName: data.firstName || '',
         lastName: data.lastName || '',
         userAccountId: data.userId || data.userAccountId || data.id,
-        role: data.userType || data.role, // бэкенд должен вернуть роль!
+        role: data.userType || data.role,
       };
 
       localStorage.setItem('jwtToken', data.token || data.accessToken || data.jwt);
 
       login(user);
 
-      // Редирект по роли, которую вернул бэкенд
-      if (user.role === 'STUDENT') {
-        navigate('/student/dashboard');
-      } else if (user.role === 'INSTRUCTOR') {
-        navigate('/instructor/dashboard');
-      } else {
-        console.warn('Unknown role:', user.role);
-        navigate('/'); // или на общую страницу
-      }
+      setIsAnimating(true);
+      
+      setTimeout(() => {
+        if (user.role === 'STUDENT') {
+          navigate('/student/dashboard');
+        } else if (user.role === 'INSTRUCTOR') {
+          navigate('/instructor/dashboard');
+        } else {
+          console.warn('Unknown role:', user.role);
+          navigate('/');
+        }
+      }, 600);
+
     } catch (err) {
       console.error('Login error:', err.response?.data);
       const msg = err.response?.data?.message || 'Invalid email or password';
       setError(msg);
-    } finally {
       setLoading(false);
     }
   };
 
+  const handleRegisterRedirect = (e) => {
+    e.preventDefault();
+    setIsAnimating(true);
+    
+    setTimeout(() => {
+      navigate('/register');
+    }, 600);
+  };
+
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h1>Login</h1>
-        {error && <div className="error-message">{error}</div>}
+    <div className={`auth-container ${isAnimating ? 'fade-out' : ''}`}>
+      <div className={`auth-wrapper login-wrapper ${isAnimating ? 'slide-out' : ''}`}>
+        {/* Левая колонка с изображением */}
+        <div className="auth-left login-left">
+          <div className="auth-content login-content">
+            <h2>Welcome Back!</h2>
+            <p>Continue your learning journey and access thousands of courses</p>
+            <div className="features">
+              <div className="feature-item">
+                <span className="feature-icon">✓</span>
+                <span>Access your purchased courses</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">✓</span>
+                <span>Track your learning progress</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">✓</span>
+                <span>Connect with instructors</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">✓</span>
+                <span>Get personalized recommendations</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+        {/* Правая колонка с формой */}
+        <div className="auth-right login-right">
+          <div className="auth-card login-card">
+            <h1>Sign In</h1>
+            <div className="auth-subtitle">Access your account</div>
+            
+            {error && <div className="error-message">{error}</div>}
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+            <form onSubmit={handleSubmit}>
+              <div className="input-group">
+                <label>Email Address</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-          <button type="submit" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+              <div className="input-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-        <p>
-          No account? <Link to="/register">Register</Link>
-        </p>
+              <button type="submit" disabled={loading}>
+                {loading ? 'Signing in...' : 'Sign In'}
+              </button>
+            </form>
+
+            <p>
+              Don't have an account?{' '}
+              <Link to="/register" onClick={handleRegisterRedirect}>
+                Create one now
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
