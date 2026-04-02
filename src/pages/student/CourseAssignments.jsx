@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getAssignments, getSubmissions, saveSubmission, saveStudentSubmission } from '../../utils/assignmentStorage';
-import './StudentDashboard.css';
+import './CourseAssigments.css';
 
 export default function CourseAssignments() {
   const { courseId } = useParams();

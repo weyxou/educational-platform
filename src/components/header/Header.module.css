@@ -1,5 +1,3 @@
-/* Header.module.css */
-/* Подключаем шрифт Montserrat */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 .header {
@@ -26,7 +24,6 @@
   position: relative;
 }
 
-/* Логотип */
 .logo {
   flex-shrink: 0;
 }
@@ -45,7 +42,6 @@
   display: block;
 }
 
-/* ==================== ДЕСКТОПНАЯ НАВИГАЦИЯ ==================== */
 .desktopNav {
   display: flex;
   align-items: center;
@@ -92,7 +88,6 @@
   border-radius: 2px;
 }
 
-/* Десктопные кнопки авторизации */
 .authButtonsDesktop {
   display: flex;
   gap: 1rem;
@@ -110,7 +105,6 @@
   font-family: 'Montserrat', sans-serif;
 }
 
-/* ==================== БУРГЕР-МЕНЮ (МОБИЛЬНОЕ) ==================== */
 .burger {
   display: none;
   flex-direction: column;
@@ -168,7 +162,6 @@
   display: flex;
 }
 
-/* Мобильная навигация */
 .nav {
   display: flex;
   flex-direction: column;
@@ -183,7 +176,6 @@
   text-align: center;
 }
 
-/* Мобильные кнопки авторизации */
 .authButtons {
   display: flex;
   flex-direction: column;
@@ -224,7 +216,6 @@
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-/* Оверлей для затемнения фона */
 .mobileMenu::before {
   content: '';
   position: fixed;
@@ -244,9 +235,7 @@
   visibility: visible;
 }
 
-/* ==================== АДАПТИВНОСТЬ ==================== */
 
-/* Планшеты (до 992px) */
 @media (max-width: 992px) {
   .container {
     padding: 0 1.5rem;
@@ -270,7 +259,6 @@
   }
 }
 
-/* Мобильные устройства (до 768px) - активируем бургер */
 @media (max-width: 768px) {
   .header {
     padding: 0.75rem 0;
@@ -290,7 +278,6 @@
   }
 }
 
-/* Маленькие мобильные устройства (до 580px) */
 @media (max-width: 580px) {
   .container {
     padding: 0 1rem;
@@ -318,7 +305,6 @@
   }
 }
 
-/* Очень маленькие экраны (до 480px) */
 @media (max-width: 480px) {
   .logoImage {
     width: 50px;
@@ -357,7 +343,6 @@
   }
 }
 
-/* Экстремально маленькие экраны (до 360px) */
 @media (max-width: 360px) {
   .logoImage {
     width: 45px;
@@ -396,7 +381,6 @@
   }
 }
 
-/* Альбомная ориентация на мобильных */
 @media (max-width: 768px) and (orientation: landscape) {
   .mobileMenu {
     padding: 70px 1.5rem 1rem;

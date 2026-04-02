@@ -5,23 +5,21 @@ import api from '../../api/api';
 import './StudentDashboard.css';
 
 export default function StudentDashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth(); // предполагаем наличие updateUser
   const navigate = useNavigate();
 
   const [allCourses, setAllCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [editingProfile, setEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
   });
-
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // состояние для бургер-меню
 
-  // Загрузка курсов и профиля
   useEffect(() => {
     if (!user) return;
 
@@ -30,7 +28,7 @@ export default function StudentDashboard() {
         const coursesRes = await api.get('/course/all_courses');
         setAllCourses(coursesRes.data || []);
 
-        const saved = localStorage.getItem(`enrolled_courses_${user.userAccountId}`);
+        const saved = localStorage.getItem(`enrolled_courses_${user.userAccountId || user.id}`);
         setEnrolledCourses(saved ? JSON.parse(saved) : []);
 
         setProfileForm({
@@ -53,279 +51,307 @@ export default function StudentDashboard() {
     init();
   }, [user]);
 
-  // Сохраняем записанные курсы в localStorage
   useEffect(() => {
     if (!user || !isInitialized) return;
-
-    localStorage.setItem(
-      `enrolled_courses_${user.userAccountId}`,
-      JSON.stringify(enrolledCourses)
-    );
+    const storageKey = `enrolled_courses_${user.userAccountId || user.id}`;
+    localStorage.setItem(storageKey, JSON.stringify(enrolledCourses));
   }, [enrolledCourses, user, isInitialized]);
 
-  // Записаться на курс
+  // Закрываем мобильное меню при ресайзе окна > 768px
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768 && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobileMenuOpen]);
+
   const handleEnroll = (course) => {
     if (!window.confirm(`Enroll in "${course.courseName}"?`)) return;
-
     setEnrolledCourses((prev) => {
       if (prev.some((c) => c.courseId === course.courseId)) return prev;
       return [...prev, course];
     });
   };
 
-  // Отписаться от курса
   const handleUnenroll = (courseId) => {
     if (!window.confirm('Are you sure you want to unenroll from this course?')) return;
-
-    setEnrolledCourses((prev) =>
-      prev.filter((c) => c.courseId !== courseId)
-    );
+    setEnrolledCourses((prev) => prev.filter((c) => c.courseId !== courseId));
   };
 
   const availableCourses = allCourses.filter(
     (course) => !enrolledCourses.some((e) => e.courseId === course.courseId)
   );
 
-  // Профиль
   const handleProfileChange = (e) => {
     setProfileForm({ ...profileForm, [e.target.name]: e.target.value });
   };
 
   const handleProfileSave = async () => {
+    const userId = user.userAccountId || user.id;
+    if (!userId) {
+      alert('User ID not found. Please log in again.');
+      return;
+    }
+
     try {
-      await api.put(`/student/update_profile/${user.userAccountId}`, profileForm);
+      await api.put(`/student/update_profile/${userId}`, profileForm);
+      if (updateUser) {
+        updateUser({
+          ...user,
+          firstName: profileForm.firstName,
+          lastName: profileForm.lastName,
+          email: profileForm.email,
+        });
+      } else {
+        localStorage.setItem('user', JSON.stringify({
+          ...user,
+          firstName: profileForm.firstName,
+          lastName: profileForm.lastName,
+          email: profileForm.email,
+        }));
+        window.location.reload();
+      }
       alert('Profile updated successfully');
       setEditingProfile(false);
     } catch (err) {
       console.error(err);
-      alert('Error updating profile');
+      alert(err.response?.data?.message || 'Error updating profile. Please try again.');
     }
   };
 
+  const displayedEnrolled = enrolledCourses.slice(0, 4);
+  const displayedAvailable = availableCourses.slice(0, 4);
+  const hasMoreEnrolled = enrolledCourses.length > 4;
+  const hasMoreAvailable = availableCourses.length > 4;
+
   if (!user) {
-    return <p style={{ padding: 40 }}>Loading user...</p>;
+    return <div className="loading-state">Loading user...</div>;
   }
 
   return (
-    <div className="dashboard-container">
-      {/* Header */}
-      <div className="dashboard-header">
-        <button onClick={logout} className="logout-btn">Logout</button>
-      </div>
-
-      {/* Hero */}
-      <div className="dashboard-hero">
-        <h1>
-          Welcome back, <span className="user-name">{user.firstName || user.email}</span> 👋
-        </h1>
-        <p>Ready to continue learning? Your courses are waiting.</p>
-      </div>
-
-      {/* Stats */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">📚</div>
-          <div className="stat-value">{enrolledCourses.length}</div>
-          <div className="stat-label">Enrolled Courses</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">➕</div>
-          <div className="stat-value">{availableCourses.length}</div>
-          <div className="stat-label">Available to Enroll</div>
-        </div>
-      </div>
-
-      {/* My Courses */}
-      <section className="courses-section">
-        <h2>My Courses</h2>
-        {loading ? (
-          <p>Loading courses...</p>
-        ) : enrolledCourses.length === 0 ? (
-          <p>You haven't enrolled in any courses yet.</p>
-        ) : (
-          <div className="courses-grid">
-            {enrolledCourses.map((course) => (
-              <div
-                key={course.courseId}
-                className="course-card enrolled"
-                onClick={() => navigate(`/courses/${course.courseId}/view`)}
-              >
-                <div className="course-header">
-                  <span className="course-icon">📖</span>
-                  <h3>{course.courseName}</h3>
-                </div>
-                {course.description && <p className="course-description">{course.description}</p>}
-                <div className="course-meta">
-                  <span>⏱ {course.duration || 'N/A'}</span>
-                </div>
-
-                <div className="course-actions">
-                  <button
-                    className="continue-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/courses/${course.courseId}/view`);
-                    }}
-                  >
-                    Continue Learning →
-                  </button>
-                  
-                  {/* Кнопка для просмотра заданий */}
-                  <button
-                    className="assignments-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/courses/${course.courseId}/assignments`);
-                    }}
-                    style={{
-                      background: '#f0f9ff',
-                      color: '#0369a1',
-                      border: '1px solid #bae6fd',
-                      padding: '0.5rem 1rem',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontWeight: '500',
-                      fontSize: '0.9rem'
-                    }}
-                  >
-                    View Assignments
-                  </button>
-
-                  <button
-                    className="unenroll-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleUnenroll(course.courseId);
-                    }}
-                  >
-                    Unenroll
-                  </button>
-                </div>
+    <div className="student-dashboard">
+      <div className="dashboard-container">
+        {/* Верхняя панель: адаптивная с бургер-меню */}
+        <div className="dashboard-top-bar">
+          <div className="profile-summary">
+            <div className="profile-avatar">
+              <span className="avatar-initials">
+                {user.firstName?.[0] || user.email?.[0] || 'S'}
+              </span>
+            </div>
+            {/* Десктопная информация о пользователе */}
+            <div className="profile-info desktop-only">
+              <div className="profile-name">
+                {user.firstName} {user.lastName}
               </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Available Courses */}
-      <section className="courses-section">
-        <h2>Available Courses</h2>
-        {loading ? (
-          <p>Loading...</p>
-        ) : availableCourses.length === 0 ? (
-          <p>No courses available for enrollment at the moment.</p>
-        ) : (
-          <div className="courses-grid">
-            {availableCourses.map((course) => (
-              <div key={course.courseId} className="course-card available">
-                <div className="course-header">
-                  <span className="course-icon">✨</span>
-                  <h3>{course.courseName}</h3>
-                </div>
-                {course.description && <p className="course-description">{course.description}</p>}
-                <div className="course-meta">
-                  <span>⏱ {course.duration || 'N/A'}</span>
-                </div>
-
-                <div className="course-actions">
-                  <button
-                    className="enroll-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEnroll(course);
-                    }}
-                  >
-                    Enroll Now
-                  </button>
-                  
-                  {/* Кнопка для просмотра деталей курса */}
-                  <button
-                    className="preview-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/courses/${course.courseId}/view`);
-                    }}
-                    style={{
-                      background: '#f8f9fa',
-                      color: '#495057',
-                      border: '1px solid #dee2e6',
-                      padding: '0.5rem 1rem',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontWeight: '500',
-                      fontSize: '0.9rem'
-                    }}
-                  >
-                    Preview Course
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Profile Section */}
-      <section className="profile-section">
-        <h2>Profile</h2>
-
-        {!editingProfile ? (
-          <div className="profile-view">
-            <p><strong>Name:</strong> {user.firstName} {user.lastName}</p>
-            <p><strong>Email:</strong> {user.email}</p>
-            <button
-              className="edit-profile-btn"
-              onClick={() => setEditingProfile(true)}
+              <div className="profile-email">{user.email}</div>
+            </div>
+            {/* Десктопная кнопка Edit Profile */}
+            <button 
+              onClick={() => setEditingProfile(true)} 
+              className="edit-profile-btn desktop-only"
             >
               Edit Profile
             </button>
           </div>
-        ) : (
-          <div className="edit-profile-form">
-            <label>
-              First Name
-              <input
-                type="text"
-                name="firstName"
-                value={profileForm.firstName}
-                onChange={handleProfileChange}
-              />
-            </label>
+          {/* Бургер-иконка (только мобильная) */}
+          <button 
+            className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Menu"
+          >
+            <span></span><span></span><span></span>
+          </button>
+          {/* Десктопная кнопка Logout */}
+          <button onClick={logout} className="logout-btn desktop-only">Logout</button>
 
-            <label>
-              Last Name
-              <input
-                type="text"
-                name="lastName"
-                value={profileForm.lastName}
-                onChange={handleProfileChange}
-              />
-            </label>
+          {/* Мобильное выезжающее меню */}
+          <div className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
+            <div className="mobile-profile-info">
+              <div className="mobile-profile-name">
+                {user.firstName} {user.lastName}
+              </div>
+              <div className="mobile-profile-email">{user.email}</div>
+            </div>
+            <button 
+              onClick={() => {
+                setEditingProfile(true);
+                setIsMobileMenuOpen(false);
+              }} 
+              className="mobile-edit-btn"
+            >
+              Edit Profile
+            </button>
+            <button 
+              onClick={() => {
+                logout();
+                setIsMobileMenuOpen(false);
+              }} 
+              className="mobile-logout-btn"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
 
-            <label>
-              Email
-              <input
-                type="email"
-                name="email"
-                value={profileForm.email}
-                onChange={handleProfileChange}
-              />
-            </label>
+        {/* Остальной контент без изменений... */}
+        <div className="dashboard-hero">
+          <h1>
+            Welcome back, <span className="user-name">{user.firstName || user.email}</span>
+          </h1>
+          <p>Ready to continue learning? Your courses are waiting.</p>
+        </div>
 
-            <div className="profile-buttons">
-              <button onClick={handleProfileSave} className="save-btn">
-                Save Changes
-              </button>
-              <button
-                onClick={() => setEditingProfile(false)}
-                className="cancel-btn"
+        <section className="courses-section">
+          <div className="section-header">
+            <h2>My Courses</h2>
+            {hasMoreEnrolled && (
+              <button 
+                onClick={() => navigate('/student/my-courses')} 
+                className="view-all-btn"
               >
-                Cancel
+                View All ({enrolledCourses.length})
               </button>
+            )}
+          </div>
+          {loading ? (
+            <div className="loading-state">Loading courses...</div>
+          ) : enrolledCourses.length === 0 ? (
+            <div className="empty-state">You haven't enrolled in any courses yet.</div>
+          ) : (
+            <div className="courses-grid">
+              {displayedEnrolled.map((course) => (
+                <div
+                  key={course.courseId}
+                  className="course-card enrolled"
+                  onClick={() => navigate(`/courses/${course.courseId}/view`)}
+                >
+                  <div className="course-card-header">
+                    <div className="course-icon"></div>
+                    <h3>{course.courseName}</h3>
+                  </div>
+                  {course.description && <p className="course-description">{course.description}</p>}
+                  <div className="course-meta">
+                    <span className="meta-item">{course.duration || 'Self-paced'}</span>
+                  </div>
+                  <div className="course-actions" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="action-btn continue"
+                      onClick={() => navigate(`/courses/${course.courseId}/view`)}
+                    >
+                      Continue Learning
+                    </button>
+                    <button
+                      className="action-btn assignments"
+                      onClick={() => navigate(`/courses/${course.courseId}/assignments`)}
+                    >
+                      Assignments
+                    </button>
+                    <button
+                      className="action-btn unenroll"
+                      onClick={() => handleUnenroll(course.courseId)}
+                    >
+                      Unenroll
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="courses-section">
+          <div className="section-header">
+            <h2>Available Courses</h2>
+            {hasMoreAvailable && (
+              <button 
+                onClick={() => navigate('/student/available-courses')} 
+                className="view-all-btn"
+              >
+                View All ({availableCourses.length})
+              </button>
+            )}
+          </div>
+          {loading ? (
+            <div className="loading-state">Loading...</div>
+          ) : availableCourses.length === 0 ? (
+            <div className="empty-state">No courses available for enrollment at the moment.</div>
+          ) : (
+            <div className="courses-grid">
+              {displayedAvailable.map((course) => (
+                <div key={course.courseId} className="course-card available">
+                  <div className="course-card-header">
+                    <div className="course-icon"></div>
+                    <h3>{course.courseName}</h3>
+                  </div>
+                  {course.description && <p className="course-description">{course.description}</p>}
+                  <div className="course-meta">
+                    <span className="meta-item">{course.duration || 'Self-paced'}</span>
+                  </div>
+                  <div className="course-actions" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="action-btn enroll"
+                      onClick={() => handleEnroll(course)}
+                    >
+                      Enroll Now
+                    </button>
+                    <button
+                      className="action-btn preview"
+                      onClick={() => navigate(`/courses/${course.courseId}/view`)}
+                    >
+                      Preview Course
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+
+      {editingProfile && (
+        <div className="modal-overlay" onClick={() => setEditingProfile(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">Edit Profile</h2>
+            <div className="profile-edit-form">
+              <div className="form-group">
+                <label>First Name</label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={profileForm.firstName}
+                  onChange={handleProfileChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={profileForm.lastName}
+                  onChange={handleProfileChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={profileForm.email}
+                  onChange={handleProfileChange}
+                />
+              </div>
+              <div className="form-actions">
+                <button onClick={handleProfileSave} className="btn btn-primary">Save Changes</button>
+                <button onClick={() => setEditingProfile(false)} className="btn btn-secondary">Cancel</button>
+              </div>
             </div>
           </div>
-        )}
-      </section>
+        </div>
+      )}
     </div>
   );
 }

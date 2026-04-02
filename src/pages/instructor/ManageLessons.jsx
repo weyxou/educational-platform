@@ -1,44 +1,63 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../api/api';
+import {
+  getAssignments,
+  saveAssignments,
+  addAssignment,
+  updateAssignment,
+  deleteAssignment
+} from '../../utils/assignmentStorage';
 import './ManageLessons.css';
-import './InstructorDashboard.css';
 
 export default function ManageLessons() {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('lessons');
 
+  // Lessons state
   const [lessons, setLessons] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingLessons, setLoadingLessons] = useState(true);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
-
-  const [newLesson, setNewLesson] = useState({
-    title: '',
-    description: '',
-    content: '',
-    order: '',
-  });
-
+  const [newLesson, setNewLesson] = useState({ title: '', description: '', content: '', order: '' });
   const [editingLesson, setEditingLesson] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditLessonModalOpen, setIsEditLessonModalOpen] = useState(false);
 
+  // Assignments state
+  const [assignments, setAssignments] = useState([]);
+  const [loadingAssignments, setLoadingAssignments] = useState(true);
+  const [newAssignment, setNewAssignment] = useState({ title: '', description: '', dueDate: '' });
+  const [editingAssignment, setEditingAssignment] = useState(null);
+  const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] = useState(false);
+
+  // Fetch lessons
   useEffect(() => {
     const fetchLessons = async () => {
       try {
         const res = await api.get(`/lesson/get_all_lessons/${courseId}`);
         setLessons(res.data || []);
       } catch (err) {
-        console.error('Failed to load lessons:', err);
+        console.error(err);
         setError('Failed to load lessons');
       } finally {
-        setLoading(false);
+        setLoadingLessons(false);
       }
     };
     fetchLessons();
   }, [courseId]);
 
-  // CREATE
+  // Load assignments
+  useEffect(() => {
+    const loadAssignments = () => {
+      const courseAssignments = getAssignments(courseId);
+      setAssignments(courseAssignments);
+      setLoadingAssignments(false);
+    };
+    loadAssignments();
+  }, [courseId]);
+
+  // Lessons CRUD
   const createLesson = async () => {
     if (!newLesson.title.trim()) {
       alert('Please enter a lesson title');
@@ -62,7 +81,6 @@ export default function ManageLessons() {
     }
   };
 
-  // UPDATE
   const openEditLessonModal = (lesson) => {
     setEditingLesson({
       ...lesson,
@@ -71,7 +89,7 @@ export default function ManageLessons() {
       content: lesson.content,
       order: lesson.lessonOrder,
     });
-    setIsEditModalOpen(true);
+    setIsEditLessonModalOpen(true);
   };
 
   const saveLessonChanges = async (e) => {
@@ -89,7 +107,7 @@ export default function ManageLessons() {
           l.lessonId === editingLesson.lessonId ? { ...l, ...updatedDto } : l
         )
       );
-      setIsEditModalOpen(false);
+      setIsEditLessonModalOpen(false);
       alert('Lesson updated successfully!');
     } catch (err) {
       console.error(err);
@@ -97,7 +115,6 @@ export default function ManageLessons() {
     }
   };
 
-  // DELETE
   const deleteLesson = async (lessonId) => {
     if (!window.confirm('Delete this lesson?')) return;
     try {
@@ -110,7 +127,50 @@ export default function ManageLessons() {
     }
   };
 
-  // MEDIA
+  // Assignments CRUD
+  const createAssignment = () => {
+    if (!newAssignment.title.trim()) {
+      alert('Please enter assignment title');
+      return;
+    }
+    const newAssign = {
+      assignmentTitle: newAssignment.title.trim(),
+      assignmentDescription: newAssignment.description.trim() || '',
+      dueDate: newAssignment.dueDate || '',
+    };
+    const added = addAssignment(courseId, newAssign);
+    setAssignments(prev => [...prev, added]);
+    setNewAssignment({ title: '', description: '', dueDate: '' });
+    alert('Assignment created');
+  };
+
+  const openEditAssignmentModal = (assign) => {
+    setEditingAssignment({ ...assign });
+    setIsEditAssignmentModalOpen(true);
+  };
+
+  const saveAssignmentChanges = (e) => {
+    e.preventDefault();
+    updateAssignment(courseId, editingAssignment.assignmentId, {
+      assignmentTitle: editingAssignment.assignmentTitle,
+      assignmentDescription: editingAssignment.assignmentDescription,
+      dueDate: editingAssignment.dueDate,
+    });
+    setAssignments(prev =>
+      prev.map(a => a.assignmentId === editingAssignment.assignmentId ? editingAssignment : a)
+    );
+    setIsEditAssignmentModalOpen(false);
+    alert('Assignment updated');
+  };
+
+  const deleteAssignmentHandler = (assignmentId) => {
+    if (!window.confirm('Delete this assignment? All submissions will be lost.')) return;
+    deleteAssignment(courseId, assignmentId);
+    setAssignments(prev => prev.filter(a => a.assignmentId !== assignmentId));
+    alert('Assignment deleted');
+  };
+
+  // Media helpers
   function extractYouTubeId(url) {
     const match = url.match(/(?:youtu\.be\/|watch\?v=|embed\/)([^&\n?#]+)/);
     return match ? match[1] : url;
@@ -119,51 +179,34 @@ export default function ManageLessons() {
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
     const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
       alert('File is too large. Maximum size is 50MB');
       return;
     }
-
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'video/mp4', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
       alert('Unsupported file type. Please upload images, MP4 videos, or PDF files.');
       return;
     }
-
     const formData = new FormData();
     formData.append('file', file);
-
     setUploading(true);
-
     try {
       const res = await api.post('/lesson/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 30000
       });
-
       const fileUrl = res.data;
       const tag = getEmbedTag(fileUrl, file.name);
-
       setNewLesson({
         ...newLesson,
         content: (newLesson.content || '') + '\n' + tag,
       });
-
       alert('File uploaded successfully!');
     } catch (err) {
       console.error(err);
-
-      if (err.response?.status === 500) {
-        alert('Server error during file upload. Try again later.');
-      } else if (err.response?.status === 413) {
-        alert('File is too large for the server.');
-      } else if (err.code === 'ECONNABORTED') {
-        alert('Upload timeout exceeded. Try a smaller file.');
-      } else {
-        alert(`Upload error: ${err.message || 'Unknown error'}`);
-      }
+      alert(`Upload error: ${err.message || 'Unknown error'}`);
     } finally {
       setUploading(false);
       event.target.value = '';
@@ -171,224 +214,212 @@ export default function ManageLessons() {
   };
 
   const getEmbedTag = (url, name) => {
-    if (url.endsWith('.mp4'))
-      return `<video controls style="width:100%" src="${url}"></video>`;
-    if (url.endsWith('.pdf'))
-      return `<iframe src="${url}" width="100%" height="500px"></iframe>`;
-    if (url.match(/\.(jpg|jpeg|png|gif)$/))
-      return `<img src="${url}" alt="${name}" style="max-width:100%; border-radius:8px"/>`;
+    if (url.endsWith('.mp4')) return `<video controls style="width:100%" src="${url}"></video>`;
+    if (url.endsWith('.pdf')) return `<iframe src="${url}" width="100%" height="500px"></iframe>`;
+    if (url.match(/\.(jpg|jpeg|png|gif)$/)) return `<img src="${url}" alt="${name}" style="max-width:100%; border-radius:8px"/>`;
     return `<a href="${url}" target="_blank">${name}</a>`;
   };
 
-  if (loading) return <div className="loading-state">Loading lessons...</div>;
+  const sortedLessons = [...lessons].sort((a, b) => (a.lessonOrder || 0) - (b.lessonOrder || 0));
+
+  if (loadingLessons && loadingAssignments) return <div className="loading-state">Loading courses...</div>;
   if (error) return <div className="error">{error}</div>;
 
-  const sortedLessons = [...lessons].sort((a, b) => a.lessonOrder - b.lessonOrder);
-
   return (
-    <div className="dashboard-container">
-      <div className="page-card">
-        <h2 className="page-title">Manage Lessons</h2>
+    <div className="manage-lessons-page">
+      <div className="manage-container">
+        <div className="page-card">
+          <h1 className="page-title">Course Management</h1>
 
-        <section className="courses-section" style={{ marginBottom: '3rem' }}>
-          <div className="section-header">
-            <h3>Add New Lesson</h3>
+          {/* Tabs */}
+          <div className="tab-bar">
+            <button className={`tab-btn ${activeTab === 'lessons' ? 'active' : ''}`} onClick={() => setActiveTab('lessons')}>
+              Lessons ({lessons.length})
+            </button>
+            <button className={`tab-btn ${activeTab === 'assignments' ? 'active' : ''}`} onClick={() => setActiveTab('assignments')}>
+              Assignments ({assignments.length})
+            </button>
           </div>
 
-          <div className="course-form">
-            <div className="form-group">
-              <label>Lesson Title *</label>
-              <input
-                className="form-input"
-                value={newLesson.title}
-                onChange={(e) =>
-                  setNewLesson({ ...newLesson, title: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Description</label>
-              <textarea
-                className="form-textarea"
-                value={newLesson.description}
-                onChange={(e) =>
-                  setNewLesson({ ...newLesson, description: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Content (Text / HTML)</label>
-              <textarea
-                rows="5"
-                className="form-textarea"
-                placeholder="Enter text or HTML, including images, videos, etc."
-                value={newLesson.content}
-                onChange={(e) =>
-                  setNewLesson({ ...newLesson, content: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Add media (optional)</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    const url = prompt(
-                      'Enter media URL (YouTube, MP4, image, PDF, etc.):'
-                    );
-                    if (!url) return;
-                    let tag;
-                    if (url.endsWith('.mp4')) {
-                      tag = `<video controls style="width:100%" src="${url}"></video>`;
-                    } else if (url.includes('youtube')) {
-                      const youtubeId = extractYouTubeId(url);
-                      tag = `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${youtubeId}" frameborder="0" allowfullscreen></iframe>`;
-                    } else if (url.match(/\.(jpg|jpeg|png|gif)$/)) {
-                      tag = `<img src="${url}" alt="media" style="max-width:100%; border-radius:8px"/>`;
-                    } else if (url.endsWith('.pdf')) {
-                      tag = `<iframe src="${url}" width="100%" height="500px"></iframe>`;
-                    } else {
-                      tag = `<a href="${url}" target="_blank">${url}</a>`;
-                    }
-
-                    setNewLesson({
-                      ...newLesson,
-                      content: (newLesson.content || '') + '\n' + tag,
-                    });
-                  }}
-                >
-                  ➕ Add link/embed
-                </button>
-
-                <label
-                  htmlFor="fileUpload"
-                  className={`btn btn-secondary ${uploading ? 'disabled' : ''}`}
-                  style={{ cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.6 : 1 }}
-                >
-                  {uploading ? '⏳ Uploading...' : '📁 Upload file'}
-                </label>
-                <input
-                  type="file"
-                  id="fileUpload"
-                  style={{ display: 'none' }}
-                  accept="image/*,video/*,application/pdf"
-                  onChange={handleFileUpload}
-                  disabled={uploading}
-                />
-              </div>
-              <small style={{ color: '#64748b' }}>
-                Insert YouTube/Google Drive links or upload MP4, images, PDF.
-              </small>
-            </div>
-
-            <div className="form-group">
-              <label>Lesson Order (optional)</label>
-              <input
-                type="number"
-                className="form-input"
-                value={newLesson.order}
-                onChange={(e) =>
-                  setNewLesson({ ...newLesson, order: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-actions">
-              <button onClick={createLesson} className="btn btn-primary">
-                Add Lesson
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="courses-section">
-          <div className="section-header">
-            <h3>Existing Lessons ({sortedLessons.length})</h3>
-          </div>
-
-          {sortedLessons.length === 0 ? (
-            <div className="empty-state">No lessons yet.</div>
-          ) : (
-            <div className="courses-grid">
-              {sortedLessons.map((lesson) => (
-                <div key={lesson.lessonId} className="course-item">
-                  <div className="course-thumb">
-                    <div className="lesson-order">
-                      #{lesson.lessonOrder || '?'}
+          {/* LESSONS TAB */}
+          {activeTab === 'lessons' && (
+            <>
+              <div className="form-section">
+                <div className="course-form">
+                  <div className="form-header">
+                    <span className="form-header-icon"></span>
+                    <h3>Create New Lesson</h3>
+                  </div>
+                  <div className="form-group">
+                    <label>Lesson Title *</label>
+                    <input className="form-input" value={newLesson.title} onChange={e => setNewLesson({ ...newLesson, title: e.target.value })} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea className="form-textarea" value={newLesson.description} onChange={e => setNewLesson({ ...newLesson, description: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>Content (Text / HTML)</label>
+                    <textarea rows="4" className="form-textarea" placeholder="Enter text or HTML..." value={newLesson.content} onChange={e => setNewLesson({ ...newLesson, content: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>Add Media</label>
+                    <div className="media-buttons-group">
+                      <button type="button" className="media-btn" onClick={() => {
+                        const url = prompt('Enter media URL (YouTube, MP4, image, PDF, etc.):');
+                        if (!url) return;
+                        let tag;
+                        if (url.endsWith('.mp4')) tag = `<video controls style="width:100%" src="${url}"></video>`;
+                        else if (url.includes('youtube')) {
+                          const youtubeId = extractYouTubeId(url);
+                          tag = `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${youtubeId}" frameborder="0" allowfullscreen></iframe>`;
+                        } else if (url.match(/\.(jpg|jpeg|png|gif)$/)) tag = `<img src="${url}" alt="media" style="max-width:100%; border-radius:8px"/>`;
+                        else if (url.endsWith('.pdf')) tag = `<iframe src="${url}" width="100%" height="500px"></iframe>`;
+                        else tag = `<a href="${url}" target="_blank">${url}</a>`;
+                        setNewLesson({ ...newLesson, content: (newLesson.content || '') + '\n' + tag });
+                      }}>Add Link / Embed</button>
+                      <label htmlFor="fileUpload" className={`media-btn ${uploading ? 'disabled' : ''}`} style={{ cursor: uploading ? 'not-allowed' : 'pointer' }}>
+                        {uploading ? 'Uploading...' : 'Upload File'}
+                      </label>
+                      <input type="file" id="fileUpload" style={{ display: 'none' }} accept="image/*,video/*,application/pdf" onChange={handleFileUpload} disabled={uploading} />
                     </div>
+                    <span className="help-text">Supports images, MP4, PDF, YouTube links</span>
                   </div>
-
-                  <div className="course-main">
-                    <h4>{lesson.lessonName}</h4>
-                    {lesson.lessonDescription && (
-                      <p>{lesson.lessonDescription.substring(0, 100)}...</p>
-                    )}
-                    <p className="meta">
-                      OTP: <strong>{lesson.otp}</strong>
-                    </p>
-                    <p className="meta">
-                      Updated: {new Date(lesson.updatedAt).toLocaleDateString()}
-                    </p>
+                  <div className="form-group">
+                    <label>Lesson Order (optional)</label>
+                    <input type="number" className="form-input" value={newLesson.order} onChange={e => setNewLesson({ ...newLesson, order: e.target.value })} />
                   </div>
-
-                  <div className="course-actions">
-                    <button
-                      onClick={() => openEditLessonModal(lesson)}
-                      className="action-btn btn-edit"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteLesson(lesson.lessonId)}
-                      className="action-btn btn-delete"
-                    >
-                      Delete
-                    </button>
+                  <div className="form-actions">
+                    <button onClick={createLesson} className="btn btn-primary">Add Lesson</button>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+
+              <div className="section-header">
+                <h3>All Lessons <span className="lessons-count">{sortedLessons.length}</span></h3>
+              </div>
+              {sortedLessons.length === 0 ? (
+                <div className="empty-state">No lessons created yet.</div>
+              ) : (
+                <div className="courses-grid">
+                  {sortedLessons.map(lesson => (
+                    <div key={lesson.lessonId} className="course-item">
+                      <div className="course-thumb">
+                        <div className="lesson-order">{lesson.lessonOrder || '—'}</div>
+                      </div>
+                      <div className="course-main">
+                        <h4>{lesson.lessonName}</h4>
+                        {lesson.lessonDescription && <p>{lesson.lessonDescription.substring(0, 100)}...</p>}
+                        <div className="meta">
+                          <span>OTP: <strong>{lesson.otp}</strong></span>
+                          <span>Updated: {new Date(lesson.updatedAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <div className="course-actions">
+                        <button onClick={() => openEditLessonModal(lesson)} className="action-btn edit">Edit</button>
+                        <button onClick={() => deleteLesson(lesson.lessonId)} className="action-btn delete">Delete</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
-        </section>
 
-        {isEditModalOpen && editingLesson && (
-          <div className="modal-overlay" onClick={() => setIsEditModalOpen(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <h2 className="modal-title">Edit Lesson</h2>
-              <form onSubmit={saveLessonChanges} className="course-form">
-                <div className="form-group">
-                  <label>Title</label>
-                  <input
-                    className="form-input"
-                    value={editingLesson.title}
-                    onChange={(e) =>
-                      setEditingLesson({
-                        ...editingLesson,
-                        title: e.target.value,
-                      })
-                    }
-                  />
+          {/* ASSIGNMENTS TAB */}
+          {activeTab === 'assignments' && (
+            <>
+              <div className="form-section">
+                <div className="course-form">
+                  <div className="form-header">
+                    <span className="form-header-icon"></span>
+                    <h3>Create New Assignment</h3>
+                  </div>
+                  <div className="form-group">
+                    <label>Assignment Title *</label>
+                    <input className="form-input" value={newAssignment.title} onChange={e => setNewAssignment({ ...newAssignment, title: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea className="form-textarea" value={newAssignment.description} onChange={e => setNewAssignment({ ...newAssignment, description: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>Due Date</label>
+                    <input type="datetime-local" className="form-input" value={newAssignment.dueDate} onChange={e => setNewAssignment({ ...newAssignment, dueDate: e.target.value })} />
+                  </div>
+                  <div className="form-actions">
+                    <button onClick={createAssignment} className="btn btn-primary">Create Assignment</button>
+                  </div>
                 </div>
+              </div>
 
-                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                  <button
-                    onClick={() => navigate('/instructor/dashboard')}
-                    className="btn btn-secondary"
-                  >
-                    ← Back to Dashboard
-                  </button>
+              <div className="section-header">
+                <h3>Assignments <span className="lessons-count">{assignments.length}</span></h3>
+              </div>
+              {assignments.length === 0 ? (
+                <div className="empty-state">No assignments created yet.</div>
+              ) : (
+                <div className="courses-grid">
+                  {assignments.map(assign => (
+                    <div key={assign.assignmentId} className="course-item">
+                      <div className="course-thumb">
+                        <div className="lesson-order">📋</div>
+                      </div>
+                      <div className="course-main">
+                        <h4>{assign.assignmentTitle}</h4>
+                        <p>{assign.assignmentDescription?.substring(0, 100) || 'No description'}</p>
+                        <div className="meta">
+                          <span>Due: {assign.dueDate ? new Date(assign.dueDate).toLocaleString() : 'No due date'}</span>
+                        </div>
+                      </div>
+                      <div className="course-actions">
+                        <Link to={`/courses/${courseId}/assignments/${assign.assignmentId}/submissions`} className="action-btn submissions">Submissions</Link>
+                        <button onClick={() => openEditAssignmentModal(assign)} className="action-btn edit">Edit</button>
+                        <button onClick={() => deleteAssignmentHandler(assign.assignmentId)} className="action-btn delete">Delete</button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </form>
-            </div>
+              )}
+            </>
+          )}
+
+          <div className="back-button-container">
+            <button onClick={() => navigate('/instructor/dashboard')} className="btn btn-secondary">← Back to Dashboard</button>
           </div>
-        )}
+        </div>
       </div>
+
+      {/* Edit Lesson Modal */}
+      {isEditLessonModalOpen && editingLesson && (
+        <div className="modal-overlay" onClick={() => setIsEditLessonModalOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2 className="modal-title">Edit Lesson</h2>
+            <form onSubmit={saveLessonChanges}>
+              <div className="form-group"><label>Title</label><input className="form-input" value={editingLesson.title} onChange={e => setEditingLesson({ ...editingLesson, title: e.target.value })} /></div>
+              <div className="form-group"><label>Description</label><textarea className="form-textarea" value={editingLesson.description} onChange={e => setEditingLesson({ ...editingLesson, description: e.target.value })} /></div>
+              <div className="form-group"><label>Content</label><textarea rows="5" className="form-textarea" value={editingLesson.content} onChange={e => setEditingLesson({ ...editingLesson, content: e.target.value })} /></div>
+              <div className="form-group"><label>Order</label><input type="number" className="form-input" value={editingLesson.order} onChange={e => setEditingLesson({ ...editingLesson, order: e.target.value })} /></div>
+              <div className="form-actions"><button type="submit" className="btn btn-primary">Save Changes</button><button type="button" onClick={() => setIsEditLessonModalOpen(false)} className="btn btn-secondary">Cancel</button></div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Assignment Modal */}
+      {isEditAssignmentModalOpen && editingAssignment && (
+        <div className="modal-overlay" onClick={() => setIsEditAssignmentModalOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2 className="modal-title">Edit Assignment</h2>
+            <form onSubmit={saveAssignmentChanges}>
+              <div className="form-group"><label>Title</label><input className="form-input" value={editingAssignment.assignmentTitle} onChange={e => setEditingAssignment({ ...editingAssignment, assignmentTitle: e.target.value })} /></div>
+              <div className="form-group"><label>Description</label><textarea className="form-textarea" value={editingAssignment.assignmentDescription} onChange={e => setEditingAssignment({ ...editingAssignment, assignmentDescription: e.target.value })} /></div>
+              <div className="form-group"><label>Due Date</label><input type="datetime-local" className="form-input" value={editingAssignment.dueDate || ''} onChange={e => setEditingAssignment({ ...editingAssignment, dueDate: e.target.value })} /></div>
+              <div className="form-actions"><button type="submit" className="btn btn-primary">Save Changes</button><button type="button" onClick={() => setIsEditAssignmentModalOpen(false)} className="btn btn-secondary">Cancel</button></div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
