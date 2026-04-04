@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../api/api';
 import './StudentDashboard.css';
 
-export default function StudentDashboard() {
-  const { user, logout, updateUser } = useAuth(); // предполагаем наличие updateUser
-  const navigate = useNavigate();
 
+export default function StudentDashboard() {
+  const { user, logout, updateUser } = useAuth(); 
+  const navigate = useNavigate();
   const [allCourses, setAllCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ export default function StudentDashboard() {
     email: '',
   });
   const [isInitialized, setIsInitialized] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // состояние для бургер-меню
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
 
   useEffect(() => {
     if (!user) return;
@@ -27,7 +27,6 @@ export default function StudentDashboard() {
       try {
         const coursesRes = await api.get('/course/all_courses');
         setAllCourses(coursesRes.data || []);
-
         const saved = localStorage.getItem(`enrolled_courses_${user.userAccountId || user.id}`);
         setEnrolledCourses(saved ? JSON.parse(saved) : []);
 
@@ -57,7 +56,7 @@ export default function StudentDashboard() {
     localStorage.setItem(storageKey, JSON.stringify(enrolledCourses));
   }, [enrolledCourses, user, isInitialized]);
 
-  // Закрываем мобильное меню при ресайзе окна > 768px
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768 && isMobileMenuOpen) {
@@ -134,7 +133,6 @@ export default function StudentDashboard() {
   return (
     <div className="student-dashboard">
       <div className="dashboard-container">
-        {/* Верхняя панель: адаптивная с бургер-меню */}
         <div className="dashboard-top-bar">
           <div className="profile-summary">
             <div className="profile-avatar">
@@ -142,14 +140,14 @@ export default function StudentDashboard() {
                 {user.firstName?.[0] || user.email?.[0] || 'S'}
               </span>
             </div>
-            {/* Десктопная информация о пользователе */}
             <div className="profile-info desktop-only">
               <div className="profile-name">
                 {user.firstName} {user.lastName}
               </div>
-              <div className="profile-email">{user.email}</div>
+              <div className="profile-email">{user.email}
+
+              </div>
             </div>
-            {/* Десктопная кнопка Edit Profile */}
             <button 
               onClick={() => setEditingProfile(true)} 
               className="edit-profile-btn desktop-only"
@@ -157,7 +155,6 @@ export default function StudentDashboard() {
               Edit Profile
             </button>
           </div>
-          {/* Бургер-иконка (только мобильная) */}
           <button 
             className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -165,7 +162,6 @@ export default function StudentDashboard() {
           >
             <span></span><span></span><span></span>
           </button>
-          {/* Десктопная кнопка Logout */}
           <button onClick={logout} className="logout-btn desktop-only">Logout</button>
 
           {/* Мобильное выезжающее меню */}
@@ -197,7 +193,6 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Остальной контент без изменений... */}
         <div className="dashboard-hero">
           <h1>
             Welcome back, <span className="user-name">{user.firstName || user.email}</span>
@@ -218,9 +213,11 @@ export default function StudentDashboard() {
             )}
           </div>
           {loading ? (
-            <div className="loading-state">Loading courses...</div>
+            <div className="loading-state">Loading courses
+            </div>
           ) : enrolledCourses.length === 0 ? (
-            <div className="empty-state">You haven't enrolled in any courses yet.</div>
+            <div className="empty-state">You haven't enrolled in any courses yet.
+            </div>
           ) : (
             <div className="courses-grid">
               {displayedEnrolled.map((course) => (

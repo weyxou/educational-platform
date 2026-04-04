@@ -4,7 +4,6 @@ import { useParams, Link } from "react-router-dom";
 import api from "../../api/api";
 import './Courses.css'
 
-
 export default function CourseDetailPage() {
   const { courseId } = useParams();
 
@@ -15,15 +14,12 @@ export default function CourseDetailPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Получаем информацию о курсе
         const courseRes = await api.get(`/course/course_id/${courseId}`);
         setCourse(courseRes.data);
-
-        // Получаем уроки курса
         const lessonsRes = await api.get(`/lesson/get_all_lessons/${courseId}`);
         setLessons(lessonsRes.data);
       } catch (err) {
-        console.error("Ошибка загрузки курса или уроков:", err);
+        console.error("Error:", err);
       } finally {
         setLoading(false);
       }
@@ -32,7 +28,7 @@ export default function CourseDetailPage() {
     fetchData();
   }, [courseId]);
 
-  if (loading) return <div className="loading">Loading course...</div>;
+  if (loading) return <div className="loading">Loading course</div>;
   if (!course) return <div className="not-found">Course not found</div>;
 
   return (

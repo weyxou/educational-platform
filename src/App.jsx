@@ -47,11 +47,6 @@ function MainLayout({ children }) {
   const location = useLocation();
   const path = location.pathname;
   
-  // Скрываем Header и Footer на страницах:
-  // - дашборды (/student/dashboard, /instructor/dashboard)
-  // - просмотр курса (/courses/.../view)
-  // - управление уроками (/courses/.../lessons)
-  // - детали урока (/courses/.../lesson/...)
   const hideHeaderFooter = path.includes('/dashboard') ||
                            (path.includes('/courses/') && (
                              path.includes('/view') ||
@@ -72,7 +67,6 @@ function AppContent() {
   return (
     <MainLayout>
       <Routes>
-        {/* Публичные маршруты */}
         <Route path="/" element={<Benefits />} />
         <Route path="/home" element={<Benefits />} />
         <Route path="/courses" element={<Courses />} />
@@ -80,35 +74,24 @@ function AppContent() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<Contact />} />
 
-        {/* Авторизация */}
+
+
         <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
         <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
 
-        {/* Студент */}
         <Route path="/student/dashboard" element={<ProtectedRoute requiredRole="STUDENT"><StudentDashboard /></ProtectedRoute>} />
 
-        {/* Инструктор */}
         <Route path="/instructor/dashboard" element={<ProtectedRoute requiredRole="INSTRUCTOR"><InstructorDashboard /></ProtectedRoute>} />
-
-        {/* Управление уроками и заданиями (инструктор) */}
         <Route path="/courses/:courseId/lessons" element={<ProtectedRoute requiredRole="INSTRUCTOR"><ManageLessons /></ProtectedRoute>} />
 
-        {/* Просмотр курса (студент и инструктор) */}
         <Route path="/courses/:courseId/view" element={<ProtectedRoute><CourseLessonsView /></ProtectedRoute>} />
-
-        {/* Детали урока */}
         <Route path="/courses/:courseId/lesson/:lessonId" element={<ProtectedRoute><LessonDetail /></ProtectedRoute>} />
 
-        {/* Детали курса (заглушка) */}
         <Route path="/courses/:courseId/detail" element={<CourseDetailPage />} />
 
-        {/* Задания студента */}
         <Route path="/courses/:courseId/assignments" element={<ProtectedRoute><CourseAssignments /></ProtectedRoute>} />
-
-        {/* Просмотр отправленных заданий (инструктор) */}
         <Route path="/courses/:courseId/assignments/:assignmentId/submissions" element={<AssignmentSubmissions />} />
 
-        {/* 404 — ВСЕГДА В КОНЦЕ */}
         <Route path="*" element={
           <div style={{ padding: '150px', textAlign: 'center', fontSize: '3rem', minHeight: '80vh' }}>
             404 — Страница не найдена

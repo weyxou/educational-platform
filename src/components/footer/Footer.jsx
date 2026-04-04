@@ -6,9 +6,7 @@ const Footer = () => {
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
-        {/* Top Section */}
         <div className={styles.top}>
-          {/* Logo & Description */}
           <div className={styles.brand}>
             <div className={styles.logo}>
               <NavLink to="/" className={styles.logoLink}>
@@ -20,8 +18,6 @@ const Footer = () => {
               Learn from industry experts and enhance your skills.
             </p>
           </div>
-
-          {/* Navigation Links */}
           <div className={styles.links}>
             <div className={styles.linkColumn}>
               <h4 className={styles.linkTitle}>Courses</h4>
@@ -48,10 +44,7 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Divider */}
         <hr className={styles.divider} />
-
-        {/* Bottom Section */}
         <div className={styles.bottom}>
           <p className={styles.copyright}>
             © 2025 Educational Platform. All rights reserved.

@@ -1,5 +1,3 @@
-/* AssignmentSubmissions.css - Modern Design consistent with InstructorDashboard */
-
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
 :root {
@@ -27,11 +25,10 @@
   box-sizing: border-box;
 }
 
-/* ===== BACKGROUND WITH IMAGE & DECORATIONS ===== */
 .submissions-page {
-  min-height: 100vh;
+  min-height: 800px;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  padding: 2rem;
+  padding: 32px;
   font-family: 'Montserrat', sans-serif;
   position: relative;
   overflow-x: hidden;
@@ -85,11 +82,10 @@
   pointer-events: none;
 }
 
-/* ===== MAIN CARD ===== */
 .page-card {
   background: white;
   border-radius: var(--border-radius);
-  padding: 2rem;
+  padding: 32px;
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(226, 232, 240, 0.6);
   transition: box-shadow 0.2s;
@@ -99,17 +95,16 @@
   box-shadow: var(--shadow-xl);
 }
 
-/* ===== HEADER ===== */
 .submissions-header {
   display: flex;
   align-items: center;
-  gap: 2rem;
-  margin-bottom: 2rem;
+  gap: 32px;
+  margin-bottom: 32px;
   flex-wrap: wrap;
 }
 
 .submissions-header h1 {
-  font-size: 1.6rem;
+  font-size: 25.6px;
   font-weight: 700;
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   background-clip: text;
@@ -122,10 +117,10 @@
   background: white;
   border: 1px solid var(--gray-200);
   color: var(--gray-700);
-  padding: 0.6rem 1.2rem;
+  padding: 9.6px 19.2px;
   border-radius: 40px;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 14px;
   font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   transition: all 0.2s;
@@ -137,18 +132,17 @@
   transform: translateY(-1px);
 }
 
-/* ===== ASSIGNMENT INFO CARD ===== */
 .assignment-info-card {
   background: var(--gray-50);
   border-radius: 20px;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 2rem;
+  padding: 20px 24px;
+  margin-bottom: 32px;
   border: 1px solid var(--gray-200);
 }
 
 .assignment-info-row {
   display: flex;
-  padding: 0.5rem 0;
+  padding: 8px 0;
   border-bottom: 1px solid var(--gray-200);
 }
 
@@ -160,7 +154,7 @@
   width: 120px;
   font-weight: 700;
   color: var(--gray-700);
-  font-size: 0.8rem;
+  font-size: 12.8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -169,7 +163,7 @@
   flex: 1;
   color: var(--gray-900);
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 14.4px;
 }
 
 .info-value.highlight {
@@ -177,7 +171,6 @@
   font-weight: 700;
 }
 
-/* ===== TABLE ===== */
 .submissions-table-wrapper {
   overflow-x: auto;
   border-radius: 20px;
@@ -188,12 +181,12 @@
   width: 100%;
   border-collapse: collapse;
   background: white;
-  font-size: 0.85rem;
+  font-size: 13.6px;
 }
 
 .submissions-table th,
 .submissions-table td {
-  padding: 1rem;
+  padding: 16px;
   text-align: left;
   border-bottom: 1px solid var(--gray-200);
   vertical-align: top;
@@ -203,7 +196,7 @@
   background: var(--gray-50);
   font-weight: 700;
   color: var(--gray-700);
-  font-size: 0.8rem;
+  font-size: 12.8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -215,11 +208,11 @@
 .student-cell {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 4px;
 }
 
 .student-email {
-  font-size: 0.7rem;
+  font-size: 11.2px;
   color: var(--gray-500);
 }
 
@@ -231,7 +224,6 @@
   line-height: 1.4;
 }
 
-/* ===== INPUTS & BUTTONS ===== */
 .grade-cell,
 .feedback-cell {
   min-width: 160px;
@@ -240,7 +232,7 @@
 .input-group {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -251,10 +243,10 @@
 
 .grade-input {
   width: 80px;
-  padding: 0.5rem;
+  padding: 8px;
   border-radius: 12px;
   border: 1px solid var(--gray-200);
-  font-size: 0.85rem;
+  font-size: 13.6px;
   font-family: 'Montserrat', sans-serif;
   text-align: center;
 }
@@ -267,10 +259,10 @@
 
 .feedback-input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 8px;
   border-radius: 12px;
   border: 1px solid var(--gray-200);
-  font-size: 0.8rem;
+  font-size: 12.8px;
   font-family: 'Montserrat', sans-serif;
   resize: vertical;
 }
@@ -286,8 +278,8 @@
   color: white;
   border: none;
   border-radius: 40px;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.7rem;
+  padding: 6.4px 14.4px;
+  font-size: 11.2px;
   font-weight: 700;
   font-family: 'Montserrat', sans-serif;
   cursor: pointer;
@@ -304,8 +296,8 @@
   border: 1px solid var(--gray-200);
   color: var(--accent-start);
   border-radius: 40px;
-  padding: 0.4rem 1rem;
-  font-size: 0.7rem;
+  padding: 6.4px 16px;
+  font-size: 11.2px;
   font-weight: 700;
   font-family: 'Montserrat', sans-serif;
   cursor: pointer;
@@ -318,10 +310,9 @@
   transform: translateY(-1px);
 }
 
-/* ===== EMPTY STATE ===== */
 .empty-state {
   text-align: center;
-  padding: 3rem 2rem;
+  padding: 48px 32px;
   background: white;
   border-radius: 20px;
   border: 2px dashed var(--gray-200);
@@ -330,7 +321,7 @@
 .empty-icon {
   width: 64px;
   height: 64px;
-  margin: 0 auto 1rem;
+  margin: 0 auto 16px;
   background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
   border-radius: 32px;
   position: relative;
@@ -348,52 +339,50 @@
 }
 
 .empty-state h4 {
-  font-size: 1.2rem;
+  font-size: 19.2px;
   font-weight: 700;
   color: var(--gray-900);
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 
 .empty-state p {
   color: var(--gray-500);
-  font-size: 0.85rem;
+  font-size: 13.6px;
 }
 
-/* ===== LOADING STATE ===== */
 .loading-state {
   text-align: center;
-  padding: 3rem;
-  font-size: 1rem;
+  padding: 48px;
+  font-size: 16px;
   color: var(--gray-500);
   background: white;
   border-radius: 20px;
   max-width: 400px;
-  margin: 2rem auto;
+  margin: 32px auto;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
   .submissions-page {
-    padding: 1rem;
+    padding: 16px;
   }
   
   .page-card {
-    padding: 1.25rem;
+    padding: 20px;
   }
   
   .submissions-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 16px;
   }
   
   .submissions-header h1 {
-    font-size: 1.3rem;
+    font-size: 20.8px;
   }
   
   .assignment-info-row {
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 4px;
   }
   
   .info-label {
@@ -402,7 +391,7 @@
   
   .submissions-table th,
   .submissions-table td {
-    padding: 0.75rem;
+    padding: 12px;
   }
   
   .grade-cell,
@@ -437,23 +426,23 @@
 
 @media (max-width: 480px) {
   .page-card {
-    padding: 1rem;
+    padding: 16px;
   }
   
   .submissions-header h1 {
-    font-size: 1.1rem;
+    font-size: 17.6px;
   }
   
   .back-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
+    padding: 8px 16px;
+    font-size: 12.8px;
   }
   
   .info-label {
-    font-size: 0.7rem;
+    font-size: 11.2px;
   }
   
   .info-value {
-    font-size: 0.8rem;
+    font-size: 12.8px;
   }
 }

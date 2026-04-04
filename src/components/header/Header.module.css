@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 .header {
-  padding: 1rem 0;
+  padding: 16px 0;
   border-bottom: 1px solid #e2e8f0;
   background: white;
   position: sticky;
@@ -13,14 +13,14 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 24px;
 }
 
 .headerContent {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 32px;
   position: relative;
 }
 
@@ -47,12 +47,12 @@
   align-items: center;
   justify-content: space-between;
   flex: 1;
-  gap: 2rem;
+  gap: 32px;
 }
 
 .navDesktop {
   display: flex;
-  gap: 2rem;
+  gap: 32px;
   flex: 1;
   justify-content: center;
 }
@@ -61,9 +61,9 @@
   color: #64748b;
   text-decoration: none;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 16px;
   transition: all 0.3s ease;
-  padding: 0.5rem 0;
+  padding: 8px 0;
   position: relative;
   white-space: nowrap;
 }
@@ -80,7 +80,7 @@
 .active::after {
   content: '';
   position: absolute;
-  bottom: -0.5rem;
+  bottom: -8px;
   left: 0;
   right: 0;
   height: 3px;
@@ -90,15 +90,15 @@
 
 .authButtonsDesktop {
   display: flex;
-  gap: 1rem;
+  gap: 16px;
   flex-shrink: 0;
 }
 
 .authButtonsDesktop a {
-  padding: 0.625rem 1.5rem;
+  padding: 10px 24px;
   border-radius: 10px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 14.4px;
   text-decoration: none;
   transition: all 0.3s ease;
   white-space: nowrap;
@@ -138,7 +138,6 @@
   transform: translateY(-9px) rotate(-45deg);
 }
 
-/* Мобильное меню */
 .mobileMenu {
   display: none;
   position: fixed;
@@ -149,9 +148,9 @@
   height: 100vh;
   background: white;
   box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
-  padding: 100px 2rem 2rem;
+  padding: 100px 32px 32px;
   flex-direction: column;
-  gap: 2rem;
+  gap: 32px;
   transition: right 0.3s ease;
   z-index: 1000;
   overflow-y: auto;
@@ -165,13 +164,13 @@
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 24px;
   width: 100%;
 }
 
 .nav a {
-  font-size: 1.2rem;
-  padding: 0.75rem 0;
+  font-size: 19.2px;
+  padding: 12px 0;
   border-bottom: 1px solid #e2e8f0;
   text-align: center;
 }
@@ -179,15 +178,15 @@
 .authButtons {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 16px;
   width: 100%;
 }
 
 .authButtons a {
-  padding: 0.875rem;
+  padding: 14px;
   border-radius: 10px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 16px;
   text-decoration: none;
   transition: all 0.3s ease;
   text-align: center;
@@ -235,10 +234,9 @@
   visibility: visible;
 }
 
-
 @media (max-width: 992px) {
   .container {
-    padding: 0 1.5rem;
+    padding: 0 24px;
   }
   
   .logoImage {
@@ -247,21 +245,21 @@
   }
   
   .navDesktop {
-    gap: 1.5rem;
+    gap: 24px;
   }
   
   .navLink {
-    font-size: 0.95rem;
+    font-size: 15.2px;
   }
   
   .authButtonsDesktop a {
-    padding: 0.5rem 1.25rem;
+    padding: 8px 20px;
   }
 }
 
 @media (max-width: 768px) {
   .header {
-    padding: 0.75rem 0;
+    padding: 12px 0;
   }
   
   .desktopNav {
@@ -280,7 +278,7 @@
 
 @media (max-width: 580px) {
   .container {
-    padding: 0 1rem;
+    padding: 0 16px;
   }
   
   .logoImage {
@@ -291,17 +289,17 @@
   .mobileMenu {
     width: 100%;
     max-width: 100%;
-    padding: 90px 1.5rem 1.5rem;
+    padding: 90px 24px 24px;
   }
   
   .nav a {
-    font-size: 1.1rem;
-    padding: 0.7rem 0;
+    font-size: 17.6px;
+    padding: 11.2px 0;
   }
   
   .authButtons a {
-    padding: 0.75rem;
-    font-size: 0.95rem;
+    padding: 12px;
+    font-size: 15.2px;
   }
 }
 
@@ -329,17 +327,17 @@
   }
   
   .mobileMenu {
-    padding: 80px 1.25rem 1.25rem;
+    padding: 80px 20px 20px;
   }
   
   .nav a {
-    font-size: 1rem;
-    padding: 0.6rem 0;
+    font-size: 16px;
+    padding: 9.6px 0;
   }
   
   .authButtons a {
-    padding: 0.65rem;
-    font-size: 0.9rem;
+    padding: 10.4px;
+    font-size: 14.4px;
   }
 }
 
@@ -367,40 +365,40 @@
   }
   
   .mobileMenu {
-    padding: 70px 1rem 1rem;
+    padding: 70px 16px 16px;
   }
   
   .nav a {
-    font-size: 0.95rem;
-    padding: 0.5rem 0;
+    font-size: 15.2px;
+    padding: 8px 0;
   }
   
   .authButtons a {
-    padding: 0.6rem;
-    font-size: 0.85rem;
+    padding: 9.6px;
+    font-size: 13.6px;
   }
 }
 
 @media (max-width: 768px) and (orientation: landscape) {
   .mobileMenu {
-    padding: 70px 1.5rem 1rem;
+    padding: 70px 24px 16px;
   }
   
   .nav {
-    gap: 0.75rem;
+    gap: 12px;
   }
   
   .nav a {
-    padding: 0.4rem 0;
-    font-size: 0.9rem;
+    padding: 6.4px 0;
+    font-size: 14.4px;
   }
   
   .authButtons {
-    gap: 0.75rem;
+    gap: 12px;
   }
   
   .authButtons a {
-    padding: 0.5rem;
-    font-size: 0.85rem;
+    padding: 8px;
+    font-size: 13.6px;
   }
 }

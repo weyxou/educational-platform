@@ -18,7 +18,6 @@ export default function LessonDetail() {
 
   const isInstructor = user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
 
-  // Получение userId из user или токена
   const getUserId = () => {
     if (user?.userId) return user.userId;
     if (user?.id) return user.id;
@@ -33,7 +32,6 @@ export default function LessonDetail() {
   };
   const userId = getUserId();
 
-  // Загрузка текущего урока и всех уроков курса
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -53,7 +51,6 @@ export default function LessonDetail() {
     fetchData();
   }, [lessonId, courseId]);
 
-  // Загрузка прогресса (завершённые уроки) из localStorage
   useEffect(() => {
     if (!courseId || !userId) return;
     const progressKey = `progress_${courseId}_${userId}`;
@@ -63,7 +60,6 @@ export default function LessonDetail() {
     }
   }, [courseId, userId]);
 
-  // Загрузка заметки для текущего урока
   useEffect(() => {
     if (!courseId || !userId || !lessonId) return;
     const notesKey = `notes_${courseId}_${lessonId}_${userId}`;
@@ -71,7 +67,6 @@ export default function LessonDetail() {
     if (savedNote) setNote(savedNote);
   }, [courseId, userId, lessonId]);
 
-  // Автосохранение заметки
   useEffect(() => {
     if (!courseId || !userId || !lessonId) return;
     const timer = setTimeout(() => {
@@ -87,7 +82,6 @@ export default function LessonDetail() {
     setNote(e.target.value);
   };
 
-  // Переключение статуса завершения текущего урока
   const toggleCompleted = () => {
     if (!courseId || !userId || !lessonId) return;
     const newCompleted = !completedLessons[lessonId];
@@ -97,7 +91,6 @@ export default function LessonDetail() {
     localStorage.setItem(progressKey, JSON.stringify(updated));
   };
 
-  // Индексы для навигации
   const currentIndex = allLessons.findIndex(l => l.lessonId === parseInt(lessonId));
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
@@ -113,7 +106,6 @@ export default function LessonDetail() {
         </Link>
 
         <div className="three-columns">
-          {/* ЛЕВАЯ КОЛОНКА: список уроков */}
           <aside className="lessons-sidebar">
             <h3>Course content</h3>
             <ul className="sidebar-lesson-list">
@@ -132,7 +124,6 @@ export default function LessonDetail() {
             </ul>
           </aside>
 
-          {/* ЦЕНТРАЛЬНАЯ КОЛОНКА: видео + текст */}
           <main className="lesson-main">
             <div className="lesson-header">
               <div className="lesson-header-top">
@@ -194,7 +185,6 @@ export default function LessonDetail() {
               </div>
             </div>
 
-            {/* Кнопки навигации под основным контентом */}
             <div className="navigation-section">
               {prevLesson ? (
                 <Link to={`/courses/${courseId}/lesson/${prevLesson.lessonId}`} className="nav-link prev">
@@ -213,7 +203,6 @@ export default function LessonDetail() {
             </div>
           </main>
 
-          {/* ПРАВАЯ КОЛОНКА: заметки */}
           {!isInstructor && (
             <aside className="notes-sidebar">
               <div className="notes-section">

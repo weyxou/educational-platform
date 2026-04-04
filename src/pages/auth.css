@@ -1,10 +1,7 @@
-/* auth.css */
-/* Подключаем шрифт Montserrat */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
-/* ==================== CONTAINER ==================== */
 .auth-container {
-  min-height: 100vh;
+  min-height: 800px;
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   display: flex;
   align-items: center;
@@ -22,7 +19,7 @@
   display: flex;
   width: 100%;
   max-width: 1400px;
-  min-height: 100vh;
+  min-height: 800px;
   background: white;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -34,7 +31,6 @@
   opacity: 0;
 }
 
-/* Регистрация - форма слева, картинка справа */
 .register-wrapper {
   flex-direction: row;
 }
@@ -47,7 +43,6 @@
   order: 2;
 }
 
-/* Логин - картинка слева, форма справа */
 .login-wrapper {
   flex-direction: row;
 }
@@ -60,17 +55,15 @@
   order: 2;
 }
 
-/* ==================== LEFT COLUMN ==================== */
 .auth-left {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 32px;
   background: white;
 }
 
-/* Левая колонка для логина (с картинкой) */
 .login-left {
   position: relative;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -84,7 +77,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover no-repeat;
+  background: url('/images/login.jpg') center/cover no-repeat;
   opacity: 0.2;
   z-index: 0;
 }
@@ -95,35 +88,33 @@
   text-align: center;
   color: white;
   max-width: 400px;
-  padding: 2rem;
+  padding: 32px;
 }
 
 .login-content h2 {
-  font-size: 2rem;
+  font-size: 32px;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
   font-family: 'Montserrat', sans-serif;
 }
 
 .login-content p {
-  font-size: 1rem;
+  font-size: 16px;
   line-height: 1.6;
   opacity: 0.9;
   font-weight: 500;
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 }
 
-/* ==================== RIGHT COLUMN ==================== */
 .auth-right {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 32px;
   background: white;
 }
 
-/* Правая колонка для логина (с формой) */
 .login-right {
   background: white;
 }
@@ -131,12 +122,12 @@
 .auth-card {
   width: 100%;
   max-width: 420px;
-  padding: 2rem;
+  padding: 32px;
 }
 
 .auth-card h1 {
-  margin-bottom: 0.5rem;
-  font-size: 2rem;
+  margin-bottom: 8px;
+  font-size: 32px;
   font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
@@ -146,34 +137,33 @@
 
 .auth-subtitle {
   color: #64748b;
-  font-size: 0.9rem;
-  margin-bottom: 2rem;
+  font-size: 14.4px;
+  margin-bottom: 32px;
   font-weight: 500;
 }
 
 .auth-card p {
   text-align: center;
-  margin-top: 1.5rem;
+  margin-top: 24px;
   color: #64748b;
-  font-size: 0.9rem;
+  font-size: 14.4px;
   font-weight: 500;
 }
 
-/* ==================== FORM ==================== */
 .auth-card form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .input-group label {
-  font-size: 0.85rem;
+  font-size: 13.6px;
   font-weight: 600;
   color: #334155;
   font-family: 'Montserrat', sans-serif;
@@ -181,8 +171,8 @@
 
 .auth-card input {
   width: 100%;
-  padding: 0.875rem 1rem;
-  font-size: 0.95rem;
+  padding: 14px 16px;
+  font-size: 15.2px;
   font-family: 'Montserrat', sans-serif;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
@@ -205,10 +195,9 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-/* ==================== ROLE SELECTION ==================== */
 .role-selection {
-  margin: 0.5rem 0;
-  padding: 1rem;
+  margin: 8px 0;
+  padding: 16px;
   background: #f8fafc;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
@@ -220,10 +209,10 @@
 }
 
 .role-title {
-  margin-bottom: 0.75rem;
+  margin-bottom: 12px;
   font-weight: 600;
   color: #475569;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   text-align: center;
   font-family: 'Montserrat', sans-serif;
 }
@@ -231,15 +220,15 @@
 .role-options {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 24px;
 }
 
 .role-radio {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 14.4px;
   font-weight: 500;
   color: #475569;
   font-family: 'Montserrat', sans-serif;
@@ -253,14 +242,13 @@
   accent-color: #667eea;
 }
 
-/* ==================== BUTTON ==================== */
 .auth-card button {
   width: 100%;
-  padding: 0.875rem;
-  margin-top: 0.5rem;
+  padding: 14px;
+  margin-top: 8px;
   border: none;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 15.2px;
   font-weight: 600;
   font-family: 'Montserrat', sans-serif;
   color: white;
@@ -297,20 +285,18 @@
   transform: none;
 }
 
-/* ==================== ERROR MESSAGE ==================== */
 .error-message {
   background: #fef2f2;
   color: #991b1b;
-  padding: 0.875rem 1rem;
+  padding: 14px 16px;
   border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.85rem;
+  margin-bottom: 16px;
+  font-size: 13.6px;
   font-weight: 500;
   border: 1px solid #fecaca;
   font-family: 'Montserrat', sans-serif;
 }
 
-/* ==================== LINK ==================== */
 .auth-card a {
   color: #667eea;
   font-weight: 600;
@@ -338,7 +324,6 @@
   width: 100%;
 }
 
-/* ==================== RIGHT COLUMN (для регистрации) ==================== */
 .register-right {
   position: relative;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -352,8 +337,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover no-repeat;
-  opacity: 0.2;
+  background: url('/images/signup.jpg') center/cover no-repeat;
+  opacity: 0.1;
   z-index: 0;
 }
 
@@ -363,35 +348,35 @@
   text-align: center;
   color: white;
   max-width: 400px;
-  padding: 2rem;
+  padding: 32px;
 }
 
 .auth-content h2 {
-  font-size: 2rem;
+  font-size: 32px;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
   font-family: 'Montserrat', sans-serif;
 }
 
 .auth-content p {
-  font-size: 1rem;
+  font-size: 16px;
   line-height: 1.6;
   opacity: 0.9;
   font-weight: 500;
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 }
 
 .features {
-  margin-top: 1rem;
+  margin-top: 16px;
   text-align: left;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 14.4px;
 }
 
 .feature-icon {
@@ -406,25 +391,21 @@
   flex-shrink: 0;
 }
 
-/* ==================== RESPONSIVE DESIGN ==================== */
-
-/* Планшеты и небольшие десктопы (до 1024px) */
 @media (max-width: 1024px) {
   .auth-card {
     max-width: 380px;
-    padding: 1.5rem;
+    padding: 24px;
   }
   
   .auth-card h1 {
-    font-size: 1.75rem;
+    font-size: 28px;
   }
   
   .auth-content h2 {
-    font-size: 1.75rem;
+    font-size: 28px;
   }
 }
 
-/* Мобильные устройства (до 968px) */
 @media (max-width: 968px) {
   .auth-wrapper {
     flex-direction: column !important;
@@ -445,7 +426,7 @@
   
   .auth-left,
   .auth-right {
-    padding: 2rem 1.5rem;
+    padding: 32px 24px;
   }
   
   .login-left,
@@ -455,47 +436,46 @@
   
   .auth-content {
     max-width: 100%;
-    padding: 1rem;
+    padding: 16px;
   }
   
   .features {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
+    gap: 16px;
+    margin-top: 24px;
   }
   
   .feature-item {
-    width: calc(50% - 0.5rem);
+    width: calc(50% - 8px);
     margin-bottom: 0;
   }
 }
 
-/* Планшеты (до 768px) */
 @media (max-width: 768px) {
   .auth-left,
   .auth-right {
-    padding: 1.5rem;
+    padding: 24px;
   }
   
   .auth-card {
-    padding: 1rem;
+    padding: 16px;
     max-width: 100%;
   }
   
   .auth-card h1 {
-    font-size: 1.5rem;
+    font-size: 24px;
   }
   
   .auth-subtitle {
-    font-size: 0.85rem;
-    margin-bottom: 1.5rem;
+    font-size: 13.6px;
+    margin-bottom: 24px;
   }
   
   .role-options {
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 12px;
     align-items: center;
   }
   
@@ -510,47 +490,46 @@
   }
   
   .auth-content h2 {
-    font-size: 1.35rem;
+    font-size: 21.6px;
   }
   
   .auth-content p {
-    font-size: 0.85rem;
-    margin-bottom: 1.5rem;
+    font-size: 13.6px;
+    margin-bottom: 24px;
   }
 }
 
-/* Мобильные устройства (до 480px) */
 @media (max-width: 480px) {
   .auth-left,
   .auth-right {
-    padding: 1rem;
+    padding: 16px;
   }
   
   .auth-card {
-    padding: 0.75rem;
+    padding: 12px;
   }
   
   .auth-card h1 {
-    font-size: 1.35rem;
+    font-size: 21.6px;
   }
   
   .auth-subtitle {
-    font-size: 0.8rem;
-    margin-bottom: 1.25rem;
+    font-size: 12.8px;
+    margin-bottom: 20px;
   }
   
   .auth-card form {
-    gap: 0.75rem;
+    gap: 12px;
   }
   
   .auth-card input {
-    padding: 0.75rem;
-    font-size: 0.9rem;
+    padding: 12px;
+    font-size: 14.4px;
   }
   
   .auth-card button {
-    padding: 0.75rem;
-    font-size: 0.9rem;
+    padding: 12px;
+    font-size: 14.4px;
   }
   
   .login-left,
@@ -559,15 +538,14 @@
   }
   
   .auth-content h2 {
-    font-size: 1.25rem;
+    font-size: 20px;
   }
   
   .auth-content p {
-    font-size: 0.8rem;
+    font-size: 12.8px;
   }
 }
 
-/* Анимация для ссылок */
 .auth-card a {
   transition: all 0.3s ease;
 }

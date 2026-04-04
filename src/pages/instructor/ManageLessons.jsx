@@ -15,7 +15,6 @@ export default function ManageLessons() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('lessons');
 
-  // Lessons state
   const [lessons, setLessons] = useState([]);
   const [loadingLessons, setLoadingLessons] = useState(true);
   const [error, setError] = useState('');
@@ -24,14 +23,12 @@ export default function ManageLessons() {
   const [editingLesson, setEditingLesson] = useState(null);
   const [isEditLessonModalOpen, setIsEditLessonModalOpen] = useState(false);
 
-  // Assignments state
   const [assignments, setAssignments] = useState([]);
   const [loadingAssignments, setLoadingAssignments] = useState(true);
   const [newAssignment, setNewAssignment] = useState({ title: '', description: '', dueDate: '' });
   const [editingAssignment, setEditingAssignment] = useState(null);
   const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] = useState(false);
 
-  // Fetch lessons
   useEffect(() => {
     const fetchLessons = async () => {
       try {
@@ -47,7 +44,6 @@ export default function ManageLessons() {
     fetchLessons();
   }, [courseId]);
 
-  // Load assignments
   useEffect(() => {
     const loadAssignments = () => {
       const courseAssignments = getAssignments(courseId);
@@ -57,7 +53,6 @@ export default function ManageLessons() {
     loadAssignments();
   }, [courseId]);
 
-  // Lessons CRUD
   const createLesson = async () => {
     if (!newLesson.title.trim()) {
       alert('Please enter a lesson title');
@@ -127,7 +122,6 @@ export default function ManageLessons() {
     }
   };
 
-  // Assignments CRUD
   const createAssignment = () => {
     if (!newAssignment.title.trim()) {
       alert('Please enter assignment title');
@@ -170,7 +164,6 @@ export default function ManageLessons() {
     alert('Assignment deleted');
   };
 
-  // Media helpers
   function extractYouTubeId(url) {
     const match = url.match(/(?:youtu\.be\/|watch\?v=|embed\/)([^&\n?#]+)/);
     return match ? match[1] : url;
@@ -230,8 +223,6 @@ export default function ManageLessons() {
       <div className="manage-container">
         <div className="page-card">
           <h1 className="page-title">Course Management</h1>
-
-          {/* Tabs */}
           <div className="tab-bar">
             <button className={`tab-btn ${activeTab === 'lessons' ? 'active' : ''}`} onClick={() => setActiveTab('lessons')}>
               Lessons ({lessons.length})
@@ -240,8 +231,6 @@ export default function ManageLessons() {
               Assignments ({assignments.length})
             </button>
           </div>
-
-          {/* LESSONS TAB */}
           {activeTab === 'lessons' && (
             <>
               <div className="form-section">
@@ -305,14 +294,18 @@ export default function ManageLessons() {
                   {sortedLessons.map(lesson => (
                     <div key={lesson.lessonId} className="course-item">
                       <div className="course-thumb">
-                        <div className="lesson-order">{lesson.lessonOrder || '—'}</div>
+                        <div className="lesson-order">{lesson.lessonOrder || '—'}
+
+                        </div>
                       </div>
                       <div className="course-main">
                         <h4>{lesson.lessonName}</h4>
                         {lesson.lessonDescription && <p>{lesson.lessonDescription.substring(0, 100)}...</p>}
                         <div className="meta">
                           <span>OTP: <strong>{lesson.otp}</strong></span>
-                          <span>Updated: {new Date(lesson.updatedAt).toLocaleDateString()}</span>
+                          <span>Updated: {new Date(lesson.updatedAt).toLocaleDateString()}
+
+                          </span>
                         </div>
                       </div>
                       <div className="course-actions">
@@ -326,13 +319,14 @@ export default function ManageLessons() {
             </>
           )}
 
-          {/* ASSIGNMENTS TAB */}
           {activeTab === 'assignments' && (
             <>
               <div className="form-section">
                 <div className="course-form">
                   <div className="form-header">
-                    <span className="form-header-icon"></span>
+                    <span className="form-header-icon">
+
+                    </span>
                     <h3>Create New Assignment</h3>
                   </div>
                   <div className="form-group">
@@ -357,13 +351,16 @@ export default function ManageLessons() {
                 <h3>Assignments <span className="lessons-count">{assignments.length}</span></h3>
               </div>
               {assignments.length === 0 ? (
-                <div className="empty-state">No assignments created yet.</div>
+                <div className="empty-state">No assignments created yet.
+                </div>
               ) : (
                 <div className="courses-grid">
                   {assignments.map(assign => (
                     <div key={assign.assignmentId} className="course-item">
                       <div className="course-thumb">
-                        <div className="lesson-order">📋</div>
+                        <div className="lesson-order">📋
+
+                        </div>
                       </div>
                       <div className="course-main">
                         <h4>{assign.assignmentTitle}</h4>
@@ -389,33 +386,42 @@ export default function ManageLessons() {
           </div>
         </div>
       </div>
-
-      {/* Edit Lesson Modal */}
       {isEditLessonModalOpen && editingLesson && (
         <div className="modal-overlay" onClick={() => setIsEditLessonModalOpen(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2 className="modal-title">Edit Lesson</h2>
             <form onSubmit={saveLessonChanges}>
-              <div className="form-group"><label>Title</label><input className="form-input" value={editingLesson.title} onChange={e => setEditingLesson({ ...editingLesson, title: e.target.value })} /></div>
-              <div className="form-group"><label>Description</label><textarea className="form-textarea" value={editingLesson.description} onChange={e => setEditingLesson({ ...editingLesson, description: e.target.value })} /></div>
-              <div className="form-group"><label>Content</label><textarea rows="5" className="form-textarea" value={editingLesson.content} onChange={e => setEditingLesson({ ...editingLesson, content: e.target.value })} /></div>
-              <div className="form-group"><label>Order</label><input type="number" className="form-input" value={editingLesson.order} onChange={e => setEditingLesson({ ...editingLesson, order: e.target.value })} /></div>
-              <div className="form-actions"><button type="submit" className="btn btn-primary">Save Changes</button><button type="button" onClick={() => setIsEditLessonModalOpen(false)} className="btn btn-secondary">Cancel</button></div>
+              <div className="form-group"><label>Title</label><input className="form-input" value={editingLesson.title} onChange={e => setEditingLesson({ ...editingLesson, title: e.target.value })} />
+              </div>
+              <div className="form-group"><label>Description</label><textarea className="form-textarea" value={editingLesson.description} onChange={e => setEditingLesson({ ...editingLesson, description: e.target.value })} />
+
+              </div>
+              <div className="form-group"><label>Content</label><textarea rows="5" className="form-textarea" value={editingLesson.content} onChange={e => setEditingLesson({ ...editingLesson, content: e.target.value })} />
+
+              </div>
+              <div className="form-group"><label>Order</label><input type="number" className="form-input" value={editingLesson.order} onChange={e => setEditingLesson({ ...editingLesson, order: e.target.value })} />
+              </div>
+              <div className="form-actions"><button type="submit" className="btn btn-primary">Save Changes</button><button type="button" onClick={() => setIsEditLessonModalOpen(false)} className="btn btn-secondary">Cancel</button>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Edit Assignment Modal */}
       {isEditAssignmentModalOpen && editingAssignment && (
         <div className="modal-overlay" onClick={() => setIsEditAssignmentModalOpen(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2 className="modal-title">Edit Assignment</h2>
             <form onSubmit={saveAssignmentChanges}>
-              <div className="form-group"><label>Title</label><input className="form-input" value={editingAssignment.assignmentTitle} onChange={e => setEditingAssignment({ ...editingAssignment, assignmentTitle: e.target.value })} /></div>
-              <div className="form-group"><label>Description</label><textarea className="form-textarea" value={editingAssignment.assignmentDescription} onChange={e => setEditingAssignment({ ...editingAssignment, assignmentDescription: e.target.value })} /></div>
-              <div className="form-group"><label>Due Date</label><input type="datetime-local" className="form-input" value={editingAssignment.dueDate || ''} onChange={e => setEditingAssignment({ ...editingAssignment, dueDate: e.target.value })} /></div>
-              <div className="form-actions"><button type="submit" className="btn btn-primary">Save Changes</button><button type="button" onClick={() => setIsEditAssignmentModalOpen(false)} className="btn btn-secondary">Cancel</button></div>
+              <div className="form-group"><label>Title</label><input className="form-input" value={editingAssignment.assignmentTitle} onChange={e => setEditingAssignment({ ...editingAssignment, assignmentTitle: e.target.value })} />
+              </div>
+              <div className="form-group"><label>Description</label><textarea className="form-textarea" value={editingAssignment.assignmentDescription} onChange={e => setEditingAssignment({ ...editingAssignment, assignmentDescription: e.target.value })} />
+
+              </div>
+              <div className="form-group"><label>Due Date</label><input type="datetime-local" className="form-input" value={editingAssignment.dueDate || ''} onChange={e => setEditingAssignment({ ...editingAssignment, dueDate: e.target.value })} />
+              </div>
+              <div className="form-actions"><button type="submit" className="btn btn-primary">Save Changes</button><button type="button" onClick={() => setIsEditAssignmentModalOpen(false)} className="btn btn-secondary">Cancel</button>
+              </div>
             </form>
           </div>
         </div>

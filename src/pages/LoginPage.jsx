@@ -37,7 +37,6 @@ export default function LoginPage() {
       });
 
       const data = res.data;
-
       const user = {
         email: data.email,
         firstName: data.firstName || '',
@@ -83,7 +82,6 @@ export default function LoginPage() {
   return (
     <div className={`auth-container ${isAnimating ? 'fade-out' : ''}`}>
       <div className={`auth-wrapper login-wrapper ${isAnimating ? 'slide-out' : ''}`}>
-        {/* Левая колонка с изображением */}
         <div className="auth-left login-left">
           <div className="auth-content login-content">
             <h2>Welcome Back!</h2>
@@ -108,13 +106,10 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
-
-        {/* Правая колонка с формой */}
         <div className="auth-right login-right">
           <div className="auth-card login-card">
             <h1>Sign In</h1>
             <div className="auth-subtitle">Access your account</div>
-            
             {error && <div className="error-message">{error}</div>}
 
             <form onSubmit={handleSubmit}>

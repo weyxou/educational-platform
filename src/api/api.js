@@ -1,4 +1,3 @@
-// src/api/api.js
 import axios from 'axios';
 
 const api = axios.create({
@@ -6,7 +5,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('jwtToken');  // ← ДОЛЖНО БЫТЬ jwtToken
+  const token = localStorage.getItem('jwtToken');  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
     console.log('Token sent:', token.substring(0, 20) + '...');

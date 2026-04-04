@@ -13,9 +13,7 @@ export default function CourseAssignments() {
   const [submissions, setSubmissions] = useState({});
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-  // Модалка отправки
-  const [showSubmitModal, setShowSubmitModal] = useState(false);
+    const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [currentAssignment, setCurrentAssignment] = useState(null);
   const [answer, setAnswer] = useState('');
   
@@ -25,18 +23,14 @@ export default function CourseAssignments() {
   }, [courseId, user]);
   
   const loadData = () => {
-    // 1. Загружаем курс
     const allCourses = JSON.parse(localStorage.getItem('all_courses') || '[]');
     const courseData = allCourses.find(c => c.courseId == courseId);
     setCourse(courseData);
     
-    // 2. Загружаем задания используя универсальную функцию
     const courseAssignments = getAssignments(courseId);
     console.log('Assignments loaded for student:', courseAssignments);
     setAssignments(courseAssignments);
-    
-    // 3. Загружаем отправки студента
-    const studentKey = `student_${user.userAccountId}_submissions`;
+        const studentKey = `student_${user.userAccountId}_submissions`;
     const studentData = JSON.parse(localStorage.getItem(studentKey) || '{}');
     setSubmissions(studentData[courseId] || {});
     
@@ -66,13 +60,9 @@ export default function CourseAssignments() {
     };
     
     try {
-      // 1. Сохраняем у студента
       saveStudentSubmission(user.userAccountId, courseId, currentAssignment.assignmentId, submissionData);
+            saveSubmission(courseId, submissionData);
       
-      // 2. Сохраняем для инструктора
-      saveSubmission(courseId, submissionData);
-      
-      // 3. Обновляем состояние
       const studentKey = `student_${user.userAccountId}_submissions`;
       const studentData = JSON.parse(localStorage.getItem(studentKey) || '{}');
       setSubmissions(studentData[courseId] || {});
@@ -246,9 +236,7 @@ export default function CourseAssignments() {
           )}
         </section>
       </div>
-      
-      {/* Модалка отправки задания */}
-      {showSubmitModal && currentAssignment && (
+            {showSubmitModal && currentAssignment && (
         <div className="modal-overlay" onClick={() => setShowSubmitModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2 className="modal-title">

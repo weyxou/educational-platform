@@ -1,42 +1,41 @@
-/* ================= GLOBAL ================= */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
 .courses-page {
   font-family: 'Montserrat', sans-serif;
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  min-height: 100vh;
+  min-height: 800px;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 24px;
 }
 
-/* ================= HERO ================= */
 .courses-hero {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 3.5rem 0;
+  padding: 56px 0;
   text-align: center;
   color: white;
 }
 
 .courses-hero h1 {
-  font-size: 2.2rem;
+  font-size: 35.2px;
   font-weight: 700;
 }
 
 .subtitle {
-  margin: 1rem 0 2rem;
+  margin: 16px 0 32px;
   opacity: 0.9;
 }
 
-/* ================= SEARCH ================= */
 .search-input {
-  padding: 0.8rem 1.2rem;
+  padding: 12.8px 19.2px;
   border-radius: 999px;
   border: none;
   width: 100%;
   max-width: 400px;
-  font-size: 0.95rem;
+  font-size: 15.2px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
@@ -45,18 +44,16 @@
   transform: scale(1.03);
 }
 
-/* ================= GRID ================= */
 .courses-grid-section {
-  padding: 2.5rem 0;
+  padding: 40px 0;
 }
 
 .courses-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  gap: 24px;
 }
 
-/* ================= CARD ================= */
 .course-square {
   text-decoration: none;
   color: inherit;
@@ -82,43 +79,40 @@
   box-shadow: 0 10px 30px rgba(102,126,234,0.3);
 }
 
-/* HEADER */
 .course-header {
-  padding: 1.3rem;
+  padding: 20.8px;
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
 }
 
 .price-tag {
-  margin-top: 0.5rem;
+  margin-top: 8px;
   background: rgba(255,255,255,0.2);
-  padding: 0.3rem 0.7rem;
+  padding: 4.8px 11.2px;
   border-radius: 20px;
   display: inline-block;
 }
 
-/* BODY */
 .course-body {
-  padding: 1.2rem;
+  padding: 19.2px;
   flex-grow: 1;
 }
 
 .instructor {
-  font-size: 0.9rem;
+  font-size: 14.4px;
   color: #64748b;
 }
 
 .course-stats {
-  margin-top: 1rem;
+  margin-top: 16px;
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   color: #64748b;
 }
 
-/* FOOTER */
 .course-footer {
-  padding: 1rem;
+  padding: 16px;
   text-align: center;
   font-weight: 600;
   color: #667eea;
@@ -131,26 +125,24 @@
   color: white;
 }
 
-/* ================= STATES ================= */
 .loading {
   text-align: center;
-  padding: 4rem;
+  padding: 64px;
 }
 
 .no-courses {
   text-align: center;
-  padding: 3rem;
+  padding: 48px;
   color: #64748b;
 }
 
-/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   .courses-hero {
-    padding: 2.5rem 1rem;
+    padding: 40px 16px;
   }
 
   .courses-hero h1 {
-    font-size: 1.8rem;
+    font-size: 28.8px;
   }
 
   .courses-grid {
@@ -168,6 +160,6 @@
   }
 
   .courses-hero h1 {
-    font-size: 1.5rem;
+    font-size: 24px;
   }
 }

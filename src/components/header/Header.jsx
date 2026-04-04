@@ -17,7 +17,6 @@ export default function Header() {
     setIsMenuOpen(false);
   };
 
-  // Переключение меню
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -25,9 +24,7 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={`${styles.container} ${styles.headerContent}`}>
-        
-        {/* Логотип — переход на главную */}
-        <div className={styles.logo}>
+                <div className={styles.logo}>
           <NavLink to="/" onClick={handleLinkClick}>
             <img 
               src={logo}
@@ -37,7 +34,6 @@ export default function Header() {
           </NavLink>
         </div>
 
-        {/* Бургер-иконка */}
         <button 
           className={`${styles.burger} ${isMenuOpen ? styles.burgerActive : ''}`}
           onClick={toggleMenu}
@@ -48,9 +44,7 @@ export default function Header() {
           <span className={styles.burgerLine}></span>
         </button>
 
-        {/* Мобильное меню */}
         <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ''}`}>
-          {/* Навигация */}
           <nav className={styles.nav}>
             <NavLink to="/home" className={getLinkClass} onClick={handleLinkClick}>
               Home
@@ -65,8 +59,6 @@ export default function Header() {
               Contact
             </NavLink>
           </nav>
-
-          {/* Кнопки авторизации */}
           <div className={styles.authButtons}>
             <NavLink to="/register" className={styles.signup} onClick={handleLinkClick}>
               Sign Up
@@ -77,7 +69,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Десктопная навигация (скрывается на мобильных) */}
         <div className={styles.desktopNav}>
           <nav className={styles.navDesktop}>
             <NavLink to="/home" className={getLinkClass}>
@@ -94,7 +85,6 @@ export default function Header() {
             </NavLink>
           </nav>
 
-          {/* Десктопные кнопки авторизации */}
           <div className={styles.authButtonsDesktop}>
             <NavLink to="/register" className={styles.signup}>
               Sign Up

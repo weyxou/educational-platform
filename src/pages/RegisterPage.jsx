@@ -87,11 +87,8 @@ export default function RegisterPage() {
           console.warn('Could not update profile names:', profileErr);
         }
       }
-
-      // Добавляем анимацию перед редиректом
       setIsAnimating(true);
       
-      // Ждем завершения анимации, затем редирект
       setTimeout(() => {
         navigate(user.role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard');
       }, 600);
@@ -170,8 +167,6 @@ export default function RegisterPage() {
                   required
                 />
               </div>
-
-              {/* Выбор роли */}
               <div className="role-selection">
                 <div className="role-title">I want to join as:</div>
                 <div className="role-options">
@@ -212,7 +207,6 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Правая колонка с контентом */}
         <div className="auth-right register-right">
           <div className="auth-content">
             <h2>Start Your Journey Today</h2>

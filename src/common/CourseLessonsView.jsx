@@ -15,26 +15,20 @@ export default function CourseLessonsView() {
   const [completedLessons, setCompletedLessons] = useState({});
   const [lastOpenedLessonId, setLastOpenedLessonId] = useState(null);
 
-  // 🔥 Надёжное получение userId из JWT токена
   const getUserIdFromToken = () => {
     const token = localStorage.getItem('jwtToken');
     if (!token) return null;
     try {
       const decoded = jwtDecode(token);
-      // Пробуем разные возможные названия поля с id
       return decoded.userId || decoded.id || decoded.sub || decoded.user_id || null;
     } catch (err) {
-      console.error('Ошибка декодирования токена:', err);
       return null;
     }
   };
 
-  // ID пользователя: сначала из объекта user, потом из токена
   const userId = user?.userId || user?.id || getUserIdFromToken();
-
   const isInstructor = user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
 
-  // Загрузка курса и уроков
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,7 +37,6 @@ export default function CourseLessonsView() {
         const lessonsRes = await api.get(`/lesson/get_all_lessons/${courseId}`);
         setLessons(lessonsRes.data || []);
       } catch (err) {
-        console.error('Error loading course/lessons:', err);
       } finally {
         setLoading(false);
       }
@@ -51,15 +44,10 @@ export default function CourseLessonsView() {
     fetchData();
   }, [courseId]);
 
-  // Загрузка прогресса из localStorage
   useEffect(() => {
-    if (!courseId || !userId) {
-      console.warn('Нет courseId или userId для загрузки прогресса');
-      return;
-    }
+    if (!courseId || !userId) return;
     const progressKey = `progress_${courseId}_${userId}`;
     const lastLessonKey = `last_lesson_${courseId}_${userId}`;
-    console.log('Загружаем прогресс по ключу:', progressKey);
     const savedProgress = localStorage.getItem(progressKey);
     if (savedProgress) {
       setCompletedLessons(JSON.parse(savedProgress));
@@ -70,7 +58,6 @@ export default function CourseLessonsView() {
     }
   }, [courseId, userId]);
 
-  // Синхронизация при фокусе
   useEffect(() => {
     const handleFocus = () => {
       if (!courseId || !userId) return;
@@ -91,7 +78,6 @@ export default function CourseLessonsView() {
     if (courseId && userId) {
       const key = `progress_${courseId}_${userId}`;
       localStorage.setItem(key, JSON.stringify(newCompleted));
-      console.log(`Сохранён прогресс: ${key}`, newCompleted);
     }
   };
 
@@ -100,7 +86,6 @@ export default function CourseLessonsView() {
       const key = `last_lesson_${courseId}_${userId}`;
       localStorage.setItem(key, lessonId);
       setLastOpenedLessonId(lessonId);
-      console.log(`Сохранён последний урок: ${key}`, lessonId);
     }
   };
 

@@ -36,18 +36,16 @@ const AllCoursesPage = () => {
     );
   });
 
-  if (loading) return <div className="loading">Loading courses...</div>;
+  if (loading) return <div className="loading">Loading courses</div>;
 
   return (
     <div className="courses-page">
-      {/* HERO */}
       <section className="courses-hero">
         <div className="container">
           <h1>All Courses</h1>
           <p className="subtitle">
             Choose from courses created by expert instructors
           </p>
-
           <input
             type="text"
             placeholder="Search courses or instructors..."
@@ -57,8 +55,6 @@ const AllCoursesPage = () => {
           />
         </div>
       </section>
-
-      {/* GRID */}
       <section className="courses-grid-section">
         <div className="container">
           <div className="courses-grid">

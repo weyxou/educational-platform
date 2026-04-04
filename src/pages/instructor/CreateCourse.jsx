@@ -29,7 +29,7 @@
   return (
     <div className="dashboard-container">
       <div className="page-card">
-        <h2 className="page-title">Create New Course</h2> {/* или Edit Course */}
+        <h2 className="page-title">Create New Course</h2>
         <form onSubmit={handleSubmit} className="course-form">
           <div className="form-group">
             <label>Course Name</label>
