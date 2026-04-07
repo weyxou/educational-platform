@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import api from "../../api/api";
 import "./Courses.css";
 
-const AllCoursesPage = () => {
+const Courses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,7 +23,6 @@ const AllCoursesPage = () => {
         setLoading(false);
       }
     };
-
     fetchCourses();
   }, []);
 
@@ -61,29 +60,24 @@ const AllCoursesPage = () => {
             {filteredCourses.length > 0 ? (
               filteredCourses.map((course) => (
                 <Link
-                  to={`/courses/${course.id}/detail`}
-                  key={course.id}
+                  to={`/courses/${course.courseId}/detail`} 
+                  key={course.courseId}
                   className="course-square"
                 >
                   <div className="course-square-inner">
                     <div className="course-header">
                       <h3>{course.courseName}</h3>
-                      <div className="price-tag">
-                        {course.price || "Free"}
-                      </div>
+      
                     </div>
-
                     <div className="course-body">
                       <p className="instructor">
                         by <strong>{course.instructorName}</strong>
                       </p>
-
                       <div className="course-stats">
                         <span>{course.studentsCount || 0} students</span>
                         <span>★ {course.rating || 0}</span>
                       </div>
                     </div>
-
                     <div className="course-footer">
                       View Details →
                     </div>
@@ -103,4 +97,4 @@ const AllCoursesPage = () => {
   );
 };
 
-export default AllCoursesPage;
+export default Courses;

@@ -33,14 +33,13 @@ const Contact = () => {
               </form>
             </div>
             <div className="contact-info-compact">
-              <h2>Get in Touch</h2>
+              <h2>Information</h2>
               <div className="info-row">support@educationalplatform.com</div>
               <div className="info-row">+996 707000999</div>
               <div className="info-row">Bishkek, Kyrgyzstan</div>
 
               <div className="social-mini">
                 <a href="#">Facebook</a>
-                <a href="#">Twitter</a>
                 <a href="#">LinkedIn</a>
                 <a href="#">Instagram</a>
               </div>
