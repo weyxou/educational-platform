@@ -51,13 +51,13 @@ const Footer = () => {
           </p>
           <div className={styles.social}>
             <a href="#" className={styles.socialLink} aria-label="Facebook">
-             <img src="public\images\facebook.svg" alt="" />
+             <img src="\images\facebook.svg" alt="" />
             </a>
             <a href="#" className={styles.socialLink} aria-label="Instagram">
-              <img src="public\images\insta.svg" alt="" />
+              <img src="\images\insta.svg" alt="" />
             </a>
             <a href="#" className={styles.socialLink} aria-label="LinkedIn">
-             <img src="public\images\linkedin.svg" alt="" />
+             <img src="\images\linkedin.svg" alt="" />
             </a>
           </div>
         </div>

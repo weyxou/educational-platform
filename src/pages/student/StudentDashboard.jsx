@@ -4,9 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../api/api';
 import './StudentDashboard.css';
 
-
 export default function StudentDashboard() {
-  const { user, logout, updateUser } = useAuth(); 
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [allCourses, setAllCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -17,67 +16,65 @@ export default function StudentDashboard() {
     lastName: '',
     email: '',
   });
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const getUserId = () => user?.userAccountId || user?.id;
   useEffect(() => {
     if (!user) return;
 
-    const init = async () => {
+    const fetchData = async () => {
       try {
-        const coursesRes = await api.get('/course/all_courses');
+        const [coursesRes, enrolledRes] = await Promise.all([
+          api.get('/course/all_courses'),
+          api.get('/enrollment/my-courses')
+        ]);
         setAllCourses(coursesRes.data || []);
-        const saved = localStorage.getItem(`enrolled_courses_${user.userAccountId || user.id}`);
-        setEnrolledCourses(saved ? JSON.parse(saved) : []);
-
-        setProfileForm({
-          firstName: user.firstName || '',
-          lastName: user.lastName || '',
-          email: user.email || '',
-        });
-
-        setIsInitialized(true);
+        setEnrolledCourses(enrolledRes.data || []);
       } catch (err) {
-        console.error(err);
-        setAllCourses([]);
+        console.error('Error loading courses:', err);
         setEnrolledCourses([]);
-        setIsInitialized(true);
       } finally {
         setLoading(false);
       }
     };
 
-    init();
+    fetchData();
   }, [user]);
 
   useEffect(() => {
-    if (!user || !isInitialized) return;
-    const storageKey = `enrolled_courses_${user.userAccountId || user.id}`;
-    localStorage.setItem(storageKey, JSON.stringify(enrolledCourses));
-  }, [enrolledCourses, user, isInitialized]);
+    if (user) {
+      setProfileForm({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+      });
+    }
+  }, [user]);
 
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768 && isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [isMobileMenuOpen]);
-
-  const handleEnroll = (course) => {
+  const handleEnroll = async (course) => {
     if (!window.confirm(`Enroll in "${course.courseName}"?`)) return;
-    setEnrolledCourses((prev) => {
-      if (prev.some((c) => c.courseId === course.courseId)) return prev;
-      return [...prev, course];
-    });
+    try {
+      await api.post(`/enrollment/enroll/${course.courseId}`);
+      const enrolledRes = await api.get('/enrollment/my-courses');
+      setEnrolledCourses(enrolledRes.data);
+      alert('Successfully enrolled!');
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Enrollment failed. Please try again.');
+    }
   };
 
-  const handleUnenroll = (courseId) => {
+  
+  const handleUnenroll = async (courseId) => {
     if (!window.confirm('Are you sure you want to unenroll from this course?')) return;
-    setEnrolledCourses((prev) => prev.filter((c) => c.courseId !== courseId));
+    try {
+      await api.delete(`/enrollment/unenroll/${courseId}`);
+      setEnrolledCourses((prev) => prev.filter((c) => c.courseId !== courseId));
+      alert('Unenrolled successfully');
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Unenroll failed');
+    }
   };
 
   const availableCourses = allCourses.filter(
@@ -89,7 +86,7 @@ export default function StudentDashboard() {
   };
 
   const handleProfileSave = async () => {
-    const userId = user.userAccountId || user.id;
+    const userId = getUserId();
     if (!userId) {
       alert('User ID not found. Please log in again.');
       return;
@@ -144,18 +141,16 @@ export default function StudentDashboard() {
               <div className="profile-name">
                 {user.firstName} {user.lastName}
               </div>
-              <div className="profile-email">{user.email}
-
-              </div>
+              <div className="profile-email">{user.email}</div>
             </div>
-            <button 
-              onClick={() => setEditingProfile(true)} 
+            <button
+              onClick={() => setEditingProfile(true)}
               className="edit-profile-btn desktop-only"
             >
               Edit Profile
             </button>
           </div>
-          <button 
+          <button
             className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Menu"
@@ -164,7 +159,6 @@ export default function StudentDashboard() {
           </button>
           <button onClick={logout} className="logout-btn desktop-only">Logout</button>
 
-          {/* Мобильное выезжающее меню */}
           <div className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
             <div className="mobile-profile-info">
               <div className="mobile-profile-name">
@@ -172,20 +166,20 @@ export default function StudentDashboard() {
               </div>
               <div className="mobile-profile-email">{user.email}</div>
             </div>
-            <button 
+            <button
               onClick={() => {
                 setEditingProfile(true);
                 setIsMobileMenuOpen(false);
-              }} 
+              }}
               className="mobile-edit-btn"
             >
               Edit Profile
             </button>
-            <button 
+            <button
               onClick={() => {
                 logout();
                 setIsMobileMenuOpen(false);
-              }} 
+              }}
               className="mobile-logout-btn"
             >
               Logout
@@ -204,8 +198,8 @@ export default function StudentDashboard() {
           <div className="section-header">
             <h2>My Courses</h2>
             {hasMoreEnrolled && (
-              <button 
-                onClick={() => navigate('/student/my-courses')} 
+              <button
+                onClick={() => navigate('/student/my-courses')}
                 className="view-all-btn"
               >
                 View All ({enrolledCourses.length})
@@ -213,11 +207,9 @@ export default function StudentDashboard() {
             )}
           </div>
           {loading ? (
-            <div className="loading-state">Loading courses
-            </div>
+            <div className="loading-state">Loading courses</div>
           ) : enrolledCourses.length === 0 ? (
-            <div className="empty-state">You haven't enrolled in any courses yet.
-            </div>
+            <div className="empty-state">You haven't enrolled in any courses yet.</div>
           ) : (
             <div className="courses-grid">
               {displayedEnrolled.map((course) => (
@@ -264,8 +256,8 @@ export default function StudentDashboard() {
           <div className="section-header">
             <h2>Available Courses</h2>
             {hasMoreAvailable && (
-              <button 
-                onClick={() => navigate('/student/available-courses')} 
+              <button
+                onClick={() => navigate('/student/available-courses')}
                 className="view-all-btn"
               >
                 View All ({availableCourses.length})

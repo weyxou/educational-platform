@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import api from '../../api/api';
 import './AssignmentSubmissions.css';
 
 export default function AssignmentSubmissions() {
@@ -8,107 +9,89 @@ export default function AssignmentSubmissions() {
   
   const [assignment, setAssignment] = useState(null);
   const [submissions, setSubmissions] = useState([]);
-  const [feedback, setFeedback] = useState({});
-  const [grades, setGrades] = useState({});
   const [loading, setLoading] = useState(true);
+  const [grades, setGrades] = useState({});
+  const [feedbacks, setFeedbacks] = useState({});
   
   useEffect(() => {
     loadData();
-  }, [courseId, assignmentId]);
+  }, [assignmentId]);
   
-  const loadData = () => {
-    // Load assignment from storage (supports both storage patterns)
-    const instructorAssignments = JSON.parse(localStorage.getItem('instructor_assignments') || '{}');
-    const courseAssignments = instructorAssignments[courseId] || [];
-    let foundAssignment = courseAssignments.find(a => a.assignmentId == assignmentId);
-    
-    if (!foundAssignment) {
-      const newFormat = localStorage.getItem(`instructor_assignments_${courseId}`);
-      if (newFormat) {
-        const assignments = JSON.parse(newFormat);
-        foundAssignment = assignments.find(a => a.assignmentId == assignmentId);
+  const loadData = async () => {
+    try {
+      const submissionsRes = await api.get(`/assignment/submissions/${assignmentId}`);
+      const subs = submissionsRes.data;
+      setSubmissions(subs);
+      
+      const initGrades = {};
+      const initFeedbacks = {};
+      subs.forEach(sub => {
+        initGrades[sub.submissionId] = sub.grade !== null ? sub.grade : '';
+        initFeedbacks[sub.submissionId] = sub.feedback || '';
+      });
+      setGrades(initGrades);
+      setFeedbacks(initFeedbacks);
+            try {
+        const assignmentRes = await api.get(`/assignment/${assignmentId}`);
+        setAssignment(assignmentRes.data);
+      } catch (err) {
+        setAssignment({ assignmentTitle: `Assignment ${assignmentId}` });
       }
+    } catch (err) {
+      console.error('Error loading submissions:', err);
+      alert('Failed to load submissions');
+    } finally {
+      setLoading(false);
     }
-    
-    if (foundAssignment) {
-      setAssignment(foundAssignment);
-    } else {
-      setAssignment({ assignmentTitle: `Assignment ${assignmentId}` });
-    }
-    
-    // Load submissions
-    const allSubmissions = JSON.parse(localStorage.getItem(`instructor_submissions_${courseId}`) || '[]');
-    const assignmentSubmissions = allSubmissions.filter(sub => sub.assignmentId == assignmentId);
-    setSubmissions(assignmentSubmissions);
-    
-    const feedbackObj = {};
-    const gradesObj = {};
-    assignmentSubmissions.forEach(sub => {
-      feedbackObj[sub.submissionId] = sub.feedback || '';
-      gradesObj[sub.submissionId] = sub.grade !== undefined && sub.grade !== null ? sub.grade : '';
-    });
-    setFeedback(feedbackObj);
-    setGrades(gradesObj);
-    setLoading(false);
   };
   
-  const saveGrade = (submissionId, studentId) => {
+  const saveGrade = async (submissionId, studentId) => {
     const grade = grades[submissionId];
-    if (grade === '' || grade === null || grade === undefined) {
+    if (grade === '' || grade === null) {
       alert('Please enter a grade');
       return;
     }
     const numericGrade = parseFloat(grade);
     if (isNaN(numericGrade) || numericGrade < 0 || numericGrade > 100) {
-      alert('Please enter a valid grade between 0 and 100');
+      alert('Grade must be between 0 and 100');
       return;
     }
-    
-    const currentSubmission = submissions.find(sub => sub.submissionId === submissionId);
-    if (currentSubmission?.grade === numericGrade) return;
-    
-    // Update instructor submissions
-    const allSubmissions = JSON.parse(localStorage.getItem(`instructor_submissions_${courseId}`) || '[]');
-    const updated = allSubmissions.map(sub => 
-      sub.submissionId === submissionId ? { ...sub, grade: numericGrade } : sub
-    );
-    localStorage.setItem(`instructor_submissions_${courseId}`, JSON.stringify(updated));
-    
-    // Update student's record
-    const studentData = JSON.parse(localStorage.getItem(`student_${studentId}_submissions`) || '{}');
-    if (studentData[courseId] && studentData[courseId][assignmentId]) {
-      studentData[courseId][assignmentId].grade = numericGrade;
-      localStorage.setItem(`student_${studentId}_submissions`, JSON.stringify(studentData));
+    try {
+      await api.put('/assignment/gradeAssignment', {
+        studentId: studentId,
+        assignmentId: parseInt(assignmentId),
+        grade: numericGrade
+      });
+      setSubmissions(prev => prev.map(sub => 
+        sub.submissionId === submissionId ? { ...sub, grade: numericGrade } : sub
+      ));
+      alert('Grade saved successfully');
+    } catch (err) {
+      console.error('Grade save error:', err);
+      alert('Failed to save grade');
     }
-    
-    // Update local state
-    setSubmissions(prev => prev.map(sub => 
-      sub.submissionId === submissionId ? { ...sub, grade: numericGrade } : sub
-    ));
-    alert('Grade saved successfully');
   };
   
-  const saveFeedback = (submissionId, studentId) => {
-    const text = feedback[submissionId] || '';
-    const currentSubmission = submissions.find(sub => sub.submissionId === submissionId);
-    if (currentSubmission?.feedback === text) return;
-    
-    const allSubmissions = JSON.parse(localStorage.getItem(`instructor_submissions_${courseId}`) || '[]');
-    const updated = allSubmissions.map(sub => 
-      sub.submissionId === submissionId ? { ...sub, feedback: text } : sub
-    );
-    localStorage.setItem(`instructor_submissions_${courseId}`, JSON.stringify(updated));
-    
-    const studentData = JSON.parse(localStorage.getItem(`student_${studentId}_submissions`) || '{}');
-    if (studentData[courseId] && studentData[courseId][assignmentId]) {
-      studentData[courseId][assignmentId].feedback = text;
-      localStorage.setItem(`student_${studentId}_submissions`, JSON.stringify(studentData));
+  const saveFeedback = async (submissionId, studentId) => {
+    const feedback = feedbacks[submissionId];
+    if (!feedback) {
+      alert('Please enter feedback');
+      return;
     }
-    
-    setSubmissions(prev => prev.map(sub => 
-      sub.submissionId === submissionId ? { ...sub, feedback: text } : sub
-    ));
-    alert('Feedback saved successfully');
+    try {
+      await api.put('/assignment/saveAssignmentFeedback', {
+        studentId: studentId,
+        assignmentId: parseInt(assignmentId),
+        feedback: feedback
+      });
+      setSubmissions(prev => prev.map(sub => 
+        sub.submissionId === submissionId ? { ...sub, feedback: feedback } : sub
+      ));
+      alert('Feedback saved successfully');
+    } catch (err) {
+      console.error('Feedback save error:', err);
+      alert('Failed to save feedback');
+    }
   };
   
   const formatDate = (dateString) => {
@@ -118,36 +101,15 @@ export default function AssignmentSubmissions() {
   
   if (loading) return <div className="loading-state">Loading submissions...</div>;
   
-  const handleBack = () => {
-    if (window.location.pathname.includes('/instructor/')) {
-      navigate(`/instructor/course/${courseId}/manage`);
-    } else {
-      navigate(`/courses/${courseId}/assignments`);
-    }
-  };
-  
   return (
     <div className="submissions-page">
       <div className="submissions-container">
         <div className="page-card">
           <div className="submissions-header">
-            <button onClick={handleBack} className="back-btn">← Back to Course</button>
-            <h1>{assignment?.assignmentTitle} - Submissions</h1>
-          </div>
-          
-          <div className="assignment-info-card">
-            <div className="assignment-info-row">
-              <span className="info-label">Description</span>
-              <span className="info-value">{assignment?.assignmentDescription || 'No description'}</span>
-            </div>
-            <div className="assignment-info-row">
-              <span className="info-label">Due Date</span>
-              <span className="info-value">{assignment?.dueDate ? formatDate(assignment.dueDate) : 'No due date'}</span>
-            </div>
-            <div className="assignment-info-row">
-              <span className="info-label">Submissions</span>
-              <span className="info-value highlight">{submissions.length} student(s)</span>
-            </div>
+            <button onClick={() => navigate(`/instructor/course/${courseId}/manage`)} className="back-btn">
+              ← Back to Course
+            </button>
+            <h1>{assignment?.assignmentTitle || 'Assignment'} - Submissions</h1>
           </div>
           
           {submissions.length === 0 ? (
@@ -173,42 +135,54 @@ export default function AssignmentSubmissions() {
                   {submissions.map(sub => (
                     <tr key={sub.submissionId}>
                       <td className="student-cell">
-                        <strong>{sub.studentName}</strong>
-                        <span className="student-email">{sub.studentEmail}</span>
+                        <strong>{sub.student?.firstName} {sub.student?.lastName}</strong>
+                        <span className="student-email">{sub.student?.email}</span>
                       </td>
-                      <td>{formatDate(sub.submittedAt)}</td>
+                      <td>{formatDate(sub.submissionDate)}</td>
                       <td>
-                        <div className="answer-preview">{sub.answer?.substring(0, 100)}...</div>
-                      </td>
+                        <div className="answer-preview">{sub.submittedContent?.substring(0, 100)}...</div>
+                       </td>
                       <td className="grade-cell">
                         <div className="input-group">
                           <input 
                             type="number" 
                             min="0" 
                             max="100" 
-                            step="1" 
+                            step="1"
                             value={grades[sub.submissionId] || ''}
                             onChange={e => setGrades({...grades, [sub.submissionId]: e.target.value})}
                             className="grade-input" 
                           />
-                          <button onClick={() => saveGrade(sub.submissionId, sub.studentId)} className="icon-btn save-grade">Save</button>
+                          <button 
+                            onClick={() => saveGrade(sub.submissionId, sub.student?.userAccountId)} 
+                            className="icon-btn save-grade"
+                          >
+                            Save
+                          </button>
                         </div>
                       </td>
                       <td className="feedback-cell">
                         <div className="input-group vertical">
                           <textarea 
-                            rows="2" 
-                            value={feedback[sub.submissionId] || ''}
-                            onChange={e => setFeedback({...feedback, [sub.submissionId]: e.target.value})}
+                            rows="2"
+                            value={feedbacks[sub.submissionId] || ''}
+                            onChange={e => setFeedbacks({...feedbacks, [sub.submissionId]: e.target.value})}
                             placeholder="Write feedback..."
-                            className="feedback-input"
+                            className="feedback-input" 
                           />
-                          <button onClick={() => saveFeedback(sub.submissionId, sub.studentId)} className="icon-btn save-feedback">Save</button>
+                          <button 
+                            onClick={() => saveFeedback(sub.submissionId, sub.student?.userAccountId)}
+                            className="icon-btn save-feedback"
+                          >
+                            Save
+                          </button>
                         </div>
                       </td>
                       <td>
-                        <button onClick={() => alert(sub.answer)} className="view-btn">View Full Answer</button>
-                      </td>
+                        <button onClick={() => alert(sub.submittedContent)} className="view-btn">
+                          View Full Answer
+                        </button>
+                       </td>
                     </tr>
                   ))}
                 </tbody>

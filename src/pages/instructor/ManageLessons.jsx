@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../api/api';
-import {
-  getAssignments,
-  saveAssignments,
-  addAssignment,
-  updateAssignment,
-  deleteAssignment
-} from '../../utils/assignmentStorage';
 import './ManageLessons.css';
 
 export default function ManageLessons() {
@@ -45,12 +38,18 @@ export default function ManageLessons() {
   }, [courseId]);
 
   useEffect(() => {
-    const loadAssignments = () => {
-      const courseAssignments = getAssignments(courseId);
-      setAssignments(courseAssignments);
-      setLoadingAssignments(false);
+    const loadAssignmentsFromApi = async () => {
+      try {
+        const res = await api.get(`/assignment/course/${courseId}`);
+        setAssignments(res.data || []);
+      } catch (err) {
+        console.error('Failed to load assignments:', err);
+        setError('Failed to load assignments');
+      } finally {
+        setLoadingAssignments(false);
+      }
     };
-    loadAssignments();
+    loadAssignmentsFromApi();
   }, [courseId]);
 
   const createLesson = async () => {
@@ -122,20 +121,26 @@ export default function ManageLessons() {
     }
   };
 
-  const createAssignment = () => {
+  const createAssignment = async () => {
     if (!newAssignment.title.trim()) {
       alert('Please enter assignment title');
       return;
     }
-    const newAssign = {
-      assignmentTitle: newAssignment.title.trim(),
-      assignmentDescription: newAssignment.description.trim() || '',
-      dueDate: newAssignment.dueDate || '',
-    };
-    const added = addAssignment(courseId, newAssign);
-    setAssignments(prev => [...prev, added]);
-    setNewAssignment({ title: '', description: '', dueDate: '' });
-    alert('Assignment created');
+    try {
+      const payload = {
+        courseId: parseInt(courseId, 10),
+        assignmentTitle: newAssignment.title.trim(),
+        assignmentDescription: newAssignment.description.trim() || '',
+        dueDate: newAssignment.dueDate ? new Date(newAssignment.dueDate).toISOString() : null
+      };
+      const res = await api.post('/assignment/add_assignment', payload);
+      setAssignments(prev => [...prev, res.data]);
+      setNewAssignment({ title: '', description: '', dueDate: '' });
+      alert('Assignment created successfully!');
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to create assignment');
+    }
   };
 
   const openEditAssignmentModal = (assign) => {
@@ -143,27 +148,23 @@ export default function ManageLessons() {
     setIsEditAssignmentModalOpen(true);
   };
 
-  const saveAssignmentChanges = (e) => {
+  const saveAssignmentChanges = async (e) => {
     e.preventDefault();
-    updateAssignment(courseId, editingAssignment.assignmentId, {
-      assignmentTitle: editingAssignment.assignmentTitle,
-      assignmentDescription: editingAssignment.assignmentDescription,
-      dueDate: editingAssignment.dueDate,
-    });
-    setAssignments(prev =>
-      prev.map(a => a.assignmentId === editingAssignment.assignmentId ? editingAssignment : a)
-    );
+    alert('Editing not yet implemented on backend. Please delete and recreate.');
     setIsEditAssignmentModalOpen(false);
-    alert('Assignment updated');
   };
 
-  const deleteAssignmentHandler = (assignmentId) => {
+  const deleteAssignmentHandler = async (assignmentId) => {
     if (!window.confirm('Delete this assignment? All submissions will be lost.')) return;
-    deleteAssignment(courseId, assignmentId);
-    setAssignments(prev => prev.filter(a => a.assignmentId !== assignmentId));
-    alert('Assignment deleted');
+    try {
+      await api.delete(`/assignment/${assignmentId}`);
+      setAssignments(prev => prev.filter(a => a.assignmentId !== assignmentId));
+      alert('Assignment deleted');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete assignment');
+    }
   };
-
   function extractYouTubeId(url) {
     const match = url.match(/(?:youtu\.be\/|watch\?v=|embed\/)([^&\n?#]+)/);
     return match ? match[1] : url;
@@ -215,7 +216,7 @@ export default function ManageLessons() {
 
   const sortedLessons = [...lessons].sort((a, b) => (a.lessonOrder || 0) - (b.lessonOrder || 0));
 
-  if (loadingLessons && loadingAssignments) return <div className="loading-state">Loading courses...</div>;
+  if (loadingLessons && loadingAssignments) return <div className="loading-state">Loading course content...</div>;
   if (error) return <div className="error">{error}</div>;
 
   return (
@@ -231,6 +232,7 @@ export default function ManageLessons() {
               Assignments ({assignments.length})
             </button>
           </div>
+
           {activeTab === 'lessons' && (
             <>
               <div className="form-section">
@@ -267,10 +269,12 @@ export default function ManageLessons() {
                         else tag = `<a href="${url}" target="_blank">${url}</a>`;
                         setNewLesson({ ...newLesson, content: (newLesson.content || '') + '\n' + tag });
                       }}>Add Link / Embed</button>
-                      <label htmlFor="fileUpload" className={`media-btn ${uploading ? 'disabled' : ''}`} style={{ cursor: uploading ? 'not-allowed' : 'pointer' }}>
+                      <label htmlFor="fileUpload" className={`media-btn ${uploading ? 'disabled' : ''}`} 
+                      style={{ cursor: uploading ? 'not-allowed' : 'pointer' }}>
                         {uploading ? 'Uploading...' : 'Upload File'}
                       </label>
-                      <input type="file" id="fileUpload" style={{ display: 'none' }} accept="image/*,video/*,application/pdf" onChange={handleFileUpload} disabled={uploading} />
+                      <input type="file" id="fileUpload" style={{ display: 'none' }}
+                       accept="image/*,video/*,application/pdf" onChange={handleFileUpload} disabled={uploading} />
                     </div>
                     <span className="help-text">Supports images, MP4, PDF, YouTube links</span>
                   </div>
@@ -294,23 +298,21 @@ export default function ManageLessons() {
                   {sortedLessons.map(lesson => (
                     <div key={lesson.lessonId} className="course-item">
                       <div className="course-thumb">
-                        <div className="lesson-order">{lesson.lessonOrder || '—'}
-
-                        </div>
+                        <div className="lesson-order">{lesson.lessonOrder || '—'}</div>
                       </div>
                       <div className="course-main">
                         <h4>{lesson.lessonName}</h4>
                         {lesson.lessonDescription && <p>{lesson.lessonDescription.substring(0, 100)}...</p>}
                         <div className="meta">
                           <span>OTP: <strong>{lesson.otp}</strong></span>
-                          <span>Updated: {new Date(lesson.updatedAt).toLocaleDateString()}
-
-                          </span>
+                          <span>Updated: {new Date(lesson.updatedAt).toLocaleDateString()}</span>
                         </div>
                       </div>
                       <div className="course-actions">
-                        <button onClick={() => openEditLessonModal(lesson)} className="action-btn edit">Edit</button>
-                        <button onClick={() => deleteLesson(lesson.lessonId)} className="action-btn delete">Delete</button>
+                        <button onClick={() => openEditLessonModal(lesson)} 
+                        className="action-btn edit">Edit</button>
+                        <button onClick={() => deleteLesson(lesson.lessonId)}
+                         className="action-btn delete">Delete</button>
                       </div>
                     </div>
                   ))}
@@ -324,22 +326,23 @@ export default function ManageLessons() {
               <div className="form-section">
                 <div className="course-form">
                   <div className="form-header">
-                    <span className="form-header-icon">
-
-                    </span>
+                    <span className="form-header-icon"></span>
                     <h3>Create New Assignment</h3>
                   </div>
                   <div className="form-group">
                     <label>Assignment Title *</label>
-                    <input className="form-input" value={newAssignment.title} onChange={e => setNewAssignment({ ...newAssignment, title: e.target.value })} />
+                    <input className="form-input" value={newAssignment.title} 
+                    onChange={e => setNewAssignment({ ...newAssignment, title: e.target.value })} />
                   </div>
                   <div className="form-group">
                     <label>Description</label>
-                    <textarea className="form-textarea" value={newAssignment.description} onChange={e => setNewAssignment({ ...newAssignment, description: e.target.value })} />
+                    <textarea className="form-textarea" value={newAssignment.description}
+                     onChange={e => setNewAssignment({ ...newAssignment, description: e.target.value })} />
                   </div>
                   <div className="form-group">
                     <label>Due Date</label>
-                    <input type="datetime-local" className="form-input" value={newAssignment.dueDate} onChange={e => setNewAssignment({ ...newAssignment, dueDate: e.target.value })} />
+                    <input type="datetime-local" className="form-input" value={newAssignment.dueDate} 
+                    onChange={e => setNewAssignment({ ...newAssignment, dueDate: e.target.value })} />
                   </div>
                   <div className="form-actions">
                     <button onClick={createAssignment} className="btn btn-primary">Create Assignment</button>
@@ -351,26 +354,25 @@ export default function ManageLessons() {
                 <h3>Assignments <span className="lessons-count">{assignments.length}</span></h3>
               </div>
               {assignments.length === 0 ? (
-                <div className="empty-state">No assignments created yet.
-                </div>
+                <div className="empty-state">No assignments created yet.</div>
               ) : (
                 <div className="courses-grid">
                   {assignments.map(assign => (
                     <div key={assign.assignmentId} className="course-item">
                       <div className="course-thumb">
-                        <div className="lesson-order">📋
-
-                        </div>
+                        <div className="lesson-order">📋</div>
                       </div>
                       <div className="course-main">
                         <h4>{assign.assignmentTitle}</h4>
                         <p>{assign.assignmentDescription?.substring(0, 100) || 'No description'}</p>
                         <div className="meta">
-                          <span>Due: {assign.dueDate ? new Date(assign.dueDate).toLocaleString() : 'No due date'}</span>
+                          <span>Due: {assign.dueDate ? new Date(assign.dueDate).toLocaleString() 
+                          : 'No due date'}</span>
                         </div>
                       </div>
                       <div className="course-actions">
-                        <Link to={`/courses/${courseId}/assignments/${assign.assignmentId}/submissions`} className="action-btn submissions">Submissions</Link>
+                        <Link to={`/courses/${courseId}/assignments/${assign.assignmentId}/submissions`} 
+                        className="action-btn submissions">Submissions</Link>
                         <button onClick={() => openEditAssignmentModal(assign)} className="action-btn edit">Edit</button>
                         <button onClick={() => deleteAssignmentHandler(assign.assignmentId)} className="action-btn delete">Delete</button>
                       </div>
@@ -382,27 +384,28 @@ export default function ManageLessons() {
           )}
 
           <div className="back-button-container">
-            <button onClick={() => navigate('/instructor/dashboard')} className="btn btn-secondary">← Back to Dashboard</button>
+            <button onClick={() => navigate('/instructor/dashboard')}
+             className="btn btn-secondary">← Back to Dashboard</button>
           </div>
         </div>
       </div>
+
       {isEditLessonModalOpen && editingLesson && (
         <div className="modal-overlay" onClick={() => setIsEditLessonModalOpen(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2 className="modal-title">Edit Lesson</h2>
             <form onSubmit={saveLessonChanges}>
-              <div className="form-group"><label>Title</label><input className="form-input" value={editingLesson.title} onChange={e => setEditingLesson({ ...editingLesson, title: e.target.value })} />
-              </div>
-              <div className="form-group"><label>Description</label><textarea className="form-textarea" value={editingLesson.description} onChange={e => setEditingLesson({ ...editingLesson, description: e.target.value })} />
-
-              </div>
-              <div className="form-group"><label>Content</label><textarea rows="5" className="form-textarea" value={editingLesson.content} onChange={e => setEditingLesson({ ...editingLesson, content: e.target.value })} />
-
-              </div>
-              <div className="form-group"><label>Order</label><input type="number" className="form-input" value={editingLesson.order} onChange={e => setEditingLesson({ ...editingLesson, order: e.target.value })} />
-              </div>
-              <div className="form-actions"><button type="submit" className="btn btn-primary">Save Changes</button><button type="button" onClick={() => setIsEditLessonModalOpen(false)} className="btn btn-secondary">Cancel</button>
-              </div>
+              <div className="form-group"><label>Title</label><input className="form-input"
+               value={editingLesson.title} onChange={e => setEditingLesson({ ...editingLesson, title: e.target.value })} /></div>
+              <div className="form-group"><label>Description</label><textarea 
+              className="form-textarea" value={editingLesson.description} 
+              onChange={e => setEditingLesson({ ...editingLesson, description: e.target.value })} /></div>
+              <div className="form-group"><label>Content</label><textarea rows="5" 
+              className="form-textarea" value={editingLesson.content} onChange={e => setEditingLesson({ ...editingLesson, content: e.target.value })} /></div>
+              <div className="form-group"><label>Order</label><input type="number" 
+              className="form-input" value={editingLesson.order} onChange={e => setEditingLesson({ ...editingLesson, order: e.target.value })} /></div>
+              <div className="form-actions"><button type="submit" 
+              className="btn btn-primary">Save Changes</button><button type="button" onClick={() => setIsEditLessonModalOpen(false)} className="btn btn-secondary">Cancel</button></div>
             </form>
           </div>
         </div>
@@ -412,17 +415,10 @@ export default function ManageLessons() {
         <div className="modal-overlay" onClick={() => setIsEditAssignmentModalOpen(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2 className="modal-title">Edit Assignment</h2>
-            <form onSubmit={saveAssignmentChanges}>
-              <div className="form-group"><label>Title</label><input className="form-input" value={editingAssignment.assignmentTitle} onChange={e => setEditingAssignment({ ...editingAssignment, assignmentTitle: e.target.value })} />
-              </div>
-              <div className="form-group"><label>Description</label><textarea className="form-textarea" value={editingAssignment.assignmentDescription} onChange={e => setEditingAssignment({ ...editingAssignment, assignmentDescription: e.target.value })} />
-
-              </div>
-              <div className="form-group"><label>Due Date</label><input type="datetime-local" className="form-input" value={editingAssignment.dueDate || ''} onChange={e => setEditingAssignment({ ...editingAssignment, dueDate: e.target.value })} />
-              </div>
-              <div className="form-actions"><button type="submit" className="btn btn-primary">Save Changes</button><button type="button" onClick={() => setIsEditAssignmentModalOpen(false)} className="btn btn-secondary">Cancel</button>
-              </div>
-            </form>
+            <p>Editing via API is not fully implemented. Please delete and recreate.</p>
+            <div className="form-actions">
+              <button onClick={() => setIsEditAssignmentModalOpen(false)} className="btn btn-secondary">Close</button>
+            </div>
           </div>
         </div>
       )}
