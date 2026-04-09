@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../api/api';
+import { useNotification } from '../../context/AlertCustom';
 import './ManageLessons.css';
 
 export default function ManageLessons() {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const { showToast, confirm } = useNotification();
   const [activeTab, setActiveTab] = useState('lessons');
 
   const [lessons, setLessons] = useState([]);
   const [loadingLessons, setLoadingLessons] = useState(true);
-  const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [newLesson, setNewLesson] = useState({ title: '', description: '', content: '', order: '' });
   const [editingLesson, setEditingLesson] = useState(null);
@@ -29,13 +30,13 @@ export default function ManageLessons() {
         setLessons(res.data || []);
       } catch (err) {
         console.error(err);
-        setError('Failed to load lessons');
+        showToast('Failed to load lessons', 'error');
       } finally {
         setLoadingLessons(false);
       }
     };
     fetchLessons();
-  }, [courseId]);
+  }, [courseId, showToast]);
 
   useEffect(() => {
     const loadAssignmentsFromApi = async () => {
@@ -44,17 +45,17 @@ export default function ManageLessons() {
         setAssignments(res.data || []);
       } catch (err) {
         console.error('Failed to load assignments:', err);
-        setError('Failed to load assignments');
+        showToast('Failed to load assignments', 'error');
       } finally {
         setLoadingAssignments(false);
       }
     };
     loadAssignmentsFromApi();
-  }, [courseId]);
+  }, [courseId, showToast]);
 
   const createLesson = async () => {
     if (!newLesson.title.trim()) {
-      alert('Please enter a lesson title');
+      showToast('Please enter a lesson title', 'error');
       return;
     }
     try {
@@ -68,10 +69,10 @@ export default function ManageLessons() {
       const res = await api.post('/lesson/add_lesson', dto);
       setLessons([...lessons, res.data]);
       setNewLesson({ title: '', description: '', content: '', order: '' });
-      alert('Lesson added successfully!');
+      showToast('Lesson added successfully!', 'success');
     } catch (err) {
       console.error(err);
-      alert('Failed to add lesson');
+      showToast('Failed to add lesson', 'error');
     }
   };
 
@@ -102,28 +103,29 @@ export default function ManageLessons() {
         )
       );
       setIsEditLessonModalOpen(false);
-      alert('Lesson updated successfully!');
+      showToast('Lesson updated successfully!', 'success');
     } catch (err) {
       console.error(err);
-      alert('Failed to update lesson');
+      showToast('Failed to update lesson', 'error');
     }
   };
 
-  const deleteLesson = async (lessonId) => {
-    if (!window.confirm('Delete this lesson?')) return;
-    try {
-      await api.delete(`/lesson/delete/lesson_id/${lessonId}/course_id/${Number(courseId)}`);
-      setLessons(lessons.filter((l) => l.lessonId !== lessonId));
-      alert('Lesson deleted successfully!');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete lesson');
-    }
+  const deleteLesson = (lessonId) => {
+    confirm('Delete this lesson?', async () => {
+      try {
+        await api.delete(`/lesson/delete/lesson_id/${lessonId}/course_id/${Number(courseId)}`);
+        setLessons(lessons.filter((l) => l.lessonId !== lessonId));
+        showToast('Lesson deleted successfully!', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to delete lesson', 'error');
+      }
+    }, 'Delete Lesson');
   };
 
   const createAssignment = async () => {
     if (!newAssignment.title.trim()) {
-      alert('Please enter assignment title');
+      showToast('Please enter assignment title', 'error');
       return;
     }
     try {
@@ -136,10 +138,10 @@ export default function ManageLessons() {
       const res = await api.post('/assignment/add_assignment', payload);
       setAssignments(prev => [...prev, res.data]);
       setNewAssignment({ title: '', description: '', dueDate: '' });
-      alert('Assignment created successfully!');
+      showToast('Assignment created successfully!', 'success');
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to create assignment');
+      showToast(err.response?.data?.message || 'Failed to create assignment', 'error');
     }
   };
 
@@ -150,21 +152,23 @@ export default function ManageLessons() {
 
   const saveAssignmentChanges = async (e) => {
     e.preventDefault();
-    alert('Editing not yet implemented on backend. Please delete and recreate.');
+    showToast('Editing not yet implemented on backend. Please delete and recreate.', 'info');
     setIsEditAssignmentModalOpen(false);
   };
 
-  const deleteAssignmentHandler = async (assignmentId) => {
-    if (!window.confirm('Delete this assignment? All submissions will be lost.')) return;
-    try {
-      await api.delete(`/assignment/${assignmentId}`);
-      setAssignments(prev => prev.filter(a => a.assignmentId !== assignmentId));
-      alert('Assignment deleted');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete assignment');
-    }
+  const deleteAssignmentHandler = (assignmentId) => {
+    confirm('Delete this assignment? All submissions will be lost.', async () => {
+      try {
+        await api.delete(`/assignment/${assignmentId}`);
+        setAssignments(prev => prev.filter(a => a.assignmentId !== assignmentId));
+        showToast('Assignment deleted', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to delete assignment', 'error');
+      }
+    }, 'Delete Assignment');
   };
+
   function extractYouTubeId(url) {
     const match = url.match(/(?:youtu\.be\/|watch\?v=|embed\/)([^&\n?#]+)/);
     return match ? match[1] : url;
@@ -175,12 +179,12 @@ export default function ManageLessons() {
     if (!file) return;
     const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert('File is too large. Maximum size is 50MB');
+      showToast('File is too large. Maximum size is 50MB', 'error');
       return;
     }
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'video/mp4', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
-      alert('Unsupported file type. Please upload images, MP4 videos, or PDF files.');
+      showToast('Unsupported file type. Please upload images, MP4 videos, or PDF files.', 'error');
       return;
     }
     const formData = new FormData();
@@ -197,10 +201,10 @@ export default function ManageLessons() {
         ...newLesson,
         content: (newLesson.content || '') + '\n' + tag,
       });
-      alert('File uploaded successfully!');
+      showToast('File uploaded successfully!', 'success');
     } catch (err) {
       console.error(err);
-      alert(`Upload error: ${err.message || 'Unknown error'}`);
+      showToast(`Upload error: ${err.message || 'Unknown error'}`, 'error');
     } finally {
       setUploading(false);
       event.target.value = '';
@@ -217,7 +221,6 @@ export default function ManageLessons() {
   const sortedLessons = [...lessons].sort((a, b) => (a.lessonOrder || 0) - (b.lessonOrder || 0));
 
   if (loadingLessons && loadingAssignments) return <div className="loading-state">Loading course content...</div>;
-  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="manage-lessons-page">

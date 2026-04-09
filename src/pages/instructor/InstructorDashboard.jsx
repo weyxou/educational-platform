@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/api';
+import { useNotification } from '../../context/AlertCustom';
 import './InstructorDashboard.css';
 
 export default function InstructorDashboard() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
+  const { showToast, confirm } = useNotification();
 
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newCourse, setNewCourse] = useState({ courseName: '', description: '', duration: '' });
@@ -34,13 +34,13 @@ export default function InstructorDashboard() {
         const myCourses = response.data.filter(c => c.instructorId === user?.userAccountId);
         setCourses(myCourses);
       } catch (err) {
-        setError('Failed to load courses');
+        showToast('Failed to load courses', 'error');
       } finally {
         setLoading(false);
       }
     };
     if (user?.userAccountId) fetchCourses();
-  }, [user]);
+  }, [user, showToast]);
 
   useEffect(() => {
     setProfileData({
@@ -53,18 +53,14 @@ export default function InstructorDashboard() {
 
   const createCourse = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
     try {
       const res = await api.post('/course/add_course', { ...newCourse, instructorId: user.userAccountId });
       setCourses([...courses, res.data]);
       setIsCreateModalOpen(false);
       setNewCourse({ courseName: '', description: '', duration: '' });
-      setSuccess('Course created successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      showToast('Course created successfully!', 'success');
     } catch (err) {
-      setError('Failed to create course');
-      setTimeout(() => setError(''), 3000);
+      showToast('Failed to create course', 'error');
     }
   };
 
@@ -75,34 +71,33 @@ export default function InstructorDashboard() {
 
   const saveCourseChanges = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
     try {
       await api.put(`/course/update/course_id/${editingCourse.courseId}`, editingCourse);
       setCourses(courses.map(c => c.courseId === editingCourse.courseId ? editingCourse : c));
       setIsEditModalOpen(false);
-      setSuccess('Course updated successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      showToast('Course updated successfully!', 'success');
     } catch (err) {
-      setError('Failed to update course');
-      setTimeout(() => setError(''), 3000);
+      showToast('Failed to update course', 'error');
     }
   };
 
-  const deleteCourse = async (courseId) => {
-    if (!window.confirm('Delete this course? All lessons and assignments will be deleted.')) return;
-    try {
-      await api.delete(`/course/delete/course_id/${courseId}`);
-      localStorage.removeItem(`instructor_lessons_${courseId}`);
-      localStorage.removeItem(`instructor_assignments_${courseId}`);
-      localStorage.removeItem(`instructor_submissions_${courseId}`);
-      setCourses(courses.filter(c => c.courseId !== courseId));
-      setSuccess('Course deleted successfully!');
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError('Failed to delete course');
-      setTimeout(() => setError(''), 3000);
-    }
+  const deleteCourse = (courseId) => {
+    confirm(
+      'Delete this course? All lessons and assignments will be deleted permanently.',
+      async () => {
+        try {
+          await api.delete(`/course/delete/course_id/${courseId}`);
+          localStorage.removeItem(`instructor_lessons_${courseId}`);
+          localStorage.removeItem(`instructor_assignments_${courseId}`);
+          localStorage.removeItem(`instructor_submissions_${courseId}`);
+          setCourses(courses.filter(c => c.courseId !== courseId));
+          showToast('Course deleted successfully!', 'success');
+        } catch (err) {
+          showToast('Failed to delete course', 'error');
+        }
+      },
+      'Delete the Course?'
+    );
   };
 
   const handleProfileChange = (e) => {
@@ -114,11 +109,9 @@ export default function InstructorDashboard() {
       await api.put(`/student/update_profile/${user.userAccountId}`, profileData);
       updateUser(profileData);
       setIsEditingProfile(false);
-      setSuccess('Profile updated successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      showToast('Profile updated successfully!', 'success');
     } catch (err) {
-      setError('Failed to update profile');
-      setTimeout(() => setError(''), 3000);
+      showToast('Failed to update profile', 'error');
     }
   };
 
@@ -132,9 +125,6 @@ export default function InstructorDashboard() {
           </div>
           <button onClick={logout} className="logout-btn">Logout</button>
         </div>
-
-        {error && <div className="message error">{error}</div>}
-        {success && <div className="message success">{success}</div>}
 
         <section className="courses-section">
           <div className="section-header">
@@ -208,6 +198,7 @@ export default function InstructorDashboard() {
       {isCreateModalOpen && (
         <CourseModal title="Create New Course" course={newCourse} setCourse={setNewCourse} onClose={() => setIsCreateModalOpen(false)} onSave={createCourse} saveBtnText="Create Course" />
       )}
+
       {isEditModalOpen && editingCourse && (
         <CourseModal title="Edit Course" course={editingCourse} setCourse={setEditingCourse} onClose={() => setIsEditModalOpen(false)} onSave={saveCourseChanges} saveBtnText="Save Changes" />
       )}

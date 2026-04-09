@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/api';
+import { useNotification } from '../../context/AlertCustom';
 import './CourseAssigments.css';
 
 export default function CourseAssignments() {
   const { courseId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { showToast, confirm } = useNotification();
 
   const [assignments, setAssignments] = useState([]);
   const [submissions, setSubmissions] = useState({});
@@ -42,7 +44,6 @@ export default function CourseAssignments() {
         try {
           const subRes = await api.get(`/assignment/submission/student/${user.userAccountId}/assignment/${assignment.assignmentId}`);
           if (subRes.data) {
-            console.log('Submission data:', subRes.data); // для отладки
             submissionsMap[assignment.assignmentId] = subRes.data;
           }
         } catch (err) {
@@ -54,7 +55,7 @@ export default function CourseAssignments() {
       setSubmissions(submissionsMap);
     } catch (err) {
       console.error('Error loading assignments:', err);
-      alert('Failed to load assignments. Make sure the backend is running.');
+      showToast('Failed to load assignments. Make sure the backend is running.', 'error');
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,7 @@ export default function CourseAssignments() {
 
   const submitAssignment = async () => {
     if (!answer.trim()) {
-      alert('Please write your answer');
+      showToast('Please write your answer', 'error');
       return;
     }
     if (!currentAssignment || !user) return;
@@ -85,19 +86,19 @@ export default function CourseAssignments() {
 
       setAnswer('');
       setShowSubmitModal(false);
-      alert('Assignment submitted successfully!');
+      showToast('Assignment submitted successfully!', 'success');
     } catch (err) {
       console.error('Submit error:', err);
       if (err.response) {
         console.error('Response data:', err.response.data);
         console.error('Status:', err.response.status);
         if (err.response.status === 400 && err.response.data?.message?.includes('already submitted')) {
-          alert('You have already submitted this assignment. Resubmission is not allowed.');
+          showToast('You have already submitted this assignment. Resubmission is not allowed.', 'error');
         } else {
-          alert(`Submission failed: ${err.response.status} - ${err.response.data?.message || JSON.stringify(err.response.data)}`);
+          showToast(`Submission failed: ${err.response.status} - ${err.response.data?.message || JSON.stringify(err.response.data)}`, 'error');
         }
       } else {
-        alert('Failed to submit assignment. Check network connection.');
+        showToast('Failed to submit assignment. Check network connection.', 'error');
       }
     }
   };
@@ -105,7 +106,6 @@ export default function CourseAssignments() {
   const viewSubmissionDetails = (assignment) => {
     const submission = submissions[assignment.assignmentId];
     if (submission) {
-      console.log('Viewing submission grade:', submission.grade); // отладка
       setViewSubmission({
         assignmentTitle: assignment.assignmentTitle,
         submittedContent: submission.submittedContent,

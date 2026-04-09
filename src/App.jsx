@@ -8,7 +8,6 @@ import Benefits from './components/benefits/Benefits';
 import Courses from './components/courses/Courses';
 import AboutUs from './components/aboutus/AboutUs';
 import Contact from './components/contact/Contact';
-
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -19,16 +18,17 @@ import LessonDetail from './common/LessonDetail';
 import CourseDetailPage from './components/courses/CourseDetailPage';
 import AssignmentSubmissions from './pages/instructor/AssignmentSubmissions';
 import CourseAssignments from './pages/student/CourseAssignments';
+import NotificationProvider from './context/AlertCustom';
 
 const AllCoursesPage = () => (
   <div style={{ padding: '150px', textAlign: 'center', fontSize: '2.5rem' }}>
-    Все курсы — скоро здесь
+    All Courses
   </div>
 );
 
 function ProtectedRoute({ children, requiredRole }) {
   const { user, loading, role } = useAuth();
-  if (loading) return <div style={{ padding: '150px', textAlign: 'center' }}>Загрузка...</div>;
+  if (loading) return <div style={{ padding: '150px', textAlign: 'center' }}>Loading</div>;
   if (!user) return <Navigate to="/login" replace />;
   if (requiredRole && role !== requiredRole) return <Navigate to="/" replace />;
   return children;
@@ -94,7 +94,7 @@ function AppContent() {
 
         <Route path="*" element={
           <div style={{ padding: '150px', textAlign: 'center', fontSize: '3rem', minHeight: '80vh' }}>
-            404 — Страница не найдена
+            404 — Page not Found
           </div>
         } />
       </Routes>
@@ -105,9 +105,11 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
+      <NotificationProvider>
       <BrowserRouter>
         <AppContent />
       </BrowserRouter>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

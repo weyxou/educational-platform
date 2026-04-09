@@ -129,7 +129,7 @@ export default function CourseLessonsView() {
                 className="continue-btn"
                 onClick={() => handleLastLesson(continueLessonId)}
               >
-                ▶ Continue Learning
+                 Continue Learning
               </Link>
             ) : (
               <button className="continue-btn disabled" disabled>No lessons available</button>

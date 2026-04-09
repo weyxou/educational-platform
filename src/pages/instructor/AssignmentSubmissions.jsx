@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/api';
+import { useNotification } from '../../context/AlertCustom';
 import './AssignmentSubmissions.css';
 
 export default function AssignmentSubmissions() {
   const { courseId, assignmentId } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useNotification();
   
   const [assignment, setAssignment] = useState(null);
   const [submissions, setSubmissions] = useState([]);
@@ -31,7 +33,7 @@ export default function AssignmentSubmissions() {
       });
       setGrades(initGrades);
       setFeedbacks(initFeedbacks);
-            try {
+      try {
         const assignmentRes = await api.get(`/assignment/${assignmentId}`);
         setAssignment(assignmentRes.data);
       } catch (err) {
@@ -39,7 +41,7 @@ export default function AssignmentSubmissions() {
       }
     } catch (err) {
       console.error('Error loading submissions:', err);
-      alert('Failed to load submissions');
+      showToast('Failed to load submissions', 'error');
     } finally {
       setLoading(false);
     }
@@ -48,12 +50,12 @@ export default function AssignmentSubmissions() {
   const saveGrade = async (submissionId, studentId) => {
     const grade = grades[submissionId];
     if (grade === '' || grade === null) {
-      alert('Please enter a grade');
+      showToast('Please enter a grade', 'error');
       return;
     }
     const numericGrade = parseFloat(grade);
     if (isNaN(numericGrade) || numericGrade < 0 || numericGrade > 100) {
-      alert('Grade must be between 0 and 100');
+      showToast('Grade must be between 0 and 100', 'error');
       return;
     }
     try {
@@ -65,17 +67,17 @@ export default function AssignmentSubmissions() {
       setSubmissions(prev => prev.map(sub => 
         sub.submissionId === submissionId ? { ...sub, grade: numericGrade } : sub
       ));
-      alert('Grade saved successfully');
+      showToast('Grade saved successfully', 'success');
     } catch (err) {
       console.error('Grade save error:', err);
-      alert('Failed to save grade');
+      showToast('Failed to save grade', 'error');
     }
   };
   
   const saveFeedback = async (submissionId, studentId) => {
     const feedback = feedbacks[submissionId];
     if (!feedback) {
-      alert('Please enter feedback');
+      showToast('Please enter feedback', 'error');
       return;
     }
     try {
@@ -87,16 +89,20 @@ export default function AssignmentSubmissions() {
       setSubmissions(prev => prev.map(sub => 
         sub.submissionId === submissionId ? { ...sub, feedback: feedback } : sub
       ));
-      alert('Feedback saved successfully');
+      showToast('Feedback saved successfully', 'success');
     } catch (err) {
       console.error('Feedback save error:', err);
-      alert('Failed to save feedback');
+      showToast('Failed to save feedback', 'error');
     }
   };
   
   const formatDate = (dateString) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleString();
+  };
+  
+  const viewFullAnswer = (content) => {
+    showToast(content, 'info');
   };
   
   if (loading) return <div className="loading-state">Loading submissions...</div>;
@@ -141,7 +147,7 @@ export default function AssignmentSubmissions() {
                       <td>{formatDate(sub.submissionDate)}</td>
                       <td>
                         <div className="answer-preview">{sub.submittedContent?.substring(0, 100)}...</div>
-                       </td>
+                      </td>
                       <td className="grade-cell">
                         <div className="input-group">
                           <input 
@@ -179,10 +185,10 @@ export default function AssignmentSubmissions() {
                         </div>
                       </td>
                       <td>
-                        <button onClick={() => alert(sub.submittedContent)} className="view-btn">
+                        <button onClick={() => viewFullAnswer(sub.submittedContent)} className="view-btn">
                           View Full Answer
                         </button>
-                       </td>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

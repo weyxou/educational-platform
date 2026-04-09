@@ -2,11 +2,14 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/api';
+import { useNotification } from '../../context/AlertCustom';
 import './StudentDashboard.css';
 
 export default function StudentDashboard() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
+  const { showToast, confirm } = useNotification();
+
   const [allCourses, setAllCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +22,7 @@ export default function StudentDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const getUserId = () => user?.userAccountId || user?.id;
+
   useEffect(() => {
     if (!user) return;
 
@@ -33,13 +37,14 @@ export default function StudentDashboard() {
       } catch (err) {
         console.error('Error loading courses:', err);
         setEnrolledCourses([]);
+        showToast('Failed to load courses', 'error');
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [user]);
+  }, [user, showToast]);
 
   useEffect(() => {
     if (user) {
@@ -52,29 +57,30 @@ export default function StudentDashboard() {
   }, [user]);
 
   const handleEnroll = async (course) => {
-    if (!window.confirm(`Enroll in "${course.courseName}"?`)) return;
-    try {
-      await api.post(`/enrollment/enroll/${course.courseId}`);
-      const enrolledRes = await api.get('/enrollment/my-courses');
-      setEnrolledCourses(enrolledRes.data);
-      alert('Successfully enrolled!');
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || 'Enrollment failed. Please try again.');
-    }
+    confirm(`Enroll in "${course.courseName}"?`, async () => {
+      try {
+        await api.post(`/enrollment/enroll/${course.courseId}`);
+        const enrolledRes = await api.get('/enrollment/my-courses');
+        setEnrolledCourses(enrolledRes.data);
+        showToast('Successfully enrolled!', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast(err.response?.data?.message || 'Enrollment failed. Please try again.', 'error');
+      }
+    }, 'Enroll');
   };
 
-  
   const handleUnenroll = async (courseId) => {
-    if (!window.confirm('Are you sure you want to unenroll from this course?')) return;
-    try {
-      await api.delete(`/enrollment/unenroll/${courseId}`);
-      setEnrolledCourses((prev) => prev.filter((c) => c.courseId !== courseId));
-      alert('Unenrolled successfully');
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || 'Unenroll failed');
-    }
+    confirm('Are you sure you want to unenroll from this course?', async () => {
+      try {
+        await api.delete(`/enrollment/unenroll/${courseId}`);
+        setEnrolledCourses((prev) => prev.filter((c) => c.courseId !== courseId));
+        showToast('Unenrolled successfully', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast(err.response?.data?.message || 'Unenroll failed', 'error');
+      }
+    }, 'Unenroll');
   };
 
   const availableCourses = allCourses.filter(
@@ -88,7 +94,7 @@ export default function StudentDashboard() {
   const handleProfileSave = async () => {
     const userId = getUserId();
     if (!userId) {
-      alert('User ID not found. Please log in again.');
+      showToast('User ID not found. Please log in again.', 'error');
       return;
     }
 
@@ -110,11 +116,11 @@ export default function StudentDashboard() {
         }));
         window.location.reload();
       }
-      alert('Profile updated successfully');
+      showToast('Profile updated successfully', 'success');
       setEditingProfile(false);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Error updating profile. Please try again.');
+      showToast(err.response?.data?.message || 'Error updating profile. Please try again.', 'error');
     }
   };
 
