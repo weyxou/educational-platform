@@ -4,38 +4,38 @@ import styles from './Benefits.module.css';
 const benefitsData = [
   {
     number: '01',
-    title: 'Learn at Your Own Pace',
-    desc: 'Access courses anytime, anywhere, and study according to your own schedule.',
+    title: 'Learn or Teach at Your Own Pace',
+    desc: 'Study new skills or share your knowledge whenever it works for you — no strict schedules.',
     gradient: 'gradient1',
   },
   {
     number: '02',
-    title: 'Industry Experts',
-    desc: 'Gain knowledge from experienced instructors who work in the field.',
+    title: 'Learn from Real Experience',
+    desc: 'Get insights from professionals in the industry or become one and teach others.',
     gradient: 'gradient2',
   },
   {
     number: '03',
-    title: 'Wide Range of Courses',
-    desc: 'Explore various subjects including tech, business, design, and more.',
+    title: 'Everything in One Place',
+    desc: 'From tech and business to design and more — learn or teach whatever you’re passionate about.',
     gradient: 'gradient3',
   },
   {
     number: '04',
-    title: 'Up-to-Date Content',
-    desc: 'Stay ahead with courses that reflect the latest industry trends and skills.',
+    title: 'Always Up to Date',
+    desc: 'Courses evolve with industry trends, so learners and instructors stay relevant.',
     gradient: 'gradient1',
   },
   {
     number: '05',
-    title: 'Hands-On Projects',
-    desc: 'Work on real-world projects to build a strong portfolio for future opportunities.',
+    title: 'Learn by Doing',
+    desc: 'Build real projects as a student or guide learners through practical, hands-on experience as an instructor.',
     gradient: 'gradient2',
   },
   {
     number: '06',
-    title: 'Collaborative Learning',
-    desc: 'Engage with peers, share ideas, and enhance your learning through discussion.',
+    title: 'Grow Together',
+    desc: 'Connect with others, share feedback, and learn in a supportive community.',
     gradient: 'gradient3',
   },
 ];
@@ -46,8 +46,7 @@ const Benefits = () => {
       <div className={styles.container}>
         <h2 className={styles.title}>Why Choose Our Platform</h2>
         <p className={styles.subtitle}>
-          Our online educational platform is designed to help you learn effectively, build new skills, and achieve your career goals with flexible and interactive courses.
-        </p>
+Our platform helps you learn new skills, grow your career, or share your knowledge with others through flexible and interactive learning.        </p>
 
         <div className={styles.grid}>
           {benefitsData.map((item, index) => (

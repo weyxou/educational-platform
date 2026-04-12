@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import styles from './Header.module.css';
@@ -7,12 +6,10 @@ import logo from '../../assets/logo.png';
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Функция для определения класса активной ссылки
   const getLinkClass = ({ isActive }) => {
     return isActive ? `${styles.navLink} ${styles.active}` : styles.navLink;
   };
 
-  // Закрыть меню при клике на ссылку
   const handleLinkClick = () => {
     setIsMenuOpen(false);
   };

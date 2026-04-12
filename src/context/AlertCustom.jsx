@@ -1,10 +1,8 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import './AlertCustom.css';
 
-// Создаём контекст с уникальным именем
 const NotificationContext = createContext();
 
-// Компонент-провайдер (экспортируем как default, чтобы удобно импортировать)
 export default function NotificationProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const [confirmState, setConfirmState] = useState({
@@ -53,7 +51,6 @@ export default function NotificationProvider({ children }) {
   );
 }
 
-// Хук для использования уведомлений
 export const useNotification = () => {
   const context = useContext(NotificationContext);
   if (!context) throw new Error('useNotification must be used within NotificationProvider');

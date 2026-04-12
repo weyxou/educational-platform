@@ -1,8 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import "./AboutUs.css";
+import { useNavigate } from "react-router-dom";
 
 const AboutUs = () => {
   const statsRef = useRef(null);
+
+  const navigate = useNavigate();
+
+    const handleStartLearning = () => {
+    navigate("/register");
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -20,38 +27,17 @@ const AboutUs = () => {
     return () => observer.disconnect();
   }, []);
 
+
   return (
     <div className="about-us-page">
+
       <section className="about-hero">
         <div className="container">
           <h1 className="fade-up">About Us</h1>
           <p className="hero-subtitle fade-up">
-            We are passionate about making high-quality education accessible to everyone,
-            anytime and anywhere.
+            We believe learning should be simple, accessible, and meaningful — whether you're
+    starting your journey as a student or sharing your experience as an instructor.
           </p>
-        </div>
-      </section>
-
-      <section className="stats-section">
-        <div className="container">
-          <div className="stats-grid">
-            <div className="stat-card fade-up">
-              <div className="stat-number">10K+</div>
-              <div className="stat-label">Active Students</div>
-            </div>
-            <div className="stat-card fade-up">
-              <div className="stat-number">50+</div>
-              <div className="stat-label">Expert Instructors</div>
-            </div>
-            <div className="stat-card fade-up">
-              <div className="stat-number">120+</div>
-              <div className="stat-label">Courses</div>
-            </div>
-            <div className="stat-card fade-up">
-              <div className="stat-number">4.9</div>
-              <div className="stat-label">Average Rating</div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -59,50 +45,93 @@ const AboutUs = () => {
  <section className="benefits-section">
   <div className="container">
     <h2 className="section-title fade-up">Why Choose Us</h2>
+
     <div className="benefits-grid">
+
       <div className="benefit-card fade-up">
         <img 
           src="/images/learning.jpg" 
           alt="Flexible Learning" 
           className="benefit-image"
         />
-        <div className="benefit-number">01</div>
-        <h3>Flexible Learning</h3>
-        <p>Study anytime, anywhere at your own pace without strict schedules.</p>
+        <div className="benefit-number"></div>
+        <h3>Flexible Learning & Teaching</h3>
+        <p>
+          Learn or teach anytime, from any device — on your own schedule.
+        </p>
       </div>
+
       <div className="benefit-card fade-up">
         <img 
           src="/images/instructors.jpg" 
-          alt="Expert Instructors" 
+          alt="Expert Community" 
           className="benefit-image"
         />
-        <div className="benefit-number">02</div>
-        <h3>Expert Instructors</h3>
-        <p>Learn from professionals with real-world experience in their fields.</p>
+        <div className="benefit-number"></div>
+        <h3>Expert Community</h3>
+        <p>
+          Learn from industry professionals or share your knowledge as an instructor.
+        </p>
       </div>
+
       <div className="benefit-card fade-up">
         <img 
           src="/images/skills.jpg" 
-          alt="Modern Skills" 
+          alt="Practical Growth" 
           className="benefit-image"
         />
-        <div className="benefit-number">03</div>
-        <h3>Modern Skills</h3>
-        <p>Courses designed for today’s job market and future career growth.</p>
+        <div className="benefit-number"></div>
+        <h3>Practical Skills & Growth</h3>
+        <p>
+          Gain real-world skills or help others build them through hands-on teaching.
+        </p>
       </div>
+
     </div>
   </div>
 </section>
-
-      <section className="about-section">
-        <div className="container">
-          <h2 className="section-title fade-up">Our Mission</h2>
-          <p className="section-text fade-up">
-            To empower learners worldwide by providing flexible, expert-led online courses
-            that fit into busy lifestyles and help people achieve their career and personal goals.
-          </p>
+  <section>
+        <div className="cta-buttons">
+          <button onClick={handleStartLearning}>  Join as Student or Instructor
+</button>
         </div>
+        
       </section>
+
+
+    <section className="about-section">
+  <div className="container">
+    <div className="mission-grid">
+
+      <div className="mission-text fade-up">
+        <h2>Grow your skills, share what you know</h2>
+
+        <p className="mission-description">
+          Whether you're here to learn something new or teach what you already know,
+          we’re here to support your journey.
+        </p>
+
+        <ul className="mission-features">
+          <li>Learn practical skills that you can use right away</li>
+          <li>Get guidance and prepare for real career opportunities</li>
+          <li>Build projects instead of just watching lessons</li>
+          <li>Teach others and grow as an expert in your field</li>
+        </ul>
+
+        <div className="mission-cta">
+          <button className="mission-link">Explore platform</button>
+        </div>
+      </div>
+
+      <div className="mission-image fade-up">
+        <div className="image-placeholder">
+          <img src="public/images/tIED7.jpg" alt="Learning community" />
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
 
     
 

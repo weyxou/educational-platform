@@ -14,8 +14,7 @@ const Footer = () => {
               </NavLink>
             </div>
             <p className={styles.desc}>
-              Unlock your potential with our online design and development courses. 
-              Learn from industry experts and enhance your skills.
+             Learn new skills or teach what you know on our platform built for growth and connection.
             </p>
           </div>
           <div className={styles.links}>

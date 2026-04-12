@@ -43,7 +43,7 @@ const Courses = () => {
         <div className="container">
           <h1>All Courses</h1>
           <p className="subtitle">
-            Choose from courses created by expert instructors
+  Learn new skills from expert instructors and build real-world experience
           </p>
           <input
             type="text"
