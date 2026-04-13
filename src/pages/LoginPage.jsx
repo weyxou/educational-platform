@@ -1,4 +1,3 @@
-// src/pages/LoginPage.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -84,26 +83,29 @@ export default function LoginPage() {
       <div className={`auth-wrapper login-wrapper ${isAnimating ? 'slide-out' : ''}`}>
         <div className="auth-left login-left">
           <div className="auth-content login-content">
-            <h2>Welcome Back!</h2>
-            <p>Continue your learning journey and access thousands of courses</p>
-            <div className="features">
-              <div className="feature-item">
-                <span className="feature-icon">✓</span>
-                <span>Access your purchased courses</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">✓</span>
-                <span>Track your learning progress</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">✓</span>
-                <span>Connect with instructors</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">✓</span>
-                <span>Get personalized recommendations</span>
-              </div>
-            </div>
+           <h2>Welcome Back!</h2>
+
+<p>
+  Continue your journey — learn new skills, teach your courses, and grow with the platform.
+</p>
+
+<div className="features">
+  <div className="feature-item">
+    <span>Access your courses and learning materials</span>
+  </div>
+
+  <div className="feature-item">
+    <span>Track your progress or student performance</span>
+  </div>
+
+  <div className="feature-item">
+    <span>Connect with instructors and learners</span>
+  </div>
+
+  <div className="feature-item">
+    <span>Get personalized recommendations for growth</span>
+  </div>
+</div>
           </div>
         </div>
         <div className="auth-right login-right">

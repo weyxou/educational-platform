@@ -1,4 +1,3 @@
-// src/pages/RegisterPage.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -113,7 +112,6 @@ export default function RegisterPage() {
   return (
     <div className={`auth-container ${isAnimating ? 'fade-out' : ''}`}>
       <div className={`auth-wrapper register-wrapper ${isAnimating ? 'slide-out' : ''}`}>
-        {/* Левая колонка с формой */}
         <div className="auth-left register-left">
           <div className="auth-card register-card">
             <h1>Create Account</h1>
@@ -213,19 +211,15 @@ export default function RegisterPage() {
             <p>Join thousands of successful students and instructors who are already learning and teaching on our platform</p>
             <div className="features">
               <div className="feature-item">
-                <span className="feature-icon">📚</span>
                 <span>1000+ courses available</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">🎓</span>
                 <span>Learn from industry experts</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">🏆</span>
                 <span>Earn certificates & advance career</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">💡</span>
                 <span>Teach what you love</span>
               </div>
             </div>

@@ -21,7 +21,7 @@
 
 .sidebar {
   width: 280px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: white;
   color: #e0e7ff;
   display: flex;
   flex-direction: column;
@@ -35,7 +35,7 @@
 .sidebar-logo h2 {
   font-size: 28px;
   font-weight: 800;
-  background: linear-gradient(135deg, #c7d2fe, #a5b4fc);
+  background: linear-gradient(135deg, #764ba2, #a5b4fc);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -57,7 +57,7 @@
   padding: 12px 20px;
   background: transparent;
   border: none;
-  color: #cbd5e1;
+  color: #764ba2;
   font-size: 16px;
   font-weight: 600;
   font-family: 'Montserrat', sans-serif;
@@ -73,12 +73,12 @@
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, #764ba2, #a5b4fc);
   color: white;
 }
 
 .nav-item.active {
-  background: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #764ba2, #a5b4fc);
   color: white;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
 }
@@ -659,21 +659,7 @@
   margin-top: 24px;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 @media (max-width: 1024px) {
   .courses-grid {

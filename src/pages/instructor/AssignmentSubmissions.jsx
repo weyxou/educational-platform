@@ -14,6 +14,9 @@ export default function AssignmentSubmissions() {
   const [loading, setLoading] = useState(true);
   const [grades, setGrades] = useState({});
   const [feedbacks, setFeedbacks] = useState({});
+
+  const [modalOpen, setModalOpen] = useState(false);
+const [fullAnswer, setFullAnswer] = useState('');
   
   useEffect(() => {
     loadData();
@@ -102,10 +105,11 @@ export default function AssignmentSubmissions() {
   };
   
   const viewFullAnswer = (content) => {
-    showToast(content, 'info');
-  };
+  setFullAnswer(content);
+  setModalOpen(true);
+};
   
-  if (loading) return <div className="loading-state">Loading submissions...</div>;
+  if (loading) return <div className="loading-state">Loading submissions</div>;
   
   return (
     <div className="submissions-page">
@@ -113,9 +117,9 @@ export default function AssignmentSubmissions() {
         <div className="page-card">
           <div className="submissions-header">
             <button onClick={() => navigate(`/instructor/course/${courseId}/manage`)} className="back-btn">
-              ← Back to Course
+              Back to Course
             </button>
-            <h1>{assignment?.assignmentTitle || 'Assignment'} - Submissions</h1>
+            <h1>{assignment?.assignmentTitle || 'Assignment'} Submissions</h1>
           </div>
           
           {submissions.length === 0 ? (
@@ -195,6 +199,23 @@ export default function AssignmentSubmissions() {
               </table>
             </div>
           )}
+
+          {modalOpen && (
+  <div className="modal-overlay" onClick={() => setModalOpen(false)}>
+    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-header">
+        <h2>Full Answer</h2>
+        <button className="modal-close" onClick={() => setModalOpen(false)}>×</button>
+      </div>
+      <div className="modal-body">
+        <p>{fullAnswer}</p>
+      </div>
+      <div className="modal-footer">
+        <button onClick={() => setModalOpen(false)} className="btn btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
+)}
         </div>
       </div>
     </div>

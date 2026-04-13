@@ -69,7 +69,7 @@
 }
 
 .navLink:hover {
-  color: #4a5568;
+  color: #531a8c;
 }
 
 .active {
@@ -147,7 +147,7 @@
   max-width: 400px;
   height: 100vh;
   background: white;
-  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+  box-shadow: -5px 0 20px #764ba2;
   padding: 100px 32px 32px;
   flex-direction: column;
   gap: 32px;
@@ -222,7 +222,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
   z-index: -1;
   opacity: 0;
   visibility: hidden;

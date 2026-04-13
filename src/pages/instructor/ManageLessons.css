@@ -1,27 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
-:root {
-  --primary-dark: #1e293b;
-  --primary-light: #334155;
-  --accent-start: #667eea;
-  --accent-end: #764ba2;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-500: #64748b;
-  --gray-700: #334155;
-  --gray-900: #0f172a;
-  --border-radius: 20px;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-  --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.02);
-  --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.15);
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -87,21 +65,21 @@
 
 .page-card {
   background: white;
-  border-radius: var(--border-radius);
+  border-radius: 20px;
   padding: 32px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.02);
   border: 1px solid rgba(226, 232, 240, 0.6);
   transition: box-shadow 0.2s;
 }
 
 .page-card:hover {
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
 }
 
 .page-title {
   font-size: 28px;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -112,7 +90,7 @@
 .tab-bar {
   display: flex;
   gap: 8px;
-  border-bottom: 2px solid var(--gray-200);
+  border-bottom: 2px solid #e2e8f0;
   margin-bottom: 32px;
 }
 
@@ -120,10 +98,10 @@
   background: none;
   border: none;
   padding: 12px 24px;
-  font-size: 15.2px;
+  font-size: 15px;
   font-weight: 600;
   font-family: 'Montserrat', sans-serif;
-  color: var(--gray-500);
+  color: #64748b;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
@@ -131,7 +109,7 @@
 }
 
 .tab-btn.active {
-  color: var(--accent-start);
+  color: #667eea;
 }
 
 .tab-btn.active::after {
@@ -141,13 +119,13 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+  background: linear-gradient(90deg, #667eea, #764ba2);
   border-radius: 3px 3px 0 0;
 }
 
 .tab-btn:hover:not(.active) {
-  color: var(--gray-700);
-  background: var(--gray-50);
+  color: #334155;
+  background: #f8fafc;
 }
 
 .form-section {
@@ -157,19 +135,19 @@
 }
 
 .course-form {
-  background: var(--gray-50);
-  border: 1px solid var(--gray-200);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 24px;
   padding: 28px;
   max-width: 520px;
   width: 100%;
   transition: all 0.3s ease;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .course-form:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--gray-300);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+  border-color: #cbd5e1;
 }
 
 .form-header {
@@ -179,13 +157,13 @@
   gap: 8px;
   margin-bottom: 24px;
   padding-bottom: 12px;
-  border-bottom: 2px solid var(--gray-200);
+  border-bottom: 2px solid #e2e8f0;
 }
 
 .form-header h3 {
   font-size: 16px;
   font-weight: 700;
-  color: var(--gray-900);
+  color: #0f172a;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -193,7 +171,7 @@
 .form-header-icon {
   width: 24px;
   height: 24px;
-  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  background: linear-gradient(135deg, #667eea, #764ba2);
   border-radius: 8px;
   display: inline-block;
 }
@@ -205,8 +183,8 @@
 .form-group label {
   display: block;
   font-weight: 700;
-  color: var(--gray-700);
-  font-size: 11.2px;
+  color: #334155;
+  font-size: 11px;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -217,7 +195,7 @@
   width: 100%;
   padding: 12px 16px;
   border-radius: 12px;
-  border: 1px solid var(--gray-200);
+  border: 1px solid #e2e8f0;
   font-size: 14px;
   transition: all 0.2s;
   font-family: 'Montserrat', sans-serif;
@@ -226,7 +204,7 @@
 
 .form-input:focus,
 .form-textarea:focus {
-  border-color: var(--accent-start);
+  border-color: #667eea;
   outline: none;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -249,19 +227,19 @@
   gap: 8px;
   padding: 8px 16px;
   background: white;
-  border: 1px solid var(--gray-200);
+  border: 1px solid #e2e8f0;
   border-radius: 40px;
   font-size: 12px;
   font-weight: 600;
   font-family: 'Montserrat', sans-serif;
-  color: var(--gray-700);
+  color: #334155;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .media-btn:hover:not(.disabled) {
-  border-color: var(--accent-start);
-  background: var(--gray-50);
+  border-color: #667eea;
+  background: #f8fafc;
   transform: translateY(-1px);
 }
 
@@ -272,7 +250,7 @@
 
 .help-text {
   font-size: 10.4px;
-  color: var(--gray-500);
+  color: #64748b;
   margin-top: 8px;
   display: block;
 }
@@ -300,7 +278,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
 }
 
@@ -311,13 +289,13 @@
 
 .btn-secondary {
   background: white;
-  border: 1px solid var(--gray-200);
-  color: var(--gray-700);
+  border: 1px solid #e2e8f0;
+  color: #334155;
 }
 
 .btn-secondary:hover {
-  border-color: var(--accent-start);
-  background: var(--gray-50);
+  border-color: #667eea;
+  background: #f8fafc;
   transform: translateY(-1px);
 }
 
@@ -333,16 +311,16 @@
 .section-header h3 {
   font-size: 20px;
   font-weight: 700;
-  color: var(--gray-900);
+  color: #0f172a;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .lessons-count {
-  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  padding: 3.2px 11.2px;
+  padding: 3px 11px;
   border-radius: 40px;
   font-size: 11.2px;
   font-weight: 600;
@@ -356,7 +334,7 @@
 
 .course-item {
   background: white;
-  border: 1px solid var(--gray-200);
+  border: 1px solid #e2e8f0;
   border-radius: 20px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -365,13 +343,13 @@
 
 .course-item:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--gray-300);
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.02);
+  border-color: #cbd5e1;
 }
 
 .course-thumb {
   height: 100px;
-  background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -381,7 +359,7 @@
 .lesson-order {
   font-weight: 800;
   font-size: 24px;
-  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  background: linear-gradient(135deg, #667eea, #764ba2);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -395,13 +373,13 @@
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 8px;
-  color: var(--gray-900);
+  color: #0f172a;
   line-height: 1.3;
 }
 
 .course-main p {
-  font-size: 12.8px;
-  color: var(--gray-500);
+  font-size: 12px;
+  color: #64748b;
   line-height: 1.4;
   margin-bottom: 12px;
   display: -webkit-box;
@@ -411,19 +389,19 @@
 }
 
 .meta {
-  font-size: 11.2px;
+  font-size: 11px;
   padding-top: 8px;
-  border-top: 1px solid var(--gray-200);
-  color: var(--gray-500);
+  border-top: 1px solid #e2e8f0;
+  color: #64748b;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
 
 .meta strong {
-  color: var(--accent-start);
+  color: #667eea;
   background: rgba(102, 126, 234, 0.1);
-  padding: 2.4px 6.4px;
+  padding: 2px 6px;
   border-radius: 20px;
   font-weight: 600;
 }
@@ -432,8 +410,8 @@
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  border-top: 1px solid var(--gray-200);
-  background: var(--gray-50);
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
 }
 
 .action-btn {
@@ -442,7 +420,7 @@
   font-size: 11.2px;
   font-weight: 700;
   border-radius: 40px;
-  border: 1px solid var(--gray-200);
+  border: 1px solid #e2e8f0;
   background: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -453,23 +431,23 @@
 }
 
 .action-btn.edit:hover {
-  border-color: var(--accent-start);
+  border-color: #667eea;
   background: #eff6ff;
-  color: var(--accent-start);
+  color: #667eea;
   transform: translateY(-1px);
 }
 
 .action-btn.delete:hover {
-  border-color: var(--danger);
+  border-color: #ff3030;
   background: #fef2f2;
-  color: var(--danger);
+  color: #ff3030;
   transform: translateY(-1px);
 }
 
 .action-btn.submissions:hover {
-  border-color: var(--warning);
+  border-color: #f59e0b;
   background: #fffbeb;
-  color: var(--warning);
+  color: #f59e0b;
   transform: translateY(-1px);
 }
 
@@ -497,13 +475,13 @@
   overflow-y: auto;
   padding: 24px;
   animation: slideUp 0.3s ease;
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
 }
 
 .modal-title {
   font-size: 20px;
   font-weight: 700;
-  color: var(--gray-900);
+  color: #0f172a;
   margin-bottom: 24px;
   text-align: center;
 }
@@ -531,13 +509,13 @@
   padding: 48px;
   border-radius: 20px;
   background: white;
-  border: 1px solid var(--gray-200);
-  color: var(--gray-500);
+  border: 1px solid #e2e8f0;
+  color: #64748b;
   font-weight: 500;
 }
 
 .error {
-  color: var(--danger);
+  color: #ef4444;
   border-color: #fecaca;
   background: #fef2f2;
 }
@@ -550,7 +528,7 @@
   text-align: center;
   margin-top: 40px;
   padding-top: 24px;
-  border-top: 1px solid var(--gray-200);
+  border-top: 1px solid #e2e8f0;
 }
 
 @media (max-width: 1024px) {
@@ -569,7 +547,7 @@
   }
   
   .page-title {
-    font-size: 21.6px;
+    font-size: 21px;
   }
   
   .tab-bar {
@@ -578,7 +556,7 @@
   
   .tab-btn {
     padding: 8px 16px;
-    font-size: 13.6px;
+    font-size: 13px;
   }
   
   .courses-grid {
@@ -590,13 +568,13 @@
   }
   
   .form-header h3 {
-    font-size: 14.4px;
+    font-size: 14px;
   }
 }
 
 @media (max-width: 480px) {
   .page-title {
-    font-size: 17.6px;
+    font-size: 17px;
   }
   
   .course-thumb {
@@ -604,19 +582,19 @@
   }
   
   .lesson-order {
-    font-size: 19.2px;
+    font-size: 19px;
   }
   
   .course-main h4 {
-    font-size: 14.4px;
+    font-size: 14px;
   }
   
   .course-main p {
-    font-size: 11.2px;
+    font-size: 11px;
   }
   
   .action-btn {
-    font-size: 10.4px;
+    font-size: 10px;
   }
   
   .media-buttons-group {

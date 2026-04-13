@@ -51,7 +51,9 @@ function MainLayout({ children }) {
                            (path.includes('/courses/') && (
                              path.includes('/view') ||
                              path.includes('/lessons') ||
-                             path.includes('/lesson')
+                             path.includes('/lesson') ||
+                            path.includes('/assignments') ||  
+                             path.includes('/submissions') 
                            ));
   
   return (

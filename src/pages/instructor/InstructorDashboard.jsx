@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/api';
@@ -18,31 +18,28 @@ export default function InstructorDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [newCourse, setNewCourse] = useState({ courseName: '', description: '', duration: '' });
-
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
+  const [newCourse, setNewCourse] = useState({
+    courseName: '',
+    description: '',
+    duration: ''
+  });
 
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [profileData, setProfileData] = useState({
+  const [profile, setProfile] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     email: user?.email || '',
   });
 
-  const [settingsData, setSettingsData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-  });
-
-
-  // Load instructor's courses from API
   useEffect(() => {
-    const fetchCourses = async () => {
+    if (!user?.userAccountId) return;
+
+    const loadCourses = async () => {
       try {
-        const response = await api.get('/course/all_courses');
-        const myCourses = response.data.filter(c => c.instructorId === user?.userAccountId);
+        setLoading(true);
+        const { data } = await api.get('/course/all_courses');
+        const myCourses = data.filter(c => c.instructorId === user.userAccountId);
         setCourses(myCourses);
       } catch (err) {
         showToast('Failed to load courses', 'error');
@@ -50,67 +47,74 @@ export default function InstructorDashboard() {
         setLoading(false);
       }
     };
-    if (user?.userAccountId) fetchCourses();
-  }, [user, showToast]);
-  
+
+    loadCourses();
+  }, [user?.userAccountId, showToast]);
 
   useEffect(() => {
-    const data = {
+    setProfile({
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
       email: user?.email || '',
-    };
-    setProfileData(data);
+    });
   }, [user]);
 
-
-// Collect all students enrolled across instructor courses
-  const fetchStudents = async () => {
+  const loadStudents = useCallback(async () => {
     if (!courses.length) return;
+
     setStudentsLoading(true);
     try {
-      const enrolledStudentsMap = new Map();
+      const studentMap = new Map();
+
       for (const course of courses) {
         try {
-          const res = await api.get(`/enrollment/view_enrolled_students/${course.courseId}`);
-          const enrollments = res.data;
+          const { data: enrollments } = await api.get(
+            `/enrollment/view_enrolled_students/${course.courseId}`
+          );
+
           enrollments.forEach(enrollment => {
-            if (!enrolledStudentsMap.has(enrollment.studentId)) {
-              enrolledStudentsMap.set(enrollment.studentId, {
+            if (!studentMap.has(enrollment.studentId)) {
+              studentMap.set(enrollment.studentId, {
                 studentId: enrollment.studentId,
                 studentName: enrollment.studentName || `Student ${enrollment.studentId}`,
                 email: enrollment.email || '',
                 courses: [course.courseName],
               });
             } else {
-              enrolledStudentsMap.get(enrollment.studentId).courses.push(course.courseName);
+              studentMap.get(enrollment.studentId).courses.push(course.courseName);
             }
           });
         } catch (err) {
-          console.error(`Failed fetch enrollments for course ${course.courseId}`);
+          console.warn(`Failed to load students for course ${course.courseId}`);
         }
       }
-      setStudents(Array.from(enrolledStudentsMap.values()));
+
+      setStudents(Array.from(studentMap.values()));
     } catch (err) {
       showToast('Failed to load students', 'error');
     } finally {
       setStudentsLoading(false);
     }
-  };
+  }, [courses, showToast]);
 
   useEffect(() => {
-    if (activeTab === 'students' && courses.length > 0) {
-      fetchStudents();
+    if (activeTab === 'students') {
+      loadStudents();
     }
-  }, [activeTab, courses]);
+  }, [activeTab, loadStudents]);
 
   const createCourse = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/course/add_course', { ...newCourse, instructorId: user.userAccountId });
-      setCourses([...courses, res.data]);
+      const { data } = await api.post('/course/add_course', {
+        ...newCourse,
+        instructorId: user.userAccountId,
+      });
+
+      setCourses(prev => [...prev, data]);
       setIsCreateModalOpen(false);
       setNewCourse({ courseName: '', description: '', duration: '' });
+
       showToast('Course created successfully!', 'success');
     } catch (err) {
       showToast('Failed to create course', 'error');
@@ -124,9 +128,15 @@ export default function InstructorDashboard() {
 
   const saveCourseChanges = async (e) => {
     e.preventDefault();
+    if (!editingCourse) return;
+
     try {
       await api.put(`/course/update/course_id/${editingCourse.courseId}`, editingCourse);
-      setCourses(courses.map(c => c.courseId === editingCourse.courseId ? editingCourse : c));
+
+      setCourses(prev =>
+        prev.map(c => (c.courseId === editingCourse.courseId ? editingCourse : c))
+      );
+
       setIsEditModalOpen(false);
       showToast('Course updated successfully!', 'success');
     } catch (err) {
@@ -140,10 +150,12 @@ export default function InstructorDashboard() {
       async () => {
         try {
           await api.delete(`/course/delete/course_id/${courseId}`);
-          localStorage.removeItem(`instructor_lessons_${courseId}`);
-          localStorage.removeItem(`instructor_assignments_${courseId}`);
-          localStorage.removeItem(`instructor_submissions_${courseId}`);
-          setCourses(courses.filter(c => c.courseId !== courseId));
+
+          ['lessons', 'assignments', 'submissions'].forEach(key => {
+            localStorage.removeItem(`instructor_${key}_${courseId}`);
+          });
+
+          setCourses(prev => prev.filter(c => c.courseId !== courseId));
           showToast('Course deleted successfully!', 'success');
         } catch (err) {
           showToast('Failed to delete course', 'error');
@@ -154,41 +166,14 @@ export default function InstructorDashboard() {
   };
 
   const handleProfileChange = (e) => {
-    setProfileData({ ...profileData, [e.target.name]: e.target.value });
-  };
-
-  const saveProfile = async () => {
-    try {
-      await api.put(`/student/update_profile/${user.userAccountId}`, profileData);
-      updateUser(profileData);
-      setIsEditingProfile(false);
-      showToast('Profile updated successfully!', 'success');
-    } catch (err) {
-      showToast('Failed to update profile', 'error');
-    }
-  };
-
-  const handleSettingsChange = (e) => {
-    setSettingsData({ ...settingsData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setProfile(prev => ({ ...prev, [name]: value }));
   };
 
   const saveSettings = async () => {
     try {
-      await api.put(`/student/update_profile/${user.userAccountId}`, {
-        firstName: settingsData.firstName,
-        lastName: settingsData.lastName,
-        email: settingsData.email,
-      });
-      updateUser({
-        firstName: settingsData.firstName,
-        lastName: settingsData.lastName,
-        email: settingsData.email,
-      });
-      setProfileData({
-        firstName: settingsData.firstName,
-        lastName: settingsData.lastName,
-        email: settingsData.email,
-      });
+      await api.put(`/student/update_profile/${user.userAccountId}`, profile);
+      updateUser(profile);
       showToast('Settings saved successfully!', 'success');
     } catch (err) {
       showToast('Failed to save settings', 'error');
@@ -266,7 +251,11 @@ export default function InstructorDashboard() {
               ) : (
                 <div className="courses-grid">
                   {courses.map(course => (
-                    <div key={course.courseId} className="course-card" onClick={() => navigate(`/courses/${course.courseId}/lessons`)}>
+                    <div 
+                      key={course.courseId} 
+                      className="course-card" 
+                      onClick={() => navigate(`/courses/${course.courseId}/lessons`)}
+                    >
                       <div className="course-card-header">
                         <div className="course-icon"></div>
                         <span className="status-badge active">Active</span>
@@ -317,8 +306,8 @@ export default function InstructorDashboard() {
                         <h4>{student.studentName}</h4>
                         <p className="student-email">{student.email}</p>
                         <div className="student-courses">
-                          {student.courses.map((course, idx) => (
-                            <span key={idx} className="course-tag">{course}</span>
+                          {student.courses.map((courseName, idx) => (
+                            <span key={idx} className="course-tag">{courseName}</span>
                           ))}
                         </div>
                       </div>
@@ -335,8 +324,14 @@ export default function InstructorDashboard() {
               <div className="profile-card">
                 <div className="profile-view">
                   <div className="profile-info-grid">
-                    <div className="info-item"><label>Full Name</label><p>{profileData.firstName} {profileData.lastName}</p></div>
-                    <div className="info-item"><label>Email</label><p>{profileData.email}</p></div>
+                    <div className="info-item">
+                      <label>Full Name</label>
+                      <p>{profile.firstName} {profile.lastName}</p>
+                    </div>
+                    <div className="info-item">
+                      <label>Email</label>
+                      <p>{profile.email}</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -352,15 +347,30 @@ export default function InstructorDashboard() {
               <div className="settings-card">
                 <div className="settings-group">
                   <label>First Name</label>
-                  <input name="firstName" value={settingsData.firstName} onChange={handleSettingsChange} placeholder="First Name" />
+                  <input 
+                    name="firstName" 
+                    value={profile.firstName} 
+                    onChange={handleProfileChange} 
+                    placeholder="First Name" 
+                  />
                 </div>
                 <div className="settings-group">
                   <label>Last Name</label>
-                  <input name="lastName" value={settingsData.lastName} onChange={handleSettingsChange} placeholder="Last Name" />
+                  <input 
+                    name="lastName" 
+                    value={profile.lastName} 
+                    onChange={handleProfileChange} 
+                    placeholder="Last Name" 
+                  />
                 </div>
                 <div className="settings-group">
                   <label>Email</label>
-                  <input name="email" value={settingsData.email} onChange={handleSettingsChange} placeholder="Email" />
+                  <input 
+                    name="email" 
+                    value={profile.email} 
+                    onChange={handleProfileChange} 
+                    placeholder="Email" 
+                  />
                 </div>
                 <button onClick={saveSettings} className="btn btn-primary">Save Settings</button>
               </div>
@@ -370,11 +380,25 @@ export default function InstructorDashboard() {
       </div>
 
       {isCreateModalOpen && (
-        <CourseModal title="Create New Course" course={newCourse} setCourse={setNewCourse} onClose={() => setIsCreateModalOpen(false)} onSave={createCourse} saveBtnText="Create Course" />
+        <CourseModal 
+          title="Create New Course" 
+          course={newCourse} 
+          setCourse={setNewCourse} 
+          onClose={() => setIsCreateModalOpen(false)} 
+          onSave={createCourse} 
+          saveBtnText="Create Course" 
+        />
       )}
 
       {isEditModalOpen && editingCourse && (
-        <CourseModal title="Edit Course" course={editingCourse} setCourse={setEditingCourse} onClose={() => setIsEditModalOpen(false)} onSave={saveCourseChanges} saveBtnText="Save Changes" />
+        <CourseModal 
+          title="Edit Course" 
+          course={editingCourse} 
+          setCourse={setEditingCourse} 
+          onClose={() => setIsEditModalOpen(false)} 
+          onSave={saveCourseChanges} 
+          saveBtnText="Save Changes" 
+        />
       )}
     </div>
   );
@@ -391,15 +415,27 @@ function CourseModal({ title, course, setCourse, onClose, onSave, saveBtnText })
         <form onSubmit={onSave} className="course-form">
           <div className="form-group">
             <label>Course Name</label>
-            <input value={course.courseName} onChange={(e) => setCourse({ ...course, courseName: e.target.value })} required />
+            <input 
+              value={course.courseName} 
+              onChange={(e) => setCourse({ ...course, courseName: e.target.value })} 
+              required 
+            />
           </div>
           <div className="form-group">
             <label>Description</label>
-            <textarea value={course.description} onChange={(e) => setCourse({ ...course, description: e.target.value })} rows="4" />
+            <textarea 
+              value={course.description} 
+              onChange={(e) => setCourse({ ...course, description: e.target.value })} 
+              rows="4" 
+            />
           </div>
           <div className="form-group">
             <label>Duration</label>
-            <input value={course.duration} onChange={(e) => setCourse({ ...course, duration: e.target.value })} placeholder="e.g., 8 weeks" />
+            <input 
+              value={course.duration} 
+              onChange={(e) => setCourse({ ...course, duration: e.target.value })} 
+              placeholder="e.g., 8 weeks" 
+            />
           </div>
           <div className="form-actions">
             <button type="submit" className="btn btn-primary">{saveBtnText}</button>

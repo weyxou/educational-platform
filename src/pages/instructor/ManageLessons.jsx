@@ -418,7 +418,8 @@ export default function ManageLessons() {
         <div className="modal-overlay" onClick={() => setIsEditAssignmentModalOpen(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2 className="modal-title">Edit Assignment</h2>
-            <p>Editing via API is not fully implemented. Please delete and recreate.</p>
+            <p>Assignments cannot be edited. You can delete and recreate.
+</p>
             <div className="form-actions">
               <button onClick={() => setIsEditAssignmentModalOpen(false)} className="btn btn-secondary">Close</button>
             </div>
