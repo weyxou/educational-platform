@@ -32,8 +32,14 @@ export default function StudentDashboard() {
           api.get('/course/all_courses'),
           api.get('/enrollment/my-courses')
         ]);
-        setAllCourses(coursesRes.data || []);
-        setEnrolledCourses(enrolledRes.data || []);
+        
+        const coursesData = coursesRes.data;
+        const coursesArray = Array.isArray(coursesData) ? coursesData : (coursesData?.content || []);
+        setAllCourses(coursesArray);
+        
+        const enrolledData = enrolledRes.data;
+        const enrolledArray = Array.isArray(enrolledData) ? enrolledData : (enrolledData?.content || []);
+        setEnrolledCourses(enrolledArray);
       } catch (err) {
         console.error('Error loading courses:', err);
         setEnrolledCourses([]);
@@ -59,9 +65,15 @@ export default function StudentDashboard() {
   const handleEnroll = async (course) => {
     confirm(`Enroll in "${course.courseName}"?`, async () => {
       try {
-        await api.post(`/enrollment/enroll/${course.courseId}`);
+        const userId = getUserId();
+        await api.post('/enrollment/enroll', {
+          courseId: course.courseId,
+          studentId: userId
+        });
         const enrolledRes = await api.get('/enrollment/my-courses');
-        setEnrolledCourses(enrolledRes.data);
+        const enrolledData = enrolledRes.data;
+        const enrolledArray = Array.isArray(enrolledData) ? enrolledData : (enrolledData?.content || []);
+        setEnrolledCourses(enrolledArray);
         showToast('Successfully enrolled!', 'success');
       } catch (err) {
         console.error(err);

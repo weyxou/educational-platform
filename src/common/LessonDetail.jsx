@@ -32,6 +32,11 @@ export default function LessonDetail() {
   };
   const userId = getUserId();
 
+  const extractData = (response) => {
+    const data = response.data;
+    return Array.isArray(data) ? data : (data?.content || []);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,7 +45,8 @@ export default function LessonDetail() {
           api.get(`/lesson/get_all_lessons/${courseId}`)
         ]);
         setLesson(lessonRes.data);
-        const sorted = (lessonsRes.data || []).sort((a, b) => a.lessonOrder - b.lessonOrder);
+        const lessonsArray = extractData(lessonsRes);
+        const sorted = lessonsArray.sort((a, b) => a.lessonOrder - b.lessonOrder);
         setAllLessons(sorted);
       } catch (err) {
         console.error('Error loading lesson data:', err);

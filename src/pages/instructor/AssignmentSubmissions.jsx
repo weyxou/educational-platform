@@ -9,23 +9,26 @@ export default function AssignmentSubmissions() {
   const navigate = useNavigate();
   const { showToast } = useNotification();
   
-  const [assignment, setAssignment] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [grades, setGrades] = useState({});
   const [feedbacks, setFeedbacks] = useState({});
-
   const [modalOpen, setModalOpen] = useState(false);
-const [fullAnswer, setFullAnswer] = useState('');
+  const [fullAnswer, setFullAnswer] = useState('');
+  
+  const extractData = (response) => {
+    const data = response.data;
+    return Array.isArray(data) ? data : (data?.content || []);
+  };
   
   useEffect(() => {
-    loadData();
+    loadSubmissions();
   }, [assignmentId]);
   
-  const loadData = async () => {
+  const loadSubmissions = async () => {
     try {
       const submissionsRes = await api.get(`/assignment/submissions/${assignmentId}`);
-      const subs = submissionsRes.data;
+      const subs = extractData(submissionsRes);
       setSubmissions(subs);
       
       const initGrades = {};
@@ -36,12 +39,6 @@ const [fullAnswer, setFullAnswer] = useState('');
       });
       setGrades(initGrades);
       setFeedbacks(initFeedbacks);
-      try {
-        const assignmentRes = await api.get(`/assignment/${assignmentId}`);
-        setAssignment(assignmentRes.data);
-      } catch (err) {
-        setAssignment({ assignmentTitle: `Assignment ${assignmentId}` });
-      }
     } catch (err) {
       console.error('Error loading submissions:', err);
       showToast('Failed to load submissions', 'error');
@@ -51,6 +48,10 @@ const [fullAnswer, setFullAnswer] = useState('');
   };
   
   const saveGrade = async (submissionId, studentId) => {
+    if (!studentId) {
+      showToast('Student ID not found', 'error');
+      return;
+    }
     const grade = grades[submissionId];
     if (grade === '' || grade === null) {
       showToast('Please enter a grade', 'error');
@@ -78,8 +79,12 @@ const [fullAnswer, setFullAnswer] = useState('');
   };
   
   const saveFeedback = async (submissionId, studentId) => {
+    if (!studentId) {
+      showToast('Student ID not found', 'error');
+      return;
+    }
     const feedback = feedbacks[submissionId];
-    if (!feedback) {
+    if (!feedback || !feedback.trim()) {
       showToast('Please enter feedback', 'error');
       return;
     }
@@ -87,10 +92,10 @@ const [fullAnswer, setFullAnswer] = useState('');
       await api.put('/assignment/saveAssignmentFeedback', {
         studentId: studentId,
         assignmentId: parseInt(assignmentId),
-        feedback: feedback
+        feedback: feedback.trim()
       });
       setSubmissions(prev => prev.map(sub => 
-        sub.submissionId === submissionId ? { ...sub, feedback: feedback } : sub
+        sub.submissionId === submissionId ? { ...sub, feedback: feedback.trim() } : sub
       ));
       showToast('Feedback saved successfully', 'success');
     } catch (err) {
@@ -105,21 +110,21 @@ const [fullAnswer, setFullAnswer] = useState('');
   };
   
   const viewFullAnswer = (content) => {
-  setFullAnswer(content);
-  setModalOpen(true);
-};
+    setFullAnswer(content);
+    setModalOpen(true);
+  };
   
-  if (loading) return <div className="loading-state">Loading submissions</div>;
+  if (loading) return <div className="loading-state">Loading submissions...</div>;
   
   return (
     <div className="submissions-page">
       <div className="submissions-container">
         <div className="page-card">
           <div className="submissions-header">
-            <button onClick={() => navigate(`/instructor/course/${courseId}/manage`)} className="back-btn">
-              Back to Course
+            <button onClick={() => navigate(`/courses/${courseId}/lessons`)} className="back-btn">
+              ← Back to Course
             </button>
-            <h1>{assignment?.assignmentTitle || 'Assignment'} Submissions</h1>
+            <h1>Assignment {assignmentId} - Submissions</h1>
           </div>
           
           {submissions.length === 0 ? (
@@ -142,80 +147,89 @@ const [fullAnswer, setFullAnswer] = useState('');
                   </tr>
                 </thead>
                 <tbody>
-                  {submissions.map(sub => (
-                    <tr key={sub.submissionId}>
-                      <td className="student-cell">
-                        <strong>{sub.student?.firstName} {sub.student?.lastName}</strong>
-                        <span className="student-email">{sub.student?.email}</span>
-                      </td>
-                      <td>{formatDate(sub.submissionDate)}</td>
-                      <td>
-                        <div className="answer-preview">{sub.submittedContent?.substring(0, 100)}...</div>
-                      </td>
-                      <td className="grade-cell">
-                        <div className="input-group">
-                          <input 
-                            type="number" 
-                            min="0" 
-                            max="100" 
-                            step="1"
-                            value={grades[sub.submissionId] || ''}
-                            onChange={e => setGrades({...grades, [sub.submissionId]: e.target.value})}
-                            className="grade-input" 
-                          />
+                  {submissions.map(sub => {
+                    const studentId = sub.student?.userAccountId || sub.studentId || sub.student?.id;
+                    return (
+                      <tr key={sub.submissionId}>
+                        <td className="student-cell">
+                          <strong>{sub.student?.firstName || sub.firstName} {sub.student?.lastName || sub.lastName}</strong>
+                          <span className="student-email">{sub.student?.email || sub.email}</span>
+                        </td>
+                        <td>{formatDate(sub.submissionDate)}</td>
+                        <td>
+                          <div className="answer-preview">
+                            {sub.submittedContent ? sub.submittedContent.substring(0, 100) : 'No content'}...
+                          </div>
+                        </td>
+                        <td className="grade-cell">
+                          <div className="input-group">
+                            <input 
+                              type="number" 
+                              min="0" 
+                              max="100" 
+                              step="1"
+                              value={grades[sub.submissionId] || ''}
+                              onChange={e => setGrades({...grades, [sub.submissionId]: e.target.value})}
+                              className="grade-input" 
+                            />
+                            <button 
+                              onClick={() => saveGrade(sub.submissionId, studentId)} 
+                              className="icon-btn save-grade"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        </td>
+                        <td className="feedback-cell">
+                          <div className="input-group vertical">
+                            <textarea 
+                              rows="2"
+                              value={feedbacks[sub.submissionId] || ''}
+                              onChange={e => setFeedbacks({...feedbacks, [sub.submissionId]: e.target.value})}
+                              placeholder="Write feedback..."
+                              className="feedback-input" 
+                            />
+                            <button 
+                              onClick={() => saveFeedback(sub.submissionId, studentId)}
+                              className="icon-btn save-feedback"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        </td>
+                        <td>
                           <button 
-                            onClick={() => saveGrade(sub.submissionId, sub.student?.userAccountId)} 
-                            className="icon-btn save-grade"
+                            onClick={() => viewFullAnswer(sub.submittedContent)} 
+                            className="view-btn"
+                            disabled={!sub.submittedContent}
                           >
-                            Save
+                            View Full Answer
                           </button>
-                        </div>
-                      </td>
-                      <td className="feedback-cell">
-                        <div className="input-group vertical">
-                          <textarea 
-                            rows="2"
-                            value={feedbacks[sub.submissionId] || ''}
-                            onChange={e => setFeedbacks({...feedbacks, [sub.submissionId]: e.target.value})}
-                            placeholder="Write feedback..."
-                            className="feedback-input" 
-                          />
-                          <button 
-                            onClick={() => saveFeedback(sub.submissionId, sub.student?.userAccountId)}
-                            className="icon-btn save-feedback"
-                          >
-                            Save
-                          </button>
-                        </div>
-                      </td>
-                      <td>
-                        <button onClick={() => viewFullAnswer(sub.submittedContent)} className="view-btn">
-                          View Full Answer
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           )}
 
           {modalOpen && (
-  <div className="modal-overlay" onClick={() => setModalOpen(false)}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-      <div className="modal-header">
-        <h2>Full Answer</h2>
-        <button className="modal-close" onClick={() => setModalOpen(false)}>×</button>
-      </div>
-      <div className="modal-body">
-        <p>{fullAnswer}</p>
-      </div>
-      <div className="modal-footer">
-        <button onClick={() => setModalOpen(false)} className="btn btn-primary">Close</button>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="modal-overlay" onClick={() => setModalOpen(false)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h2>Full Answer</h2>
+                  <button className="modal-close" onClick={() => setModalOpen(false)}>×</button>
+                </div>
+                <div className="modal-body">
+                  <p style={{ whiteSpace: 'pre-wrap' }}>{fullAnswer}</p>
+                </div>
+                <div className="modal-footer">
+                  <button onClick={() => setModalOpen(false)} className="btn btn-primary">Close</button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

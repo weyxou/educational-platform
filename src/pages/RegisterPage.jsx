@@ -54,6 +54,8 @@ export default function RegisterPage() {
 
     try {
       const signupPayload = {
+        firstName: trimmedData.firstName,
+        lastName: trimmedData.lastName,
         email: trimmedData.email,
         password: trimmedData.password,
         role: trimmedData.role
@@ -62,11 +64,13 @@ export default function RegisterPage() {
       const signupRes = await api.post('/auth/signup', signupPayload);
       const data = signupRes.data;
 
+      const userId = data.userId || data.userAccountId || data.id;
+
       const user = {
         email: data.email || trimmedData.email,
         firstName: trimmedData.firstName,
         lastName: trimmedData.lastName,
-        userAccountId: data.userId || data.userAccountId || data.id,
+        userAccountId: userId,
         role: data.userType || data.role || trimmedData.role
       };
 
@@ -76,9 +80,9 @@ export default function RegisterPage() {
 
       login(user);
 
-      if (data.userId || data.userAccountId) {
+      if (userId && trimmedData.role === 'INSTRUCTOR') {
         try {
-          await api.put(`/instructor/update_profile/${user.userAccountId || data.userId}`, {
+          await api.put(`/instructor/update_profile/${userId}`, {
             firstName: trimmedData.firstName,
             lastName: trimmedData.lastName
           });
@@ -86,16 +90,27 @@ export default function RegisterPage() {
           console.warn('Could not update profile names:', profileErr);
         }
       }
+
       setIsAnimating(true);
-      
       setTimeout(() => {
-        navigate(user.role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard');
+        const dashboardPath = user.role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard';
+        navigate(dashboardPath);
       }, 600);
 
     } catch (err) {
       console.error('Registration error:', err);
-      const msg = err.response?.data?.message || err.response?.data || 'Registration failed';
-      setError(typeof msg === 'string' ? msg : 'Something went wrong');
+      console.error('Response data:', err.response?.data);
+      console.error('Response status:', err.response?.status);
+
+      let errorMessage = 'Registration failed';
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (typeof err.response?.data === 'string') {
+        errorMessage = err.response.data;
+      } else if (err.response?.data?.errors) {
+        errorMessage = Object.values(err.response.data.errors).join(', ');
+      }
+      setError(errorMessage);
       setLoading(false);
     }
   };
@@ -103,7 +118,6 @@ export default function RegisterPage() {
   const handleLoginRedirect = (e) => {
     e.preventDefault();
     setIsAnimating(true);
-    
     setTimeout(() => {
       navigate('/login');
     }, 600);
@@ -116,7 +130,7 @@ export default function RegisterPage() {
           <div className="auth-card register-card">
             <h1>Create Account</h1>
             <div className="auth-subtitle">Join our community of learners and instructors</div>
-            
+
             {error && <div className="error-message">{error}</div>}
 
             <form onSubmit={handleSubmit}>
@@ -165,6 +179,7 @@ export default function RegisterPage() {
                   required
                 />
               </div>
+
               <div className="role-selection">
                 <div className="role-title">I want to join as:</div>
                 <div className="role-options">
@@ -210,18 +225,10 @@ export default function RegisterPage() {
             <h2>Start Your Journey Today</h2>
             <p>Join thousands of successful students and instructors who are already learning and teaching on our platform</p>
             <div className="features">
-              <div className="feature-item">
-                <span>1000+ courses available</span>
-              </div>
-              <div className="feature-item">
-                <span>Learn from industry experts</span>
-              </div>
-              <div className="feature-item">
-                <span>Earn certificates & advance career</span>
-              </div>
-              <div className="feature-item">
-                <span>Teach what you love</span>
-              </div>
+              <div className="feature-item"><span>1000+ courses available</span></div>
+              <div className="feature-item"><span>Learn from industry experts</span></div>
+              <div className="feature-item"><span>Earn certificates & advance career</span></div>
+              <div className="feature-item"><span>Teach what you love</span></div>
             </div>
           </div>
         </div>

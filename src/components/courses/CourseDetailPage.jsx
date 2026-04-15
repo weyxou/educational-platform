@@ -13,6 +13,11 @@ export default function CourseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const extractData = (response) => {
+    const data = response.data;
+    return Array.isArray(data) ? data : (data?.content || []);
+  };
+
   useEffect(() => {
     if (authLoading) return;
 
@@ -27,7 +32,8 @@ export default function CourseDetailPage() {
         const courseRes = await api.get(`/course/course_id/${courseId}`);
         setCourse(courseRes.data);
         const lessonsRes = await api.get(`/lesson/get_all_lessons/${courseId}`);
-        setLessons(lessonsRes.data || []);
+        const lessonsArray = extractData(lessonsRes);
+        setLessons(lessonsArray);
         setError(null);
       } catch (err) {
         console.error("Error:", err);
@@ -51,7 +57,7 @@ export default function CourseDetailPage() {
       <div className="course-detail-page">
         <div className="container">
           <div className="auth-warning">
-            <h2>🔒 Access Restricted</h2>
+            <h2>Access Restricted</h2>
             <p>You need to be logged in to view course details and lessons.</p>
             <div className="auth-buttons">
               <Link to="/login" className="btn-login">Login</Link>
@@ -69,7 +75,7 @@ export default function CourseDetailPage() {
       <div className="course-detail-page">
         <div className="container">
           <div className="error-message">
-            <h2>⛔ Access Denied</h2>
+            <h2>Access Denied</h2>
             <p>You don't have permission to view this course.</p>
             <Link to="/student/dashboard" className="back-link">← Back to Dashboard</Link>
           </div>

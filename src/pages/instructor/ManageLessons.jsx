@@ -23,11 +23,16 @@ export default function ManageLessons() {
   const [editingAssignment, setEditingAssignment] = useState(null);
   const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] = useState(false);
 
+  const extractData = (response) => {
+    const data = response.data;
+    return Array.isArray(data) ? data : (data?.content || []);
+  };
+
   useEffect(() => {
     const fetchLessons = async () => {
       try {
         const res = await api.get(`/lesson/get_all_lessons/${courseId}`);
-        setLessons(res.data || []);
+        setLessons(extractData(res));
       } catch (err) {
         console.error(err);
         showToast('Failed to load lessons', 'error');
@@ -42,7 +47,7 @@ export default function ManageLessons() {
     const loadAssignmentsFromApi = async () => {
       try {
         const res = await api.get(`/assignment/course/${courseId}`);
-        setAssignments(res.data || []);
+        setAssignments(extractData(res));
       } catch (err) {
         console.error('Failed to load assignments:', err);
         showToast('Failed to load assignments', 'error');
@@ -418,8 +423,7 @@ export default function ManageLessons() {
         <div className="modal-overlay" onClick={() => setIsEditAssignmentModalOpen(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2 className="modal-title">Edit Assignment</h2>
-            <p>Assignments cannot be edited. You can delete and recreate.
-</p>
+            <p>Assignments cannot be edited. You can delete and recreate.</p>
             <div className="form-actions">
               <button onClick={() => setIsEditAssignmentModalOpen(false)} className="btn btn-secondary">Close</button>
             </div>

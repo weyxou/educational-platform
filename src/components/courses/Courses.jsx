@@ -12,7 +12,9 @@ const Courses = () => {
     const fetchCourses = async () => {
       try {
         const res = await api.get("/course/all_courses");
-        const instructorCourses = res.data.filter(
+        const data = res.data;
+        const coursesArray = Array.isArray(data) ? data : (data?.content || []);
+        const instructorCourses = coursesArray.filter(
           (course) => course.instructorName
         );
         setCourses(instructorCourses);
@@ -43,7 +45,7 @@ const Courses = () => {
         <div className="container">
           <h1>All Courses</h1>
           <p className="subtitle">
-  Learn new skills from expert instructors and build real-world experience
+            Learn new skills from expert instructors and build real-world experience
           </p>
           <input
             type="text"
@@ -60,14 +62,13 @@ const Courses = () => {
             {filteredCourses.length > 0 ? (
               filteredCourses.map((course) => (
                 <Link
-                  to={`/courses/${course.courseId}/detail`} 
+                  to={`/courses/${course.courseId}/detail`}
                   key={course.courseId}
                   className="course-square"
                 >
                   <div className="course-square-inner">
                     <div className="course-header">
                       <h3>{course.courseName}</h3>
-      
                     </div>
                     <div className="course-body">
                       <p className="instructor">

@@ -15,6 +15,11 @@ export default function CourseLessonsView() {
   const [completedLessons, setCompletedLessons] = useState({});
   const [lastOpenedLessonId, setLastOpenedLessonId] = useState(null);
 
+  const extractData = (response) => {
+    const data = response.data;
+    return Array.isArray(data) ? data : (data?.content || []);
+  };
+
   const getUserIdFromToken = () => {
     const token = localStorage.getItem('jwtToken');
     if (!token) return null;
@@ -35,7 +40,8 @@ export default function CourseLessonsView() {
         const courseRes = await api.get(`/course/course_id/${courseId}`);
         setCourse(courseRes.data);
         const lessonsRes = await api.get(`/lesson/get_all_lessons/${courseId}`);
-        setLessons(lessonsRes.data || []);
+        const lessonsArray = extractData(lessonsRes);
+        setLessons(lessonsArray);
       } catch (err) {
       } finally {
         setLoading(false);
@@ -139,7 +145,7 @@ export default function CourseLessonsView() {
 
         <div className="lessons-layout">
           <aside className="lessons-toc">
-            <h3>📖 Contents</h3>
+            <h3>Contents</h3>
             <ul className="toc-list">
               {sortedLessons.map((lesson, idx) => (
                 <li key={lesson.lessonId}>
@@ -176,7 +182,7 @@ export default function CourseLessonsView() {
                       <h3>{lesson.lessonName}</h3>
                       {lesson.lessonDescription && <p className="lesson-description">{lesson.lessonDescription}</p>}
                       <div className="lesson-meta">
-                        <span>📅 {new Date(lesson.createdAt).toLocaleDateString()}</span>
+                        <span> {new Date(lesson.createdAt).toLocaleDateString()}</span>
                         {completedLessons[lesson.lessonId] && <span className="completed-badge">Completed</span>}
                       </div>
                       <div className="lesson-actions">

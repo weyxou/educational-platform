@@ -32,14 +32,20 @@ export default function InstructorDashboard() {
     email: user?.email || '',
   });
 
+  const extractData = (response) => {
+    const data = response.data;
+    return Array.isArray(data) ? data : (data?.content || []);
+  };
+
   useEffect(() => {
     if (!user?.userAccountId) return;
 
     const loadCourses = async () => {
       try {
         setLoading(true);
-        const { data } = await api.get('/course/all_courses');
-        const myCourses = data.filter(c => c.instructorId === user.userAccountId);
+        const res = await api.get('/course/all_courses');
+        const allCourses = extractData(res);
+        const myCourses = allCourses.filter(c => c.instructorId === user.userAccountId);
         setCourses(myCourses);
       } catch (err) {
         showToast('Failed to load courses', 'error');
@@ -68,10 +74,8 @@ export default function InstructorDashboard() {
 
       for (const course of courses) {
         try {
-          const { data: enrollments } = await api.get(
-            `/enrollment/view_enrolled_students/${course.courseId}`
-          );
-
+          const res = await api.get(`/enrollment/view_enrolled_students/${course.courseId}`);
+          const enrollments = extractData(res);
           enrollments.forEach(enrollment => {
             if (!studentMap.has(enrollment.studentId)) {
               studentMap.set(enrollment.studentId, {

@@ -30,40 +30,37 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await api.post('/auth/login', {
-        email: email,
-        password: password,
-      });
-
+      const res = await api.post('/auth/login', { email, password });
       const data = res.data;
+
+      const token = data.token || data.accessToken || data.jwt;
+      if (!token) throw new Error('No token received');
+      localStorage.setItem('jwtToken', token);
+
+      let role = (data.userType || data.role || '').toUpperCase();
+      if (role.startsWith('ROLE_')) role = role.slice(5);
+
       const user = {
         email: data.email,
         firstName: data.firstName || '',
         lastName: data.lastName || '',
         userAccountId: data.userId || data.userAccountId || data.id,
-        role: data.userType || data.role,
+        role: role,
       };
 
-      localStorage.setItem('jwtToken', data.token || data.accessToken || data.jwt);
-
       login(user);
-
       setIsAnimating(true);
-      
-      setTimeout(() => {
-        if (user.role === 'STUDENT') {
-          navigate('/student/dashboard');
-        } else if (user.role === 'INSTRUCTOR') {
-          navigate('/instructor/dashboard');
-        } else {
-          console.warn('Unknown role:', user.role);
-          navigate('/');
-        }
-      }, 600);
 
+      setTimeout(() => {
+        if (role === 'STUDENT') navigate('/student/dashboard');
+        else if (role === 'INSTRUCTOR') navigate('/instructor/dashboard');
+        else navigate('/');
+      }, 600);
     } catch (err) {
       console.error('Login error:', err.response?.data);
-      const msg = err.response?.data?.message || 'Invalid email or password';
+      let msg = 'Invalid email or password';
+      if (err.response?.data?.message) msg = err.response.data.message;
+      else if (typeof err.response?.data === 'string') msg = err.response.data;
       setError(msg);
       setLoading(false);
     }
@@ -72,10 +69,7 @@ export default function LoginPage() {
   const handleRegisterRedirect = (e) => {
     e.preventDefault();
     setIsAnimating(true);
-    
-    setTimeout(() => {
-      navigate('/register');
-    }, 600);
+    setTimeout(() => navigate('/register'), 600);
   };
 
   return (
@@ -83,29 +77,24 @@ export default function LoginPage() {
       <div className={`auth-wrapper login-wrapper ${isAnimating ? 'slide-out' : ''}`}>
         <div className="auth-left login-left">
           <div className="auth-content login-content">
-           <h2>Welcome Back!</h2>
-
-<p>
-  Continue your journey — learn new skills, teach your courses, and grow with the platform.
-</p>
-
-<div className="features">
-  <div className="feature-item">
-    <span>Access your courses and learning materials</span>
-  </div>
-
-  <div className="feature-item">
-    <span>Track your progress or student performance</span>
-  </div>
-
-  <div className="feature-item">
-    <span>Connect with instructors and learners</span>
-  </div>
-
-  <div className="feature-item">
-    <span>Get personalized recommendations for growth</span>
-  </div>
-</div>
+            <h2>Welcome Back!</h2>
+            <p>
+              Continue your journey — learn new skills, teach your courses, and grow with the platform.
+            </p>
+            <div className="features">
+              <div className="feature-item">
+                <span>Access your courses and learning materials</span>
+              </div>
+              <div className="feature-item">
+                <span>Track your progress or student performance</span>
+              </div>
+              <div className="feature-item">
+                <span>Connect with instructors and learners</span>
+              </div>
+              <div className="feature-item">
+                <span>Get personalized recommendations for growth</span>
+              </div>
+            </div>
           </div>
         </div>
         <div className="auth-right login-right">
@@ -113,7 +102,6 @@ export default function LoginPage() {
             <h1>Sign In</h1>
             <div className="auth-subtitle">Access your account</div>
             {error && <div className="error-message">{error}</div>}
-
             <form onSubmit={handleSubmit}>
               <div className="input-group">
                 <label>Email Address</label>
@@ -126,7 +114,6 @@ export default function LoginPage() {
                   required
                 />
               </div>
-
               <div className="input-group">
                 <label>Password</label>
                 <input
@@ -138,12 +125,10 @@ export default function LoginPage() {
                   required
                 />
               </div>
-
               <button type="submit" disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
-
             <p>
               Don't have an account?{' '}
               <Link to="/register" onClick={handleRegisterRedirect}>
