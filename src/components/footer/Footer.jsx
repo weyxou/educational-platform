@@ -14,7 +14,7 @@ const Footer = () => {
               </NavLink>
             </div>
             <p className={styles.desc}>
-             Learn new skills or teach what you know on our platform built for growth and connection.
+              Learn new skills or teach what you know on our platform built for growth and connection.
             </p>
           </div>
           <div className={styles.links}>
@@ -46,17 +46,17 @@ const Footer = () => {
         <hr className={styles.divider} />
         <div className={styles.bottom}>
           <p className={styles.copyright}>
-            2025 Educational Platform. All rights reserved.
+            © 2025 Educational Platform. All rights reserved.
           </p>
           <div className={styles.social}>
             <a href="#" className={styles.socialLink} aria-label="Facebook">
-             <img src="\images\facebook.svg" alt="" />
+              <img src="/images/facebook.svg" alt="Facebook" />
             </a>
             <a href="#" className={styles.socialLink} aria-label="Instagram">
-              <img src="\images\insta.svg" alt="" />
+              <img src="/images/insta.svg" alt="Instagram" />
             </a>
             <a href="#" className={styles.socialLink} aria-label="LinkedIn">
-             <img src="\images\linkedin.svg" alt="" />
+              <img src="/images/linkedin.svg" alt="LinkedIn" />
             </a>
           </div>
         </div>
