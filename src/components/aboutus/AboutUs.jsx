@@ -125,7 +125,7 @@ const AboutUs = () => {
 
       <div className="mission-image fade-up">
         <div className="image-placeholder">
-          <img src="public/images/tIED7.jpg" alt="Learning community" />
+          <img src="/images/tIED7.jpg" alt="Learning community" />
         </div>
       </div>
 
