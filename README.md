@@ -1,3 +1,9 @@
+Faculty of Engineering and Informatics  
+Department of Computer Engineering  
+
+Student: Makushova Zhibek, Com 22  
+Supervisor: Mr. Erustan Erkebulanov  
+
 # Educational Platform
 
 A web-based educational platform built with React that supports role-based access (Student / Instructor / Admin), course management, assignments, and learning progress tracking.
@@ -15,12 +21,6 @@ https://educational-platform-zfde.onrender.com
 
 See passwords in thesis / presentation
 
-
-Faculty of Engineering and Informatics  
-Department of Computer Engineering  
-
-Student: Makushova Zhibek, Com 22  
-Supervisor: Mr. Erustan Erkebulanov  
 
 ## Problem
 
