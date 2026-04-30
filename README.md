@@ -9,11 +9,12 @@ https://educational-platform-zfde.onrender.com
 
 | Role       | Email             | Password     |
 |------------|------------------|--------------|
-| Student    | jibek@gmail.com  | Qwerty12345@ |
-| Instructor | aibek@gmail.com  | Qwerty123@   |
-| Admin      | admin@example.com | admin123     |
+| Student    | jibek@gmail.com  | **********
+| Instructor | aibek@gmail.com  | **********  |
+| Admin      | admin@example.com | **********  |
 
-## Academic Information
+See passwords in thesis / presentation
+
 
 Faculty of Engineering and Informatics  
 Department of Computer Engineering  
