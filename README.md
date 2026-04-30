@@ -129,6 +129,15 @@ npm run dev
 <img src="https://github.com/user-attachments/assets/53d170f8-49f2-4b05-a58a-dd4390881419" />
 
 
+##  Responsive Design
+
+The application is optimized for:
+- **Desktop** (full layout)
+- **Tablet** (adjusted spacing and navigation)
+- **Mobile** (collapsible menus, touch-friendly elements)
+ *See video demonstration for responsive view*
+
+
 ## Project Structure
 
 .
