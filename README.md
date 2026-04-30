@@ -5,6 +5,17 @@ A web-based educational platform built with React that supports role-based acces
 ## Live Demo
 https://educational-platform-zfde.onrender.com
 
+### Important Note about Deployment
+
+This project is hosted on **Render's free tier**. Free services automatically spin down after 15 minutes of inactivity.
+
+**If the page doesn't load immediately:**
+1. Wait **30–60 seconds** for the server to wake up
+2. **Refresh the page** (F5 or Cmd+R)
+3. The app should work normally after the initial wake-up
+
+This is normal behaviour for free hosting and does not affect the functionality of the application when running locally.
+
 ## Test Accounts
 
 | Role       | Email             | Password     |
