@@ -16,12 +16,37 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState([]);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+const validatePassword = (password) => {
+  const errors = [];
+  
+  if (password.length < 8) {
+    errors.push('Minimum 8 characters');
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push('At least one uppercase letter');
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push('At least one number');
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push('At least one special character');
+  }
+  
+  return errors;
+};
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  setFormData({ ...formData, [name]: value });
+  
+  if (name === 'password') {
+    setPasswordErrors(validatePassword(value));
+  }
+};
 
   const handleRoleChange = (role) => {
     setFormData((prev) => ({ ...prev, role }));
@@ -46,11 +71,12 @@ export default function RegisterPage() {
       return;
     }
 
-    if (trimmedData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setLoading(false);
-      return;
-    }
+    const passwordValidationErrors = validatePassword(trimmedData.password);
+if (passwordValidationErrors.length > 0) {
+  setError(`Password requirements: ${passwordValidationErrors.join(', ')}`);
+  setLoading(false);
+  return;
+}
 
     try {
       const signupPayload = {
@@ -168,17 +194,24 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <div className="input-group">
-                <label>Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Create a password (min 6 characters)"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+            <div className="input-group">
+  <label>Password</label>
+  <input
+    type="password"
+    name="password"
+    placeholder="Create a password"
+    value={formData.password}
+    onChange={handleChange}
+    required
+  />
+  {passwordErrors.length > 0 && (
+    <div className="password-requirements">
+      {passwordErrors.map((err, idx) => (
+        <div key={idx} className="requirement-error">• {err}</div>
+      ))}
+    </div>
+  )}
+</div>
 
               <div className="role-selection">
                 <div className="role-title">I want to join as:</div>

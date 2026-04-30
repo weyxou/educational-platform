@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://educational-platform-backend-o7c3.onrender.com', // без слеша в конце
+  baseURL: 'https://educational-platform-backend-o7c3.onrender.com', 
   timeout: 10000,
 });
 
