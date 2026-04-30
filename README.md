@@ -73,7 +73,7 @@ To provide instructors with simple and effective tools for course creation, stud
 ### Steps
 
 ```bash
-git clone https://github.com/MakushovaZhibek/educational-platform.git
+git clone https://github.com/weyxou/educational-platform
 cd educational-platform
 npm install
 npm run dev
@@ -116,11 +116,11 @@ npm run dev
 
 ## Screenshots
 
-### Dashboard
+### Register Page
 
 <img src="https://github.com/user-attachments/assets/b7241533-6f87-4189-bd79-415796504a0e" />
 
-### Courses
+### Login Page
 
 <img src="https://github.com/user-attachments/assets/71be4492-a4bf-4711-8433-d4a5f50f957c" />
 
