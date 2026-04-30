@@ -19,6 +19,7 @@ import CourseDetailPage from './components/courses/CourseDetailPage';
 import AssignmentSubmissions from './pages/instructor/AssignmentSubmissions';
 import CourseAssignments from './pages/student/CourseAssignments';
 import NotificationProvider from './context/AlertCustom';
+import AdminPanel from './pages/admin/AdminPanel';
 
 const AllCoursesPage = () => (
   <div style={{ padding: '150px', textAlign: 'center', fontSize: '2.5rem' }}>
@@ -28,17 +29,27 @@ const AllCoursesPage = () => (
 
 function ProtectedRoute({ children, requiredRole }) {
   const { user, loading, role } = useAuth();
+  
   if (loading) return <div style={{ padding: '150px', textAlign: 'center' }}>Loading</div>;
   if (!user) return <Navigate to="/login" replace />;
-  if (requiredRole && role !== requiredRole) return <Navigate to="/" replace />;
+  
+  if (requiredRole && role !== requiredRole) {
+    if (role === 'STUDENT') return <Navigate to="/student/dashboard" replace />;
+    if (role === 'INSTRUCTOR') return <Navigate to="/instructor/dashboard" replace />;
+    if (role === 'ADMIN') return <Navigate to="/admin" replace />;
+    return <Navigate to="/" replace />;
+  }
+  
   return children;
 }
 
 function PublicOnlyRoute({ children }) {
   const { user, role } = useAuth();
   if (user) {
-    const redirectTo = role === 'STUDENT' ? '/student/dashboard' : '/instructor/dashboard';
-    return <Navigate to={redirectTo} replace />;
+    if (role === 'STUDENT') return <Navigate to="/student/dashboard" replace />;
+    if (role === 'INSTRUCTOR') return <Navigate to="/instructor/dashboard" replace />;
+    if (role === 'ADMIN') return <Navigate to="/admin" replace />;  
+    return <Navigate to="/" replace />;
   }
   return children;
 }
@@ -48,13 +59,15 @@ function MainLayout({ children }) {
   const path = location.pathname;
   
   const hideHeaderFooter = path.includes('/dashboard') ||
+                               path.includes('/admin') ||
+
                            (path.includes('/courses/') && (
                              path.includes('/view') ||
                              path.includes('/lessons') ||
                              path.includes('/lesson') ||
                             path.includes('/assignments') ||  
                              path.includes('/submissions') 
-                           ));
+                                                       ));
   
   return (
     <>
@@ -76,7 +89,12 @@ function AppContent() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<Contact />} />
 
-
+        <Route path='/admin' element={
+    <ProtectedRoute requiredRole="ADMIN">
+      <AdminPanel />
+    </ProtectedRoute>
+  } 
+/>
 
         <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
         <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />

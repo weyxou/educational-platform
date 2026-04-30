@@ -54,8 +54,10 @@ export default function LoginPage() {
       setTimeout(() => {
         if (role === 'STUDENT') navigate('/student/dashboard');
         else if (role === 'INSTRUCTOR') navigate('/instructor/dashboard');
+        else if (role === 'ADMIN') navigate('/admin');
         else navigate('/');
       }, 600);
+      
     } catch (err) {
       console.error('Login error:', err.response?.data);
       let msg = 'Invalid email or password';
