@@ -101,11 +101,11 @@ npm run dev
 
 ## Screenshots
 
-### Login Page
+### Register Page
 
 <img src="https://github.com/user-attachments/assets/b7241533-6f87-4189-bd79-415796504a0e" />
 
-### Register Page
+### Login Page
 
 <img src="https://github.com/user-attachments/assets/71be4492-a4bf-4711-8433-d4a5f50f957c" />
 
