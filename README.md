@@ -16,7 +16,7 @@ https://educational-platform-zfde.onrender.com
 ## Academic Information
 
 Faculty of Engineering and Informatics  
-Department of Computer Engineering  
+Department of Computer Science  
 
 Student: Makushova Zhibek, Com 22  
 Supervisor: Mr. Erustan Erkebulanov  
