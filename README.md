@@ -1,16 +1,46 @@
-# React + Vite
+Faculty of Engineering and Informatics
+Department of Computer Engineering
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Student: Makushova Zhibek, Com 22
+Supervisor: Mr.Erustan Erkebulanov
 
-Currently, two official plugins are available:
+Deploy: https://educational-platform-zfde.onrender.com
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Problem:
+Existing educational platforms in Kyrgyzstan (GeekTech, Codify, Bilim) lack flexibility for instructors and students to create and learn structured courses tailored to local educational needs.
 
-## React Compiler
+Solution:
+A React-based web platform with role separation (instructor / student) enabling:
+Course creation with clear structure
+Quiz functionality and progress tracking
+Content adaptation for Kyrgyzstan's requirements
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+Goal:
+Provide instructors with simple yet powerful course creation tools while offering students a convenient and structured learning experience.
 
-## Expanding the ESLint configuration
+Objectives:
+Analyze existing platforms and define UI/UX requirements.
+Design component architecture and page structure (React).
+Implement role‑based routing with React Router.
+Build global state management using Context API.
+Integrate REST API via axios (authentication, courses, lessons, assignments).
+Implement local storage for lesson progress and student notes.
+Ensure responsive design and cross‑device compatibility.
+Deployment 
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+Technology Stack 
+• React 19
+• React Router DOM 7
+• Axios
+• jwt-decode
+• Vite
+• ESLint
+• CSS 
+• Render (deploy)
+
+
+Screenshots:
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ca522b2e-d119-4871-87de-5cd928c0e06b" />
+
+
