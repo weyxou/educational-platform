@@ -4,6 +4,8 @@ Department of Computer Engineering
 Student: Makushova Zhibek, Com 22  
 Supervisor: Mr. Erustan Erkebulanov  
 
+Project of Specialization: Front-end
+
 # Educational Platform
 
 A web-based educational platform built with React that supports role-based access (Student / Instructor / Admin), course management, assignments, and learning progress tracking.
