@@ -21,6 +21,9 @@ export default function StudentDashboard() {
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const [showAchievements, setShowAchievements] = useState(false);
+const [certificates, setCertificates] = useState([]);
+
   const getUserId = () => user?.userAccountId || user?.id;
 
   useEffect(() => {
@@ -53,14 +56,15 @@ export default function StudentDashboard() {
   }, [user, showToast]);
 
   useEffect(() => {
-    if (user) {
-      setProfileForm({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-      });
-    }
-  }, [user]);
+  if (user) {
+    setProfileForm({
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      email: user.email || '',
+    });
+  }
+  loadCertificates();
+}, [user]);
 
   const handleEnroll = async (course) => {
     confirm(`Enroll in "${course.courseName}"?`, async () => {
@@ -136,6 +140,49 @@ export default function StudentDashboard() {
     }
   };
 
+
+
+  const loadCertificates = () => {
+  const allCertificates = [];
+  const currentUserEmail = user?.email;
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    
+    if (key && key.startsWith('certificate_issued_') && key.includes(currentUserEmail)) {
+      const courseId = key.replace('certificate_issued_', '').replace(`_${currentUserEmail}`, '');
+      const courseName = localStorage.getItem(`certificate_course_name_${courseId}_${currentUserEmail}`);
+      const completionDate = localStorage.getItem(`certificate_date_${courseId}_${currentUserEmail}`);
+      
+      if (courseName) {
+        allCertificates.push({
+          courseId,
+          courseName,
+          completionDate: completionDate || 'Unknown date',
+          issued: true
+        });
+      }
+    }
+    
+    if (key && key === `certificate_issued_${key.match(/certificate_issued_(\\d+)/)?.[1]}` && !key.includes('@')) {
+      const courseId = key.replace('certificate_issued_', '');
+      const courseName = localStorage.getItem(`certificate_course_name_${courseId}`);
+      const completionDate = localStorage.getItem(`certificate_date_${courseId}`);
+      
+      if (courseName && !allCertificates.some(c => c.courseId === courseId)) {
+        allCertificates.push({
+          courseId,
+          courseName,
+          completionDate: completionDate || 'Unknown date',
+          issued: true
+        });
+      }
+    }
+  }
+  
+  setCertificates(allCertificates);
+};
+
   const displayedEnrolled = enrolledCourses.slice(0, 4);
   const displayedAvailable = availableCourses.slice(0, 4);
   const hasMoreEnrolled = enrolledCourses.length > 4;
@@ -149,32 +196,34 @@ export default function StudentDashboard() {
     <div className="student-dashboard">
       <div className="dashboard-container">
         <div className="dashboard-top-bar">
-          <div className="profile-summary">
-            <div className="profile-avatar">
-              <span className="avatar-initials">
-                {user.firstName?.[0] || user.email?.[0] || 'S'}
-              </span>
-            </div>
-            <div className="profile-info desktop-only">
-              <div className="profile-name">
-                {user.firstName} {user.lastName}
-              </div>
-              <div className="profile-email">{user.email}</div>
-            </div>
-            <button
-              onClick={() => setEditingProfile(true)}
-              className="edit-profile-btn desktop-only"
-            >
-              Edit Profile
-            </button>
-          </div>
-          <button
-            className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Menu"
-          >
-            <span></span><span></span><span></span>
-          </button>
+         <div className="profile-summary">
+  <div className="profile-avatar">
+    <span className="avatar-initials">
+      {user.firstName?.[0] || user.email?.[0] || 'S'}
+    </span>
+  </div>
+  <div className="profile-info desktop-only">
+    <div className="profile-name">
+      {user.firstName} {user.lastName}
+    </div>
+    <div className="profile-email">{user.email}</div>
+  </div>
+  <div className="profile-actions">
+    <button onClick={() => setEditingProfile(true)} className="edit-profile-btn desktop-only">
+      Edit Profile
+    </button>
+    <button onClick={() => setShowAchievements(true)} className="achievements-btn">
+      🏆 My Achievements
+    </button>
+  </div>
+</div>
+         <button
+  className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
+  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+  aria-label="Menu"
+>
+  <span></span><span></span><span></span>
+</button>
           <button onClick={logout} className="logout-btn desktop-only">Logout</button>
 
           <div className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
@@ -193,6 +242,15 @@ export default function StudentDashboard() {
             >
               Edit Profile
             </button>
+            <button
+  onClick={() => {
+    setShowAchievements(true);
+    setIsMobileMenuOpen(false);
+  }}
+  className="mobile-achievements-btn"
+>
+  🏆 My Achievements
+</button>
             <button
               onClick={() => {
                 logout();
@@ -359,6 +417,37 @@ export default function StudentDashboard() {
           </div>
         </div>
       )}
+
+      {showAchievements && (
+  <div className="modal-overlay" onClick={() => setShowAchievements(false)}>
+    <div className="modal-content achievements-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-header">
+        <h2 className="modal-title"> My Achievements</h2>
+        <button className="modal-close" onClick={() => setShowAchievements(false)}>×</button>
+      </div>
+      <div className="achievements-list">
+        {certificates.length === 0 ? (
+          <div className="empty-achievements">
+            <div className="empty-icon">🎓</div>
+            <h3>No certificates yet</h3>
+            <p>Complete a course to earn your first certificate!</p>
+          </div>
+        ) : (
+          certificates.map((cert, index) => (
+            <div key={index} className="achievement-card">
+              <div className="achievement-icon"></div>
+              <div className="achievement-info">
+                <h3>{cert.courseName}</h3>
+                <p>Completed on: {cert.completionDate}</p>
+                <span className="achievement-badge">Certificate of Completion</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

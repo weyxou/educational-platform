@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
+import { generateCertificate, markCertificateIssued, hasCertificateBeenIssued } from '../components/Certificate';
 import './CourseLessonsView.css';
 
 export default function CourseLessonsView() {
@@ -14,6 +15,8 @@ export default function CourseLessonsView() {
   const [loading, setLoading] = useState(true);
   const [completedLessons, setCompletedLessons] = useState({});
   const [lastOpenedLessonId, setLastOpenedLessonId] = useState(null);
+  const [showCertificateBtn, setShowCertificateBtn] = useState(false);
+  const [certificateAlreadyIssued, setCertificateAlreadyIssued] = useState(false);
 
   const extractData = (response) => {
     const data = response.data;
@@ -33,6 +36,8 @@ export default function CourseLessonsView() {
 
   const userId = user?.userId || user?.id || getUserIdFromToken();
   const isInstructor = user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
+
+  const sortedLessons = [...lessons].sort((a, b) => a.lessonOrder - b.lessonOrder);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,7 +67,24 @@ export default function CourseLessonsView() {
     if (lastLesson) {
       setLastOpenedLessonId(lastLesson);
     }
-  }, [courseId, userId]);
+    
+    const currentTotalLessons = sortedLessons.length;
+    const issued = hasCertificateBeenIssued(courseId, userId, currentTotalLessons);
+    setCertificateAlreadyIssued(issued);
+  }, [courseId, userId, sortedLessons.length]);
+
+  useEffect(() => {
+    if (sortedLessons.length === 0) return;
+    
+    const completedCount = sortedLessons.filter(lesson => completedLessons[lesson.lessonId]).length;
+    const allCompleted = sortedLessons.length > 0 && completedCount === sortedLessons.length;
+    
+    if (allCompleted && !certificateAlreadyIssued && !isInstructor) {
+      setShowCertificateBtn(true);
+    } else {
+      setShowCertificateBtn(false);
+    }
+  }, [completedLessons, sortedLessons, certificateAlreadyIssued, isInstructor]);
 
   useEffect(() => {
     const handleFocus = () => {
@@ -75,8 +97,6 @@ export default function CourseLessonsView() {
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, [courseId, userId]);
-
-  const sortedLessons = [...lessons].sort((a, b) => a.lessonOrder - b.lessonOrder);
 
   const handleLessonComplete = (lessonId, isComplete) => {
     const newCompleted = { ...completedLessons, [lessonId]: isComplete };
@@ -95,6 +115,26 @@ export default function CourseLessonsView() {
     }
   };
 
+  const handleGetCertificate = () => {
+    if (!user) return;
+    const userIdNum = userId;
+    const totalLessonsCount = sortedLessons.length;
+    
+    generateCertificate(
+      `${user.firstName || 'Student'} ${user.lastName || ''}`.trim(),
+      user.email || 'student@example.com',
+      course?.courseName || 'Course',
+      new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      courseId,
+      userIdNum,
+      totalLessonsCount
+    );
+    
+    markCertificateIssued(courseId, userIdNum, totalLessonsCount);
+    setShowCertificateBtn(false);
+    setCertificateAlreadyIssued(true);
+  };
+
   const getContinueLessonId = () => {
     if (sortedLessons.length === 0) return null;
     const firstIncomplete = sortedLessons.find(lesson => !completedLessons[lesson.lessonId]);
@@ -104,6 +144,7 @@ export default function CourseLessonsView() {
   const continueLessonId = getContinueLessonId();
   const completedCount = sortedLessons.filter(lesson => completedLessons[lesson.lessonId]).length;
   const progressPercentage = sortedLessons.length > 0 ? (completedCount / sortedLessons.length) * 100 : 0;
+  const allLessonsCompleted = sortedLessons.length > 0 && completedCount === sortedLessons.length;
 
   if (authLoading || loading) return <div className="loading-state">Loading course...</div>;
   if (!course) return <div className="empty-state">Course not found</div>;
@@ -129,13 +170,27 @@ export default function CourseLessonsView() {
             <div className="progress-bar">
               <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
             </div>
+            {allLessonsCompleted && (
+              <div className="certificate-section">
+                {showCertificateBtn && (
+                  <button onClick={handleGetCertificate} className="certificate-btn">
+                    🎓 Get Certificate
+                  </button>
+                )}
+                {certificateAlreadyIssued && (
+                  <div className="certificate-issued-badge">
+                    ✅ Certificate already issued
+                  </div>
+                )}
+              </div>
+            )}
             {continueLessonId ? (
               <Link
                 to={`/courses/${courseId}/lesson/${continueLessonId}`}
                 className="continue-btn"
                 onClick={() => handleLastLesson(continueLessonId)}
               >
-                 Continue Learning
+                ▶ Continue Learning
               </Link>
             ) : (
               <button className="continue-btn disabled" disabled>No lessons available</button>
@@ -182,8 +237,8 @@ export default function CourseLessonsView() {
                       <h3>{lesson.lessonName}</h3>
                       {lesson.lessonDescription && <p className="lesson-description">{lesson.lessonDescription}</p>}
                       <div className="lesson-meta">
-                        <span> {new Date(lesson.createdAt).toLocaleDateString()}</span>
-                        {completedLessons[lesson.lessonId] && <span className="completed-badge">Completed</span>}
+                        <span>📅 {new Date(lesson.createdAt).toLocaleDateString()}</span>
+                        {completedLessons[lesson.lessonId] && <span className="completed-badge">✓ Completed</span>}
                       </div>
                       <div className="lesson-actions">
                         <Link

@@ -763,3 +763,180 @@ background: url('/images/ourmission.jpg') center/cover no-repeat;}
     padding: 16px;
   }
 }
+
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.achievements-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.achievements-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.mobile-achievements-btn {
+  display: none;
+}
+
+.achievements-modal {
+  max-width: 550px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease;
+}
+
+.achievements-list {
+  padding: 8px 0;
+}
+
+.empty-achievements {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-achievements .empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.empty-achievements h3 {
+  font-size: 20px;
+  color: #1e293b;
+  margin-bottom: 8px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.empty-achievements p {
+  color: #64748b;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.achievement-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.achievement-card:hover {
+  transform: translateX(4px);
+  background: #f1f5f9;
+}
+
+.achievement-icon {
+  font-size: 40px;
+}
+
+.achievement-info {
+  flex: 1;
+}
+
+.achievement-info h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.achievement-info p {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 6px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.achievement-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #b45309;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .achievements-btn {
+    display: none;
+  }
+  
+  .mobile-achievements-btn {
+    display: flex;
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 8px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .mobile-achievements-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+  }
+  
+  .profile-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .achievements-modal {
+    width: 95%;
+  }
+  
+  .achievement-card {
+    padding: 12px;
+  }
+  
+  .achievement-icon {
+    font-size: 32px;
+  }
+}
