@@ -23,6 +23,11 @@ export default function ManageLessons() {
   const [editingAssignment, setEditingAssignment] = useState(null);
   const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] = useState(false);
 
+  // Состояния для кастомного модального окна (вместо prompt)
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [mediaUrl, setMediaUrl] = useState('');
+  const [pendingMediaCallback, setPendingMediaCallback] = useState(null);
+
   const extractData = (response) => {
     const data = response.data;
     return Array.isArray(data) ? data : (data?.content || []);
@@ -179,6 +184,41 @@ export default function ManageLessons() {
     return match ? match[1] : url;
   }
 
+  // Функция для получения embed тега (без prompt)
+  const getEmbedTagFromUrl = (url) => {
+    if (!url) return '';
+    if (url.endsWith('.mp4')) return `<video controls style="width:100%" src="${url}"></video>`;
+    if (url.includes('youtube')) {
+      const youtubeId = extractYouTubeId(url);
+      return `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${youtubeId}" frameborder="0" allowfullscreen></iframe>`;
+    }
+    if (url.match(/\.(jpg|jpeg|png|gif)$/)) return `<img src="${url}" alt="media" style="max-width:100%; border-radius:8px"/>`;
+    if (url.endsWith('.pdf')) return `<iframe src="${url}" width="100%" height="500px"></iframe>`;
+    return `<a href="${url}" target="_blank">${url}</a>`;
+  };
+
+  // Открыть кастомное модальное окно для ввода ссылки
+  const openLinkModal = () => {
+    setMediaUrl('');
+    setIsLinkModalOpen(true);
+  };
+
+  // Добавить медиа по ссылке после ввода
+  const handleAddMediaLink = () => {
+    if (!mediaUrl.trim()) {
+      showToast('Please enter a valid URL', 'error');
+      return;
+    }
+    const tag = getEmbedTagFromUrl(mediaUrl.trim());
+    setNewLesson({
+      ...newLesson,
+      content: (newLesson.content || '') + '\n' + tag,
+    });
+    showToast('Media added successfully!', 'success');
+    setIsLinkModalOpen(false);
+    setMediaUrl('');
+  };
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -201,7 +241,7 @@ export default function ManageLessons() {
         timeout: 30000
       });
       const fileUrl = res.data;
-      const tag = getEmbedTag(fileUrl, file.name);
+      const tag = getEmbedTagFromUrl(fileUrl);
       setNewLesson({
         ...newLesson,
         content: (newLesson.content || '') + '\n' + tag,
@@ -214,13 +254,6 @@ export default function ManageLessons() {
       setUploading(false);
       event.target.value = '';
     }
-  };
-
-  const getEmbedTag = (url, name) => {
-    if (url.endsWith('.mp4')) return `<video controls style="width:100%" src="${url}"></video>`;
-    if (url.endsWith('.pdf')) return `<iframe src="${url}" width="100%" height="500px"></iframe>`;
-    if (url.match(/\.(jpg|jpeg|png|gif)$/)) return `<img src="${url}" alt="${name}" style="max-width:100%; border-radius:8px"/>`;
-    return `<a href="${url}" target="_blank">${name}</a>`;
   };
 
   const sortedLessons = [...lessons].sort((a, b) => (a.lessonOrder || 0) - (b.lessonOrder || 0));
@@ -264,19 +297,9 @@ export default function ManageLessons() {
                   <div className="form-group">
                     <label>Add Media</label>
                     <div className="media-buttons-group">
-                      <button type="button" className="media-btn" onClick={() => {
-                        const url = prompt('Enter media URL (YouTube, MP4, image, PDF, etc.):');
-                        if (!url) return;
-                        let tag;
-                        if (url.endsWith('.mp4')) tag = `<video controls style="width:100%" src="${url}"></video>`;
-                        else if (url.includes('youtube')) {
-                          const youtubeId = extractYouTubeId(url);
-                          tag = `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${youtubeId}" frameborder="0" allowfullscreen></iframe>`;
-                        } else if (url.match(/\.(jpg|jpeg|png|gif)$/)) tag = `<img src="${url}" alt="media" style="max-width:100%; border-radius:8px"/>`;
-                        else if (url.endsWith('.pdf')) tag = `<iframe src="${url}" width="100%" height="500px"></iframe>`;
-                        else tag = `<a href="${url}" target="_blank">${url}</a>`;
-                        setNewLesson({ ...newLesson, content: (newLesson.content || '') + '\n' + tag });
-                      }}>Add Link / Embed</button>
+                      <button type="button" className="media-btn" onClick={openLinkModal}>
+                        Add Link / Embed
+                      </button>
                       <label htmlFor="fileUpload" className={`media-btn ${uploading ? 'disabled' : ''}`} 
                       style={{ cursor: uploading ? 'not-allowed' : 'pointer' }}>
                         {uploading ? 'Uploading...' : 'Upload File'}
@@ -397,6 +420,33 @@ export default function ManageLessons() {
           </div>
         </div>
       </div>
+
+      {/* Модальное окно для ввода ссылки (вместо prompt) */}
+      {isLinkModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsLinkModalOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">Enter Media URL</h2>
+              <button className="modal-close" onClick={() => setIsLinkModalOpen(false)}>×</button>
+            </div>
+            <div className="form-group">
+              <label>Link (YouTube, MP4, Image, PDF)</label>
+              <input 
+                type="text"
+                className="form-input"
+                placeholder="https://www.youtube.com/watch?v=... or https://example.com/video.mp4"
+                value={mediaUrl}
+                onChange={(e) => setMediaUrl(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="form-actions">
+              <button className="btn btn-primary" onClick={handleAddMediaLink}>Add Media</button>
+              <button className="btn btn-secondary" onClick={() => setIsLinkModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isEditLessonModalOpen && editingLesson && (
         <div className="modal-overlay" onClick={() => setIsEditLessonModalOpen(false)}>

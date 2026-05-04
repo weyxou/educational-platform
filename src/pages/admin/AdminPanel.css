@@ -524,6 +524,7 @@
   
   .admin-header-right {
     justify-content: center;
+    flex-wrap: wrap;
   }
   
   .admin-user-info {
@@ -578,29 +579,34 @@
   .stat-card-value {
     font-size: 24px;
   }
-}
-
-@media (max-width: 480px) {
+  
   .admin-tabs {
     justify-content: center;
   }
-
+  
   .admin-tab {
-    padding: 6px 16px;
-    font-size: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
   }
+}
 
-  .tab-name {
-    display: none;
+@media (max-width: 480px) {
+  .admin-container {
+    padding: 16px 12px;
   }
   
   .admin-title {
     font-size: 20px;
   }
   
+  .admin-subtitle {
+    font-size: 11px;
+  }
+  
   .admin-header-right {
     flex-direction: column;
     gap: 12px;
+    width: 100%;
   }
   
   .admin-logout-btn {
@@ -608,22 +614,259 @@
     text-align: center;
   }
   
+  .admin-user-info {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .admin-tabs {
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .admin-tab {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .tab-name {
+    display: none;
+  }
+  
+  .tab-icon {
+    font-size: 16px;
+    margin: 0;
+  }
+  
   .stats-header h2, .users-header h2, .courses-header h2 {
-    font-size: 18px;
+    font-size: 16px;
   }
   
   .refresh-btn {
-    padding: 6px 14px;
-    font-size: 11px;
+    padding: 5px 12px;
+    font-size: 10px;
   }
   
   .filter-btn {
-    padding: 4px 12px;
-    font-size: 11px;
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+  
+  .search-input {
+    padding: 8px 12px;
+    font-size: 12px;
   }
   
   .delete-user-btn, .delete-course-btn {
-    padding: 4px 10px;
+    padding: 4px 8px;
+    font-size: 9px;
+  }
+  
+  .stat-card {
+    padding: 12px;
+  }
+  
+  .stat-card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .stat-card-value {
+    font-size: 20px;
+  }
+  
+  .stat-card-label {
+    font-size: 11px;
+  }
+  
+  .admin-table th, 
+  .admin-table td {
+    padding: 8px 10px;
     font-size: 10px;
+  }
+  
+  .role-badge {
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+  
+  .course-title {
+    font-size: 15px;
+  }
+  
+  .course-description {
+    font-size: 11px;
+  }
+  
+  .course-meta {
+    font-size: 10px;
+  }
+  
+  .course-id {
+    font-size: 9px;
+  }
+  
+  .admin-course-card {
+    padding: 12px;
+  }
+  
+  .empty-icon {
+    font-size: 32px;
+  }
+  
+  .empty-state h4 {
+    font-size: 16px;
+  }
+  
+  .empty-state p {
+    font-size: 12px;
+  }
+  
+  .empty-state {
+    padding: 30px 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  .admin-container {
+    padding: 12px 10px;
+  }
+  
+  .admin-title {
+    font-size: 18px;
+  }
+  
+  .admin-subtitle {
+    font-size: 10px;
+  }
+  
+  .admin-user-name {
+    font-size: 12px;
+  }
+  
+  .admin-user-role {
+    font-size: 10px;
+  }
+  
+  .admin-logout-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .admin-tab {
+    padding: 5px 10px;
+    gap: 4px;
+  }
+  
+  .tab-icon {
+    font-size: 14px;
+  }
+  
+  .stats-header, .users-header, .courses-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .stats-header h2, .users-header h2, .courses-header h2 {
+    font-size: 15px;
+    text-align: center;
+  }
+  
+  .refresh-btn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .filter-buttons {
+    gap: 6px;
+  }
+  
+  .filter-btn {
+    padding: 3px 8px;
+    font-size: 9px;
+  }
+  
+  .search-input {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  
+  .stat-card {
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .stat-card-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  .stat-card-value {
+    font-size: 18px;
+  }
+  
+  .stat-card-label {
+    font-size: 10px;
+  }
+  
+  .admin-table th, 
+  .admin-table td {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+  
+  .delete-user-btn, .delete-course-btn {
+    padding: 3px 6px;
+    font-size: 8px;
+  }
+  
+  .role-badge {
+    font-size: 8px;
+    padding: 2px 6px;
+  }
+  
+  .course-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .course-id {
+    font-size: 8px;
+  }
+  
+  .course-title {
+    font-size: 14px;
+  }
+  
+  .course-description {
+    font-size: 10px;
+  }
+  
+  .course-meta {
+    font-size: 9px;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .admin-course-card {
+    padding: 10px;
+  }
+  
+  .delete-course-btn {
+    padding: 6px;
+    font-size: 11px;
+  }
+  
+  .admin-loading {
+    padding: 30px;
+  }
+  
+  .spinner {
+    width: 30px;
+    height: 30px;
   }
 }
