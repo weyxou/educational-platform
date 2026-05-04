@@ -120,18 +120,19 @@ export default function ManageLessons() {
     }
   };
 
-  const deleteLesson = (lessonId) => {
-    confirm('Delete this lesson?', async () => {
-      try {
-        await api.delete(`/lesson/delete/lesson_id/${lessonId}/course_id/${Number(courseId)}`);
-        setLessons(lessons.filter((l) => l.lessonId !== lessonId));
-        showToast('Lesson deleted successfully!', 'success');
-      } catch (err) {
-        console.error(err);
-        showToast('Failed to delete lesson', 'error');
-      }
-    }, 'Delete Lesson');
-  };
+ const deleteLesson = (lessonId) => {
+  confirm('Delete this lesson?', async () => {
+    try {
+    
+await api.delete(`/lesson/delete/lesson_id/${lessonId}`);      
+      setLessons(lessons.filter((l) => l.lessonId !== lessonId));
+      showToast('Lesson deleted successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to delete lesson', 'error');
+    }
+  }, 'Delete Lesson');
+};
 
   const createAssignment = async () => {
     if (!newAssignment.title.trim()) {

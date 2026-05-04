@@ -74,7 +74,7 @@ export default function InstructorDashboard() {
 
       for (const course of courses) {
         try {
-          const res = await api.get(`/enrollment/view_enrolled_students/${course.courseId}`);
+const res = await api.get(`/enrollment/course/${course.courseId}`);
           const enrollments = extractData(res);
           enrollments.forEach(enrollment => {
             if (!studentMap.has(enrollment.studentId)) {
